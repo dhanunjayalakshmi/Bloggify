@@ -1,5 +1,6 @@
 const express = require("express");
-const supabaseClient = require("../config/supabaseClient");
+const supabase = require("../config/supabaseClient");
+const { validateBlog } = require("../utils/validators");
 
 const router = express.Router();
 
@@ -11,6 +12,11 @@ router.post("/", async (req, res) => {
 
     const auth_id = user?.id;
     const { title, content, tags, cover_image, is_published } = req?.body;
+
+    const { error } = validateBlog(title, content);
+    if (error) {
+      return res.status(400).json({ error });
+    }
 
     const { data, dbError } = await supabase
       .from("blogs")
