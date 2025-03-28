@@ -60,6 +60,36 @@ router.get("/", async (req, res) => {
   }
 });
 
+//Get a single blog
+router.get("/:blogId", verifyToken, async (req, res) => {
+  try {
+    const userId = req?.user?.id;
+    const blogId = req?.params?.blogId;
+
+    const { data: blog, error } = await supabase
+      .from("blogs")
+      .select("*")
+      .eq("id", blogId)
+      .single();
+
+    if (error || !blog) {
+      return res.status(404).json({ error: "Blog not found" });
+    }
+
+    if (!blog.is_published && (!userId || blog.user_id !== userId)) {
+      return res.status(404).json({ error: "Access denied" });
+    }
+
+    if (blog.is_published && !blog.is_public && !userId) {
+      return res.status(403).json({ error: "Authentication required" });
+    }
+
+    res.status(200).json(blog);
+  } catch (error) {
+    res.status(500).json({ error: error?.message });
+  }
+});
+
 // Create new blog
 router.post("/", verifyToken, upload.single("image"), async (req, res) => {
   try {
@@ -99,6 +129,88 @@ router.post("/", verifyToken, upload.single("image"), async (req, res) => {
 
     if (dbError) throw dbError;
     res.status(201).json({ message: "Blog created Successfully", blog: data });
+  } catch (error) {
+    res.status(500).json({ error: error?.message });
+  }
+});
+
+//Update the blog
+router.put("/:blogId", verifyToken, async (req, res) => {
+  try {
+    const { blogId } = req?.params;
+    const { title, content, tags, is_published, is_public, read_time } =
+      req?.body;
+
+    const userId = req?.user?.id;
+
+    const { data: blog, error: fetchError } = await supabase
+      .from("blogs")
+      .select("user_id")
+      .eq("id", blogId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    if (!blog || blog?.user_id !== userId) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    const { data, error } = await supabase
+      .from("blogs")
+      .update({
+        title,
+        content,
+        tags,
+        is_published,
+        is_public,
+        read_time,
+      })
+      .eq("id", blogId)
+      .select();
+
+    if (error) throw error;
+
+    res.status(200).json({ message: "Blog updated successfully", blog: data });
+  } catch (error) {
+    res.status(500).json({ error: error?.message });
+  }
+});
+
+//Delete the blog
+router.delete("/:blogId", verifyToken, async (req, res) => {
+  try {
+    const userId = req?.user?.id;
+    const { blogId } = req?.params;
+
+    const { data: blog, error: fetchError } = await supabase
+      .from("blogs")
+      .select("user_id, cover_image")
+      .eq("id", blogId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    if (!blog || blog.user_id !== userId) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    if (blog.cover_image) {
+      const imagePath = blog.cover_image.split("/").pop();
+      const { error: storageError } = await supabase.storage
+        .from("blog-images")
+        .remove([imagePath]);
+
+      if (storageError) throw storageError;
+    }
+
+    const { error: deleteError } = await supabase
+      .from("blogs")
+      .delete()
+      .eq("id", blogId);
+
+    if (deleteError) throw deleteError;
+
+    res.status(200).json({ message: "Blog deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error?.message });
   }
