@@ -7,6 +7,7 @@ const blogsRoutes = require("./routes/blogs");
 const commentsRoutes = require("./routes/comments");
 const votesRoutes = require("./routes/votes");
 const bookmarksRoutes = require("./routes/bookmarks");
+const followsRoutes = require("./routes/follows");
 
 const app = express();
 app.use(cors());
@@ -18,6 +19,7 @@ app.use("/blogs", blogsRoutes);
 app.use("/comments", commentsRoutes);
 app.use("/votes", votesRoutes);
 app.use("/bookmarks", bookmarksRoutes);
+app.use("/follows", followsRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
