@@ -20,7 +20,6 @@ router.post("/", verifyToken, async (req, res) => {
       .eq("reporter_id", user_id)
       .eq("content_id", content_id)
       .eq("content_type", content_type)
-      .eq("status", status)
       .single();
 
     if (fetchError && fetchError.code !== "PGRST116") throw fetchError;
@@ -63,31 +62,35 @@ router.get("/my-reports", verifyToken, async (req, res) => {
   }
 });
 
-// Get All Reports (For Moderators)
-router.get("/all", verifyToken, async (req, res) => {
+// Get All Reports (For admins)
+router.get("/all", async (req, res) => {
   try {
-    const user_id = req?.user?.id;
-
-    // Ensure only moderators can access
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user_id)
-      .single();
-
-    if (userError) throw userError;
-    if (userData?.role !== "moderator") {
-      return res.status(403).json({ error: "Access denied" });
-    }
-
-    // Fetch all reports
     const { data, error } = await supabase.from("reports").select("*");
 
     if (error) throw error;
 
     res.status(200).json({ reports: data });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error?.message });
+  }
+});
+
+// Delete a Report
+router.delete("/:id", verifyToken, async (req, res) => {
+  try {
+    const { id } = req?.params;
+    const user_id = req?.user?.id;
+
+    const { error } = await supabase
+      .from("reports")
+      .delete()
+      .eq("id", id)
+      .eq("reporter_id", user_id);
+
+    if (error) throw error;
+    res.status(200).json({ message: "Report deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error?.message });
   }
 });
 

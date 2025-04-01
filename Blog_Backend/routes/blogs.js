@@ -11,16 +11,28 @@ const upload = multer();
 // Get all blogs
 router.get("/", async (req, res) => {
   try {
-    let { page, limit, search, sort, tags } = req?.query;
+    let { page, limit, search, sort, tags, authorId } = req?.query;
 
     page = page ? parseInt(page) : 1;
     limit = limit ? parseInt(limit) : 10;
     const offset = (page - 1) * limit;
 
+    const { data: reportedBlogs, error: reportError } = await supabase
+      .from("reports")
+      .select("content_id");
+
+    if (reportError) throw reportError;
+
+    const reportedBlogIds = reportedBlogs.map((report) => report.content_id);
+
     let query = supabase
       .from("blogs")
       .select("*", { count: "exact" })
       .eq("is_published", true);
+
+    if (authorId) {
+      query = query.eq("user_id", authorId);
+    }
 
     if (search) {
       query = query.or(
@@ -44,16 +56,20 @@ router.get("/", async (req, res) => {
 
     query = query.range(offset, offset + limit - 1);
 
-    const { data, error, count } = await query;
+    const { data, error } = await query;
 
     if (error) throw error;
 
+    const filteredBlogs = data.filter(
+      (blog) => !reportedBlogIds.includes(blog.id)
+    );
+
     res.status(200).json({
-      blogs: data,
-      total: count,
+      blogs: filteredBlogs,
+      total: filteredBlogs?.length,
       page,
       limit,
-      totalPages: Math.ceil(count / limit),
+      totalPages: Math.ceil(filteredBlogs?.length / limit),
     });
   } catch (error) {
     res.status(500).json({ error: error?.message });
@@ -124,8 +140,6 @@ router.post("/", verifyToken, upload.single("image"), async (req, res) => {
         is_public,
       })
       .select();
-
-    console.log("DB error:  ", dbError);
 
     if (dbError) throw dbError;
     res.status(201).json({ message: "Blog created Successfully", blog: data });
