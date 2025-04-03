@@ -3,8 +3,35 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const signupSchema = z
+  .object({
+    fullName: z
+      .string({ message: "Name should not be empty" })
+      .min(5, { message: "Must be atleast 5 characters long" }),
+    email: z.string().email("Invalid email"),
+    password: z.string().min(8, "Password must be atleast 8 characters"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 const Signup = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ resolver: zodResolver(signupSchema) });
+
+  const onSubmit = (data) => {
+    console.log(data);
+  };
+
   return (
     <div className="flex justify-center items-center h-screen bg-gray-200 dark:bg-gray-900 p-4">
       <ThemeToggle />
@@ -16,39 +43,83 @@ const Signup = () => {
           Create a new account
         </p>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
-              Full Name
-            </label>
-            <Input
-              type="text"
-              placeholder="Enter your name"
-              className="dark:bg-gray-700 dark:text-gray-100"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
-              Email Address
-            </label>
-            <Input
-              type="email"
-              placeholder="Enter your email"
-              className="dark:bg-gray-700 dark:text-gray-100"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
-              Password
-            </label>
-            <Input
-              type="password"
-              placeholder="Create a password"
-              className="dark:bg-gray-700 dark:text-gray-100"
-            />
-          </div>
-          <Button className="w-full bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700">
-            Sign Up
-          </Button>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-4"
+            autoComplete="new-password"
+          >
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                Full Name
+              </label>
+              <Input
+                {...register("fullName")}
+                type="text"
+                placeholder="Enter your name"
+                autoComplete="new-password"
+                className="dark:bg-gray-700 dark:text-gray-100"
+              />
+              {errors?.fullName && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors?.fullName?.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                Email Address
+              </label>
+              <Input
+                {...register("email")}
+                type="email"
+                placeholder="Enter your email"
+                autoComplete="new-password"
+                className="dark:bg-gray-700 dark:text-gray-100"
+              />
+              {errors?.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors?.email?.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                Password
+              </label>
+              <Input
+                {...register("password")}
+                type="password"
+                placeholder="Create a password"
+                autoComplete="new-password"
+                className="dark:bg-gray-700 dark:text-gray-100"
+              />
+              {errors?.password && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors?.password?.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                Confirm Password
+              </label>
+              <Input
+                {...register("confirmPassword")}
+                type="password"
+                placeholder="Confirm Password"
+                autoComplete="new-password"
+                className="dark:bg-gray-700 dark:text-gray-100"
+              />
+              {errors?.confirmPassword && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors?.confirmPassword?.message}
+                </p>
+              )}
+            </div>
+            <Button className="w-full bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700">
+              Sign Up
+            </Button>
+          </form>
           <p className="text-center text-sm mt-4 text-gray-900 dark:text-gray-100">
             Already have an account?{" "}
             <Link to="/login" className="text-blue-500 dark:text-blue-400">

@@ -3,8 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Invalid email"),
+});
 
 const Forgotpassword = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ resolver: zodResolver(forgotPasswordSchema) });
+
+  const onSubmit = (data) => {
+    console.log(data);
+  };
   return (
     <div className="flex justify-center items-center h-screen bg-gray-200 dark:bg-gray-900 p-4">
       <ThemeToggle />
@@ -16,19 +32,32 @@ const Forgotpassword = () => {
           Enter your email to recieve a reset link
         </p>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
-              Email Address
-            </label>
-            <Input
-              type="email"
-              placeholder="Enter your email"
-              className="dark:bg-gray-700 dark:text-gray-100"
-            />
-          </div>
-          <Button className="w-full bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700">
-            Send Reset Link
-          </Button>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            auto-complete="new-password"
+            className="space-y-4"
+          >
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                Email Address
+              </label>
+              <Input
+                {...register("email")}
+                type="email"
+                placeholder="Enter your email"
+                auto-complete="new-password"
+                className="dark:bg-gray-700 dark:text-gray-100"
+              />
+              {errors?.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors?.email?.message}
+                </p>
+              )}
+            </div>
+            <Button className="w-full bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700">
+              Send Reset Link
+            </Button>
+          </form>
           <p className="text-center text-sm mt-4 text-gray-900 dark:text-gray-100">
             <Link to="/login" className="text-blue-500 dark:text-blue-400">
               Back to Login
