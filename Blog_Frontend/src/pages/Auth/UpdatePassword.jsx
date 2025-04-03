@@ -8,9 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/lib/supabaseClient";
 
-const signupSchema = z
+const updatePasswordSchema = z
   .object({
-    email: z.string().email("Invalid email"),
     password: z.string().min(8, "Password must be atleast 8 characters"),
     confirmPassword: z.string(),
   })
@@ -19,22 +18,18 @@ const signupSchema = z
     path: ["confirmPassword"],
   });
 
-const Signup = () => {
+const UpdatePassword = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(signupSchema) });
+  } = useForm({ resolver: zodResolver(updatePasswordSchema) });
   const navigate = useNavigate();
 
   const onSubmit = async (formData) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: formData?.email,
+      const { data, error } = await supabase.auth.updateUser({
         password: formData?.password,
-        options: {
-          emailRedirectTo: "http://localhost:5173/login",
-        },
       });
 
       if (error) throw error;
@@ -50,34 +45,14 @@ const Signup = () => {
       <ThemeToggle />
       <Card className="w-full max-w-md p-6 shadow-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700">
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
-          Sign Up
+          Update Password
         </h2>
-        <p className="text-gray-500 dark:text-gray-400 text-center mb-4">
-          Create a new account
-        </p>
         <CardContent className="space-y-4">
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-4"
             autoComplete="new-password"
           >
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
-                Email Address
-              </label>
-              <Input
-                {...register("email")}
-                type="email"
-                placeholder="Enter your email"
-                autoComplete="new-password"
-                className="dark:bg-gray-700 dark:text-gray-100"
-              />
-              {errors?.email && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors?.email?.message}
-                </p>
-              )}
-            </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
                 Password
@@ -117,7 +92,7 @@ const Signup = () => {
             </Button>
           </form>
           <p className="text-center text-sm mt-4 text-gray-900 dark:text-gray-100">
-            Already have an account?{" "}
+            Or{" "}
             <Link to="/login" className="text-blue-500 dark:text-blue-400">
               Login
             </Link>
@@ -128,4 +103,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default UpdatePassword;

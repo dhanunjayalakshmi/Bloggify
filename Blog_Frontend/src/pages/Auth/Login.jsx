@@ -4,9 +4,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Lock, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { supabase } from "@/lib/supabaseClient";
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
@@ -19,9 +20,20 @@ const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: zodResolver(schema) });
+  const navigate = useNavigate();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (formData) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData?.email,
+        password: formData?.password,
+      });
+      if (error) throw error;
+      console.log(data);
+      navigate("/");
+    } catch (error) {
+      console.log(error?.message);
+    }
   };
 
   return (

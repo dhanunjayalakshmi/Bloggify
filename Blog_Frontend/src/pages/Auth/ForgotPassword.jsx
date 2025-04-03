@@ -6,20 +6,32 @@ import { Link } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { supabase } from "@/lib/supabaseClient";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email"),
 });
 
-const Forgotpassword = () => {
+const ForgotPassword = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: zodResolver(forgotPasswordSchema) });
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (formData) => {
+    try {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(
+        formData?.email,
+        {
+          redirectTo: "http://localhost:5173/update-password",
+        }
+      );
+      if (error) throw error;
+      console.log(data);
+    } catch (error) {
+      console.log(error?.message);
+    }
   };
   return (
     <div className="flex justify-center items-center h-screen bg-gray-200 dark:bg-gray-900 p-4">
@@ -69,4 +81,4 @@ const Forgotpassword = () => {
   );
 };
 
-export default Forgotpassword;
+export default ForgotPassword;
