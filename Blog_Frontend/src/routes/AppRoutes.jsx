@@ -1,3 +1,4 @@
+import Forgotpassword from "@/pages/Auth/Forgotpassword";
 import Login from "@/pages/Auth/Login";
 import Signup from "@/pages/Auth/Signup";
 import Home from "@/pages/Home/Home";
@@ -9,6 +10,7 @@ const AppRoutes = () => {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/forgot-password" element={<Forgotpassword />} />
     </Routes>
   );
 };
