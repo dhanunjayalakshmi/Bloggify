@@ -8,6 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/lib/supabaseClient";
 import { useEffect } from "react";
+import { useAuthStore } from "@/stores/authStore";
+import { toast } from "sonner";
 
 const signupSchema = z
   .object({
@@ -22,10 +24,14 @@ const signupSchema = z
 
 const Signup = () => {
   const navigate = useNavigate();
+  const setUser = useAuthStore((state) => state.setUser);
 
   useEffect(() => {
-    const user = supabase.auth.getUser();
-    if (user) navigate("/");
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data.user) navigate("/");
+    };
+    checkUser();
   }, [navigate]);
 
   const {
@@ -37,17 +43,20 @@ const Signup = () => {
 
   const onSubmit = async (formData) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { data: res, error } = await supabase.auth.signUp({
         email: formData?.email,
         password: formData?.password,
-        options: {
-          emailRedirectTo: "http://localhost:5173/login",
-        },
       });
 
       if (error) throw error;
-      console.log(data);
-      navigate("/login");
+      const { user, session } = res;
+      if (session) {
+        setUser(user, session.access_token);
+        navigate("/");
+      } else {
+        toast("Please check your email to confirm your account");
+        navigate("/login");
+      }
     } catch (error) {
       setError("root", { message: error?.message });
     }
@@ -63,6 +72,10 @@ const Signup = () => {
         <p className="text-gray-500 dark:text-gray-400 text-center mb-4">
           Create a new account
         </p>
+
+        {errors?.root && (
+          <p className="text-red-500 text-sm mt-1">{errors?.root?.message}</p>
+        )}
         <CardContent className="space-y-4">
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -123,11 +136,6 @@ const Signup = () => {
             <Button className="w-full bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700">
               Sign Up
             </Button>
-            {errors?.root && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors?.root?.message}
-              </p>
-            )}
           </form>
           <p className="text-center text-sm mt-4 text-gray-900 dark:text-gray-100">
             Already have an account?{" "}

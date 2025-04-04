@@ -9,18 +9,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/lib/supabaseClient";
 import { useEffect } from "react";
+import { useAuthStore } from "@/stores/authStore";
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
-  password: z.string().min(8, "Password must have atleast 8 characters"),
+  password: z.string(),
 });
 
 const Login = () => {
   const navigate = useNavigate();
+  const setUser = useAuthStore((state) => state.setUser);
 
   useEffect(() => {
-    const user = supabase.auth.getUser();
-    if (user) navigate("/");
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data.user) navigate("/");
+    };
+    checkUser();
   }, [navigate]);
 
   const {
@@ -32,13 +37,13 @@ const Login = () => {
 
   const onSubmit = async (formData) => {
     try {
-      const { data: user, error } = await supabase.auth.signInWithPassword({
+      const { data: userData, error } = await supabase.auth.signInWithPassword({
         email: formData?.email,
         password: formData?.password,
       });
       if (error) throw error;
-
-      sessionStorage.setItem("user", JSON.stringify(user));
+      const { user, session } = userData;
+      setUser(user, session?.access_token);
       navigate("/");
     } catch (error) {
       setError("root", { message: error?.message });
@@ -50,6 +55,9 @@ const Login = () => {
       <ThemeToggle />
       <Card className="w-96 p-6 shadow-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700">
         <h2 className="text-2xl font-bold text-center">Login</h2>
+        {errors?.root && (
+          <p className="text-red-500 text-sm mt-1">{errors?.root?.message}</p>
+        )}
         <CardContent className="space-y-4">
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -101,11 +109,6 @@ const Login = () => {
             <Button className="w-full text-lg font-bold text-gray-100 bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700">
               Login
             </Button>
-            {errors?.root && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors?.root?.message}
-              </p>
-            )}
           </form>
 
           <div className="text-center text-md text-gray-900 dark:text-gray-100">
