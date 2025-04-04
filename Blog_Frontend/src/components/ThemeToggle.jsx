@@ -1,16 +1,20 @@
 import { Moon, Sun } from "lucide-react";
 import { Button } from "./ui/button";
 import useThemeStore from "@/stores/themeStore";
-// import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const ThemeToggle = () => {
   const { theme, toggleTheme } = useThemeStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
-    <Button
-      variant="outline"
-      className="absolute top-4 right-4"
-      onClick={toggleTheme}
-    >
+    <Button variant="outline" onClick={toggleTheme}>
       {theme === "dark" ? (
         <Sun className="w-5 h-5" />
       ) : (

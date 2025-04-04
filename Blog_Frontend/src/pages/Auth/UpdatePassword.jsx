@@ -1,4 +1,3 @@
-import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,27 +21,26 @@ const UpdatePassword = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm({ resolver: zodResolver(updatePasswordSchema) });
   const navigate = useNavigate();
 
   const onSubmit = async (formData) => {
     try {
-      const { data, error } = await supabase.auth.updateUser({
+      const { error } = await supabase.auth.updateUser({
         password: formData?.password,
       });
 
       if (error) throw error;
-      console.log(data);
       navigate("/login");
     } catch (error) {
-      console.log(error?.message);
+      setError("root", { message: error?.message });
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-200 dark:bg-gray-900 p-4">
-      <ThemeToggle />
+    <div className="flex justify-center items-center p-4">
       <Card className="w-full max-w-md p-6 shadow-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700">
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
           Update Password
@@ -87,9 +85,12 @@ const UpdatePassword = () => {
                 </p>
               )}
             </div>
-            <Button className="w-full bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700">
-              Sign Up
-            </Button>
+            <Button className="w-full">Sign Up</Button>
+            {errors?.root && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors?.root?.message}
+              </p>
+            )}
           </form>
           <p className="text-center text-sm mt-4 text-gray-900 dark:text-gray-100">
             Or{" "}

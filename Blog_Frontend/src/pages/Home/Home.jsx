@@ -1,3 +1,4 @@
+import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
@@ -22,13 +23,19 @@ const Home = () => {
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-200 dark:bg-gray-900">
-      <ThemeToggle />
-      <Button
-        className="absolute top-4 right-20 text-lg font-bold text-gray-100 bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700"
-        onClick={handleLogout}
-      >
-        Logout
-      </Button>
+      <div className="absolute top-4 left-4 flex items-center gap-2">
+        <Logo />
+        <span className="text-xl font-bold text-gray-800 dark:text-gray-100 tracking-wide">
+          Blogging
+        </span>
+      </div>
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <ThemeToggle />
+        <Button className="" onClick={handleLogout}>
+          Logout
+        </Button>
+      </div>
+
       <div className="max-w-xl p-6 text-xl font-bold">Home Page</div>
     </div>
   );

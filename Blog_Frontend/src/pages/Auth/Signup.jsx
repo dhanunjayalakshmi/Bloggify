@@ -1,4 +1,3 @@
-import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,14 +24,11 @@ const signupSchema = z
 const Signup = () => {
   const navigate = useNavigate();
   const setUser = useAuthStore((state) => state.setUser);
+  const user = useAuthStore((state) => state?.user);
 
   useEffect(() => {
-    const checkUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data.user) navigate("/");
-    };
-    checkUser();
-  }, [navigate]);
+    if (user) navigate("/");
+  }, [user]);
 
   const {
     register,
@@ -63,8 +59,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-200 dark:bg-gray-900 p-4">
-      <ThemeToggle />
+    <div className="flex justify-center items-center p-4">
       <Card className="w-full max-w-md p-6 shadow-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700">
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
           Sign Up
@@ -74,7 +69,9 @@ const Signup = () => {
         </p>
 
         {errors?.root && (
-          <p className="text-red-500 text-sm mt-1">{errors?.root?.message}</p>
+          <p className="text-red-500 dark:text-red-400 text-lg mt-1">
+            {errors?.root?.message}
+          </p>
         )}
         <CardContent className="space-y-4">
           <form
@@ -83,7 +80,7 @@ const Signup = () => {
             autoComplete="new-password"
           >
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
+              <label className="block text-md font-medium text-gray-900 dark:text-gray-100">
                 Email Address
               </label>
               <Input
@@ -94,13 +91,13 @@ const Signup = () => {
                 className="dark:bg-gray-700 dark:text-gray-100"
               />
               {errors?.email && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 dark:text-red-400 text-lg mt-1">
                   {errors?.email?.message}
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
+              <label className="block text-md font-medium text-gray-900 dark:text-gray-100">
                 Password
               </label>
               <Input
@@ -111,13 +108,13 @@ const Signup = () => {
                 className="dark:bg-gray-700 dark:text-gray-100"
               />
               {errors?.password && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 dark:text-red-400 text-lg mt-1">
                   {errors?.password?.message}
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
+              <label className="block text-md font-medium text-gray-900 dark:text-gray-100">
                 Confirm Password
               </label>
               <Input
@@ -128,16 +125,14 @@ const Signup = () => {
                 className="dark:bg-gray-700 dark:text-gray-100"
               />
               {errors?.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 dark:text-red-400 text-lg mt-1">
                   {errors?.confirmPassword?.message}
                 </p>
               )}
             </div>
-            <Button className="w-full bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700">
-              Sign Up
-            </Button>
+            <Button className="w-full">Sign Up</Button>
           </form>
-          <p className="text-center text-sm mt-4 text-gray-900 dark:text-gray-100">
+          <p className="text-center text-md mt-4 text-gray-900 dark:text-gray-100">
             Already have an account?{" "}
             <Link to="/login" className="text-blue-500 dark:text-blue-400">
               Login
