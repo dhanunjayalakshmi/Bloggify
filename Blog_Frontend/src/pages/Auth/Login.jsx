@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/lib/supabaseClient";
+import { useEffect } from "react";
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
@@ -15,24 +16,32 @@ const schema = z.object({
 });
 
 const Login = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = supabase.auth.getUser();
+    if (user) navigate("/");
+  }, [navigate]);
+
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm({ resolver: zodResolver(schema) });
-  const navigate = useNavigate();
 
   const onSubmit = async (formData) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data: user, error } = await supabase.auth.signInWithPassword({
         email: formData?.email,
         password: formData?.password,
       });
       if (error) throw error;
-      console.log(data);
+
+      sessionStorage.setItem("user", JSON.stringify(user));
       navigate("/");
     } catch (error) {
-      console.log(error?.message);
+      setError("root", { message: error?.message });
     }
   };
 
@@ -92,7 +101,13 @@ const Login = () => {
             <Button className="w-full text-lg font-bold text-gray-100 bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700">
               Login
             </Button>
+            {errors?.root && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors?.root?.message}
+              </p>
+            )}
           </form>
+
           <div className="text-center text-md text-gray-900 dark:text-gray-100">
             Or Login with
           </div>

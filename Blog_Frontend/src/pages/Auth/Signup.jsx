@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/lib/supabaseClient";
+import { useEffect } from "react";
 
 const signupSchema = z
   .object({
@@ -20,12 +21,19 @@ const signupSchema = z
   });
 
 const Signup = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = supabase.auth.getUser();
+    if (user) navigate("/");
+  }, [navigate]);
+
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm({ resolver: zodResolver(signupSchema) });
-  const navigate = useNavigate();
 
   const onSubmit = async (formData) => {
     try {
@@ -41,7 +49,7 @@ const Signup = () => {
       console.log(data);
       navigate("/login");
     } catch (error) {
-      console.log(error?.message);
+      setError("root", { message: error?.message });
     }
   };
 
@@ -115,6 +123,11 @@ const Signup = () => {
             <Button className="w-full bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700">
               Sign Up
             </Button>
+            {errors?.root && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors?.root?.message}
+              </p>
+            )}
           </form>
           <p className="text-center text-sm mt-4 text-gray-900 dark:text-gray-100">
             Already have an account?{" "}
