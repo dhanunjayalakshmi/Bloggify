@@ -1,4 +1,5 @@
 import AuthLayout from "@/layouts/AuthLayout";
+import MainLayout from "@/layouts/MainLayout";
 import Forgotpassword from "@/pages/Auth/ForgotPassword";
 import Login from "@/pages/Auth/Login";
 import Signup from "@/pages/Auth/Signup";
@@ -16,7 +17,9 @@ const AppRoutes = () => {
         <Route path="/update-password" element={<UpdatePassword />} />
       </Route>
 
-      <Route path="/" element={<Home />} />
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<Home />} />
+      </Route>
     </Routes>
   );
 };

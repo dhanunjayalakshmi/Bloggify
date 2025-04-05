@@ -8,7 +8,7 @@ const AuthLayout = () => {
       <div className="absolute top-4 left-4 flex items-center gap-2">
         <Logo />
         <span className="text-xl font-bold text-gray-800 dark:text-gray-100 tracking-wide">
-          Blogging
+          Blogify
         </span>
       </div>
       <div className="absolute top-4 right-4">
