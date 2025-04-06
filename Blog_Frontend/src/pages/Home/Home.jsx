@@ -1,4 +1,5 @@
 import BlogList from "@/components/blogs/BlogList";
+import Suggestions from "@/components/sidebar/Suggestions";
 
 const Home = () => {
   return (
@@ -8,7 +9,9 @@ const Home = () => {
       </div>
 
       <aside className="sapce-y-4 hidden lg:block">
-        <div className="bg-muted rounded-xl p-4">Suggestions</div>
+        <div className="bg-muted rounded-xl p-4">
+          <Suggestions />
+        </div>
         <div className="bg-muted rounded-xl p-4">Bookmarked</div>
         <div className="bg-muted rounded-xl p-4">Profile Suggestions</div>
       </aside>
