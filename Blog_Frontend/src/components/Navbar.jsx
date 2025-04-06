@@ -42,9 +42,14 @@ const Navbar = () => {
           className="hidden md:flex items-center gap-2 cursor-pointer"
           onClick={() => navigate("/create")}
         >
-          <Pencil className="w-4 h-4" /> write
+          <Pencil className="w-4 h-4" /> Write
         </Button>
-        <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300 cursor-pointer" />
+        <Button
+          variant="outline"
+          className="hidden md:flex items-center gap-2 cursor-pointer"
+        >
+          <Bell className="w-4 h-4" />
+        </Button>
         <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger className="focus:outline-none">
