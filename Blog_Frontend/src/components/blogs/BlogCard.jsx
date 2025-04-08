@@ -15,7 +15,7 @@ const BlogCard = ({ blog }) => {
   console.log(blog);
 
   return (
-    <Card className="rounded-2xl shadow-sm hover:shadow:md transition">
+    <Card className="rounded-2xl shadow-sm hover:shadow:md transition dark:bg-gray-800 dark:text-gray-200">
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
         <img
           src={cover_image}
