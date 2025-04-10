@@ -1,11 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
-import { Bookmark, MessageCircle, Share2, ThumbsUp } from "lucide-react";
+import {
+  Bookmark,
+  MessageCircle,
+  Share2,
+  ThumbsDown,
+  ThumbsUp,
+} from "lucide-react";
 
 const BlogDetails = () => {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto p-8 my-8 rounded-lg">
       <h1 className="text-4xl font-bold leading-tight tracking-tight text-foreground dark:text-white">
         Understanding the Future of Technology
       </h1>
@@ -29,9 +35,7 @@ const BlogDetails = () => {
             <span className="text-xs">Jan 22, 2024 • 10 min read</span>
           </div>
         </div>
-        <Button size="sm" variant="outline">
-          Follow
-        </Button>
+        <Button size="sm">Follow</Button>
       </div>
       <div className="flex items-center gap-4 mt-4">
         <Button variant="ghostButton" aria-label="Like">
@@ -68,44 +72,59 @@ const BlogDetails = () => {
         </p>
       </div>
 
-      <div className="mt-10">
-        <h3 className="text-lg font-semmibold mb-2">Leave a comment</h3>
-        <Textarea placeholder="Comment Here..." className="resize-none" />
+      <div className="mt-10 space-y-2">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10">
+            <AvatarImage
+              className="w-10 h-10 rounded-full object-cover"
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s"
+            />
+          </Avatar>
+          <div className="flex flex-col">
+            <span className="font-medium text-foreground dark:text-white">
+              John Doe
+            </span>
+          </div>
+        </div>
+        <Textarea
+          placeholder="Write your thoughts Here..."
+          className="shadow-lg dark:shadow-md dark:border-none resize-none"
+        />
         <Button className="mt-2">Post comment</Button>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-8 flex flex-col gap-4">
         <h3 className="text-lg font-semibold">Comments (23)</h3>
-        <div className="mt-4">
-          <div className="flex gap-3 items-start">
-            <Avatar>
-              <AvatarImage src="/user.jpg" />
-            </Avatar>
-            <div>
-              <p className="font-medium">
-                John Doe{" "}
-                <span className="text-sm text-muted-foreground">
-                  • October 12, 2023
-                </span>
-              </p>
-              <p>This article is very insightful and well-written!</p>
-              <div className="flex gap-4 mt-2">
-                <Button variant="outline" size="icon">
-                  👍
-                </Button>
-                <Button variant="outline" size="icon">
-                  👎
-                </Button>
-                <Button variant="outline" className="text-blue-600">
-                  Reply
-                </Button>
-              </div>
+        <div className="flex gap-3 items-start">
+          <Avatar>
+            <AvatarImage
+              className="w-8 h-8 rounded-full object-cover"
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s"
+            />
+          </Avatar>
+          <div className="space-y-1">
+            <p className="font-medium">
+              John Doe{" "}
+              <span className="text-sm text-muted-foreground">
+                • October 12, 2023
+              </span>
+            </p>
+            <p>This article is very insightful and well-written!</p>
+            <div className="flex gap-4 mt-2">
+              <Button variant="outline" size="icon">
+                <ThumbsUp size={16} />
+              </Button>
+              <Button variant="outline" size="icon">
+                <ThumbsDown size={16} />
+              </Button>
+              <Button variant="outline" className="text-blue-600">
+                Reply
+              </Button>
             </div>
           </div>
         </div>
-        <Button varinat="ghost" className="mt-4">
-          See all comments
-        </Button>
+
+        <Button className="mt-4 w-1/2">See all comments</Button>
       </div>
 
       <div className="mt-10">
@@ -114,7 +133,10 @@ const BlogDetails = () => {
         </h3>
         <div className="grid gap-4 mt-4">
           {[1, 2, 3].map((_, idx) => (
-            <div key={idx} className="border p-4 rounded-xl shadow-sm">
+            <div
+              key={idx}
+              className="border p-4 rounded-xl shadow-sm transition hover:shadow-md hover:bg-muted dark:hover:bg-gray-800 cursor-pointer"
+            >
               <h4 className="font-semibold">Blog Title</h4>
               <p className="text-sm text-muted-foreground">
                 A brief description of the blog post content goes here.
@@ -122,9 +144,7 @@ const BlogDetails = () => {
             </div>
           ))}
         </div>
-        <Button variant="outline" className="mt-4">
-          See More
-        </Button>
+        <Button className="mt-4">See More</Button>
       </div>
 
       <div className="mt-10">
@@ -133,7 +153,10 @@ const BlogDetails = () => {
         </h3>
         <div className="grid gap-4 mt-4">
           {[1, 2].map((_, idx) => (
-            <div key={idx} className="border p-4 rounded-xl shadow-sm">
+            <div
+              key={idx}
+              className="border p-4 rounded-xl shadow-sm transition hover:shadow-md hover:bg-muted dark:hover:bg-gray-800 cursor-pointer"
+            >
               <h4 className="font-semibold">Blog Title</h4>
               <p className="text-sm text-muted-foreground">
                 A brief description of the blog post content goes here.
@@ -141,9 +164,7 @@ const BlogDetails = () => {
             </div>
           ))}
         </div>
-        <Button variant="outline" className="mt-4">
-          See More
-        </Button>
+        <Button className="mt-4">See More</Button>
       </div>
     </div>
   );
