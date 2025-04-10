@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import BlogCard from "./BlogCard";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
+import { Link } from "react-router";
 
 const BlogList = () => {
   const [blogs, setBlogs] = useState([]);
@@ -28,7 +29,9 @@ const BlogList = () => {
     <>
       <div className="space-y-4">
         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]?.map((blog) => (
-          <BlogCard key={blog?.id} blog={blog} />
+          <Link to={`/blogs/1`}>
+            <BlogCard key={blog?.id} blog={blog} />
+          </Link>
         ))}
       </div>
       <div ref={loaderRef} className="h-10" />
