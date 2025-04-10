@@ -4,7 +4,8 @@ import Forgotpassword from "@/pages/Auth/ForgotPassword";
 import Login from "@/pages/Auth/Login";
 import Signup from "@/pages/Auth/Signup";
 import UpdatePassword from "@/pages/Auth/UpdatePassword";
-import BlogDetails from "@/pages/Blogs/BlogDetails";
+import BlogDetails from "@/pages/Blog/BlogDetails";
+import CreateEditBlog from "@/pages/Blog/CreateEditBlog";
 import Home from "@/pages/Home/Home";
 import { Routes, Route } from "react-router";
 
@@ -20,6 +21,7 @@ const AppRoutes = () => {
 
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/create" element={<CreateEditBlog />} />
         <Route path="/blogs/:id" element={<BlogDetails />} />
       </Route>
     </Routes>

@@ -124,7 +124,9 @@ const BlogDetails = () => {
           </div>
         </div>
 
-        <Button className="mt-4 w-1/2">See all comments</Button>
+        <Button className="mt-4 mx-auto block w-1/2 max-w-xs">
+          See all comments
+        </Button>
       </div>
 
       <div className="mt-10">
