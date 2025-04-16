@@ -22,7 +22,9 @@ const DescriptionInput = ({ value, onChange, error }) => {
         maxLength={MAX_LENGTH}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Write a short summary of your blog (150–200 characters)..."
-        className={`resize-none text-base ${error ? "border-red-500" : ""}`}
+        className={`resize-none border-1 border-gray-300 text-base shadow-sm hover:shadow-md dark:border-none ${
+          error ? "border-red-500" : ""
+        }`}
         rows={4}
       />
       <div className="flex justify-between text-sm text-muted-foreground">

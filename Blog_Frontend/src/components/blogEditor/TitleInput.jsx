@@ -21,7 +21,9 @@ const TitleInput = ({ value, onChange, error }) => {
         maxLength={MAX_LENGTH}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Enter your blog title ..."
-        className={`text-lg ${error ? "border-red-500" : ""}`}
+        className={`text-lg border-1 border-gray-300 shadow-sm hover:shadow-md dark:border-none ${
+          error ? "border-red-500" : ""
+        }`}
       />
       <div className="flex justify-between text-sm text-muted-foreground">
         <span>

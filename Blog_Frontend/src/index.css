@@ -118,3 +118,82 @@
     @apply bg-background text-foreground;
   }
 }
+
+.ProseMirror {
+  border-width: 0rem;
+  padding: 0.75rem;
+  font-size: 1.25rem;
+  min-height: 300px;
+}
+
+.prose {
+  max-width: none;
+}
+
+.tiptap p {
+  margin: 0 0 0.75em;
+}
+
+.tiptap h1 {
+  font-size: 2rem; /* Tailwind's text-4xl */
+  font-weight: 600;
+  margin: 1em 0;
+}
+
+.tiptap h2 {
+  font-size: 1.75rem; /* Tailwind's text-3xl */
+  font-weight: 500;
+  margin: 1em 0;
+}
+
+.tiptap h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 1em 0;
+}
+
+.tiptap blockquote {
+  border-left: 4px solid #ccc;
+  padding-left: 1em;
+  color: #666;
+  margin: 1em 0;
+  font-style: italic;
+}
+
+.tiptap ul {
+  padding-left: 1.5em;
+  list-style-type: disc;
+  margin: 1em 0;
+}
+
+.tiptap ol {
+  padding-left: 1.5em;
+  list-style-type: decimal;
+  margin: 1em 0;
+}
+
+.tiptap li {
+  margin-bottom: 0.5em;
+}
+.tiptap pre {
+  background-color: #0f172a;
+  color: #f8fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+  font-family: "Fira Code", Menlo, Monaco, Consolas, "Courier New", monospace;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.tiptap pre code {
+  all: unset;
+}
+
+img.align-center {
+  display: block;
+  margin: 1rem auto;
+}
