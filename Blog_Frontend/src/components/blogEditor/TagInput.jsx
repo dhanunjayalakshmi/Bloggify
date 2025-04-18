@@ -2,8 +2,17 @@ import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { Badge } from "../ui/badge";
+import { X } from "lucide-react";
 
-const mockSuggestions = ["JavaScript", "React", "Node.js", "CSS", "Tailwind"];
+const mockSuggestions = [
+  "JavaScript",
+  "React",
+  "React Native",
+  "Node.js",
+  "CSS",
+  "Tailwind",
+];
 
 const TagInput = ({ selectedTags, setSelectedTags }) => {
   const [inputValue, setInputValue] = useState("");
@@ -48,9 +57,10 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
     <div className="space-y-2">
       <div className="flex flex-wrap gap-1">
         {selectedTags?.map((tag, index) => (
-          <span
+          <Badge
+            variant="secondary"
             key={index}
-            className="px-3 py-1 bg-gray-100 dark:bg-gray-700 dark:text-white rounded-full text-sm flex items-center justify-between"
+            className="flex items-center gap-1 px-2 py-1 text-sm bg-gray-100 dark:bg-gray-700 dark:text-white"
           >
             {tag}
             <Button
@@ -58,9 +68,9 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
               className="hover:text-gray-400"
               onClick={() => handleRemoveTag(tag)}
             >
-              x
+              <X className="h-3 w-3" />
             </Button>
-          </span>
+          </Badge>
         ))}
       </div>
 
@@ -78,11 +88,12 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
         />
 
         {filteredSuggestions.length > 0 && (
-          <ul className="absolute z-10 mt-1 bg-white border border-gray-300 rounded shadow">
+          <ul className="absolute z-10 mt-1 bg-white shadow">
             {filteredSuggestions?.map((suggestion, index) => (
               <li
                 key={index}
-                className="px-4 py-2 hover:bg-blue-500 hover:text-white cursor-pointer"
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 cursor-pointer"
+                onClick={() => handleAddTag(suggestion)}
               >
                 {suggestion}
               </li>
@@ -91,7 +102,7 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
         )}
 
         {inputValue && filteredSuggestions.length === 0 && (
-          <div className="absolute z-10 mt-1 bg-white border border-gray-300 rounded shadow px-4 py-2 text-gray-600">
+          <div className="absolute z-10 mt-1 bg-white border border-gray-300 rounded-md shadow px-4 py-2 text-gray-600">
             Press <b>Enter</b> to add{" "}
             <span className="text-blue-600">"{inputValue}"</span> as a new tag.
           </div>
@@ -99,7 +110,7 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
       </div>
       <div className="mt-6">
         {/* <h3 className="font-medium">Selected Tags:</h3> */}
-        <p>{selectedTags.join(", ") || "No tags selected yet."}</p>
+        <p>{selectedTags?.join(", ") || "No tags selected yet."}</p>
       </div>
     </div>
   );
