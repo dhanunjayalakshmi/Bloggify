@@ -1,5 +1,6 @@
 import ContentEditor from "@/components/blogEditor/ContentEditor";
 import DescriptionInput from "@/components/blogEditor/DescriptionInput";
+import TagInput from "@/components/blogEditor/TagInput";
 import TitleInput from "@/components/blogEditor/TitleInput";
 import { useState } from "react";
 
@@ -7,6 +8,7 @@ const CreateEditBlog = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
+  const [tags, setTags] = useState([]);
   const [errors] = useState({});
 
   return (
@@ -18,6 +20,7 @@ const CreateEditBlog = () => {
         error={errors?.description}
       />
       <ContentEditor content={content} onChange={setContent} />
+      <TagInput selectedTags={tags} setSelectedTags={setTags} />
     </div>
   );
 };
