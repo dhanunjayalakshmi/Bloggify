@@ -14,6 +14,8 @@ const mockSuggestions = [
   "Tailwind",
 ];
 
+const MAX_TAGS = 5;
+
 const TagInput = ({ selectedTags, setSelectedTags }) => {
   const [inputValue, setInputValue] = useState("");
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
@@ -39,6 +41,8 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
   };
 
   const handleAddTag = (tag) => {
+    if (selectedTags.length >= MAX_TAGS) return;
+
     if (!selectedTags.includes(tag)) {
       setSelectedTags([...selectedTags, tag]);
     }
@@ -67,6 +71,7 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
               variant="icon"
               className="hover:text-gray-400"
               onClick={() => handleRemoveTag(tag)}
+              aria-label="Remove tag"
             >
               <X className="h-3 w-3" />
             </Button>
@@ -80,8 +85,16 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
         </Label>
         <Input
           type="text"
-          className="text-lg border-1 border-gray-300 shadow-sm hover:shadow-md dark:border-none"
-          placeholder="Type and press enter to add tag..."
+          className={`${
+            selectedTags.length >= MAX_TAGS
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          } text-lg border-1 border-gray-300 shadow-sm hover:shadow-md dark:border-none`}
+          placeholder={
+            selectedTags.length >= MAX_TAGS
+              ? `Tag limit reached (${MAX_TAGS})`
+              : "Type and press Enter to add tags..."
+          }
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handlekeyDown}
@@ -109,9 +122,13 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
         )}
       </div>
       <div className="mt-6">
-        {/* <h3 className="font-medium">Selected Tags:</h3> */}
         <p>{selectedTags?.join(", ") || "No tags selected yet."}</p>
       </div>
+      {selectedTags.length >= MAX_TAGS && (
+        <p className="mt-2 text-sm text-red-500">
+          You can only add up to {MAX_TAGS} tags.
+        </p>
+      )}
     </div>
   );
 };
