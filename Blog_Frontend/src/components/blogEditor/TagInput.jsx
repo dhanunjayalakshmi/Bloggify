@@ -89,7 +89,7 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
             selectedTags.length >= MAX_TAGS
               ? "opacity-50 cursor-not-allowed"
               : ""
-          } text-lg border-1 border-gray-300 shadow-sm hover:shadow-md dark:border-none`}
+          } text-lg bg-white dark:bg-gray-800 border-1 border-gray-300 shadow-sm hover:shadow-md dark:border-none`}
           placeholder={
             selectedTags.length >= MAX_TAGS
               ? `Tag limit reached (${MAX_TAGS})`
@@ -122,7 +122,9 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
         )}
       </div>
       <div className="mt-6">
-        <p>{selectedTags?.join(", ") || "No tags selected yet."}</p>
+        <h3 className="font-medium">
+          Selected Tags : {selectedTags?.join(", ") || "No tags selected yet."}
+        </h3>
       </div>
       {selectedTags.length >= MAX_TAGS && (
         <p className="mt-2 text-sm text-red-500">
