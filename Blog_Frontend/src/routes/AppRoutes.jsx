@@ -6,6 +6,7 @@ import Signup from "@/pages/Auth/Signup";
 import UpdatePassword from "@/pages/Auth/UpdatePassword";
 import BlogDetails from "@/pages/Blog/BlogDetails";
 import CreateEditBlog from "@/pages/Blog/CreateEditBlog";
+import PreviewPage from "@/pages/Blog/PreviewPage";
 import Home from "@/pages/Home/Home";
 import { Routes, Route } from "react-router";
 
@@ -23,6 +24,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/create" element={<CreateEditBlog />} />
         <Route path="/blogs/:id" element={<BlogDetails />} />
+        <Route path="/preview" element={<PreviewPage />} />
       </Route>
     </Routes>
   );

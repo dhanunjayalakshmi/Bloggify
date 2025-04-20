@@ -68,10 +68,8 @@ const ContentEditor = ({ content, onChange }) => {
 
   useEffect(() => {
     if (!editor) return;
-    if (editor.getHTML() !== content) {
-      editor.commands.setContent(
-        content || "<p>Start writing your blog...</p>"
-      );
+    if (editor && content && editor.getHTML() !== content) {
+      editor.commands.setContent(content, false);
     }
   }, [editor]);
 

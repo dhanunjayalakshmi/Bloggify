@@ -41,6 +41,8 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
   };
 
   const handleAddTag = (tag) => {
+    tag = tag.trim().toLowerCase();
+
     if (selectedTags.length >= MAX_TAGS) return;
 
     if (!selectedTags.includes(tag)) {
@@ -49,7 +51,6 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
     setInputValue("");
     setFilteredSuggestions([]);
   };
-
   const handlekeyDown = (e) => {
     if (e.key === "Enter" && inputValue.trim() !== "") {
       e.preventDefault();
