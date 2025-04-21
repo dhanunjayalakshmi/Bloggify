@@ -57,7 +57,7 @@ const Navbar = () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="dark:bg-gray-900 ">
             <DropdownMenuItem
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/user/1")}
               className="dark:hover:bg-gray-800"
             >
               Profile

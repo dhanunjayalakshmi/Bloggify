@@ -8,6 +8,7 @@ import BlogDetails from "@/pages/Blog/BlogDetails";
 import CreateEditBlog from "@/pages/Blog/CreateEditBlog";
 import PreviewPage from "@/pages/Blog/PreviewPage";
 import Home from "@/pages/Home/Home";
+import AuthorProfilePage from "@/pages/Author/AuthorProfilePage";
 import { Routes, Route } from "react-router";
 
 const AppRoutes = () => {
@@ -25,6 +26,7 @@ const AppRoutes = () => {
         <Route path="/create" element={<CreateEditBlog />} />
         <Route path="/blogs/:id" element={<BlogDetails />} />
         <Route path="/preview" element={<PreviewPage />} />
+        <Route path="/user/:id" element={<AuthorProfilePage />} />
       </Route>
     </Routes>
   );
