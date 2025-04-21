@@ -10,6 +10,13 @@ import PreviewPage from "@/pages/Blog/PreviewPage";
 import Home from "@/pages/Home/Home";
 import AuthorProfilePage from "@/pages/Author/AuthorProfilePage";
 import { Routes, Route } from "react-router";
+import UserAccountLayout from "@/layouts/UserAccountLayout";
+import UserAccountPage from "@/pages/User/UserAccountPage";
+import Dashboard from "@/pages/User/DashboardTab";
+import Stats from "@/pages/User/StatsTab";
+import Posts from "@/pages/User/PostsTab";
+import Bookmarks from "@/pages/User/BookmarksTab";
+import { Settings } from "lucide-react";
 
 const AppRoutes = () => {
   return (
@@ -27,6 +34,14 @@ const AppRoutes = () => {
         <Route path="/blogs/:id" element={<BlogDetails />} />
         <Route path="/preview" element={<PreviewPage />} />
         <Route path="/user/:id" element={<AuthorProfilePage />} />
+        <Route path="/account" element={<UserAccountLayout />}>
+          <Route index element={<UserAccountPage />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="stats" element={<Stats />} />
+          <Route path="posts" element={<Posts />} />
+          <Route path="bookmarks" element={<Bookmarks />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
       </Route>
     </Routes>
   );
