@@ -7,8 +7,8 @@ const UserProfileHeader = ({ user, isOwnProfile = false }) => {
       <div className="absolute top-0 right-0 hidden md:block">
         {isOwnProfile ? (
           <Link
-            to="/account/settings"
-            className="text-sm bg-orange-600 text-white px-3 py-1 rounded-md hover:bg-orange-700 transition"
+            to="/account/edit"
+            className="text-sm font-medium bg-orange-600 text-white px-3 py-2 rounded-md hover:bg-orange-700 transition"
           >
             Edit Profile
           </Link>
@@ -35,8 +35,8 @@ const UserProfileHeader = ({ user, isOwnProfile = false }) => {
       <div className="md:hidden">
         {isOwnProfile ? (
           <Link
-            to="/account/settings"
-            className="text-sm bg-orange-600 text-white px-3 py-1 rounded-md hover:bg-orange-700 transition"
+            to="/account/edit"
+            className="text-sm font-medium bg-orange-600 text-white px-3 py-2 rounded-md hover:bg-orange-700 transition"
           >
             Edit Profile
           </Link>

@@ -17,6 +17,7 @@ import Stats from "@/pages/User/StatsTab";
 import Posts from "@/pages/User/PostsTab";
 import Bookmarks from "@/pages/User/BookmarksTab";
 import { Settings } from "lucide-react";
+import EditProfilePage from "@/pages/User/EditProfilePage";
 
 const AppRoutes = () => {
   return (
@@ -36,6 +37,7 @@ const AppRoutes = () => {
         <Route path="/user/:id" element={<AuthorProfilePage />} />
         <Route path="/account" element={<UserAccountLayout />}>
           <Route index element={<UserAccountPage />} />
+          <Route path="edit" element={<EditProfilePage />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="stats" element={<Stats />} />
           <Route path="posts" element={<Posts />} />
