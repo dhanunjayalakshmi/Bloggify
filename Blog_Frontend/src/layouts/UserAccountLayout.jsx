@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router";
+import { NavLink, Outlet, useLocation } from "react-router";
 import {
   Sheet,
   SheetContent,
@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const tabs = [
   { name: "Profile", path: "/account" },
@@ -19,8 +20,17 @@ const tabs = [
 ];
 
 const UserAccountLayout = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+
+  // Close the sidebar automatically on route change (mobile)
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
+
   return (
     <div className="flex min-h-[calc(100vh-4rem)] bg-gray-100 dark:bg-gray-800 mt-8 overflow-hidden relative">
+      {/* Sidebar for desktop */}
       <aside className="hidden md:block w-64 p-4 border-r dark:border-gray-700">
         <nav className="flex flex-col gap-2">
           {tabs.map((tab) => (
@@ -42,8 +52,9 @@ const UserAccountLayout = () => {
         </nav>
       </aside>
 
+      {/* Mobile Menu Button */}
       <div className="md:hidden absolute top-4 left-4 z-20">
-        <Sheet>
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
             <Button
               variant="outline"
@@ -53,6 +64,7 @@ const UserAccountLayout = () => {
               Menu
             </Button>
           </SheetTrigger>
+
           <SheetContent
             side="left"
             className="w-64 p-4 dark:bg-gray-800 bg-gray-100"
@@ -60,6 +72,7 @@ const UserAccountLayout = () => {
             <SheetHeader>
               <SheetTitle className="text-lg">Account</SheetTitle>
             </SheetHeader>
+
             <nav className="flex flex-col gap-2 mt-4">
               {tabs.map((tab) => (
                 <NavLink
@@ -82,6 +95,7 @@ const UserAccountLayout = () => {
         </Sheet>
       </div>
 
+      {/* Main Content Area */}
       <main className="flex-1 p-6">
         <Outlet />
       </main>
