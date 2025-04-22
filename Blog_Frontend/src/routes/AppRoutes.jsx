@@ -11,7 +11,7 @@ import Home from "@/pages/Home/Home";
 import AuthorProfilePage from "@/pages/Author/AuthorProfilePage";
 import { Routes, Route } from "react-router";
 import UserAccountLayout from "@/layouts/UserAccountLayout";
-import UserAccountPage from "@/pages/User/UserAccountPage";
+import UserAccountPage from "@/pages/User/UserProfilePage";
 import Dashboard from "@/pages/User/DashboardTab";
 import Stats from "@/pages/User/StatsTab";
 import Posts from "@/pages/User/PostsTab";
