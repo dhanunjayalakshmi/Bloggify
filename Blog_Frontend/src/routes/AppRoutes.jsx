@@ -12,7 +12,6 @@ import AuthorProfilePage from "@/pages/Author/AuthorProfilePage";
 import { Routes, Route } from "react-router";
 import UserAccountLayout from "@/layouts/UserAccountLayout";
 import UserAccountPage from "@/pages/User/UserProfilePage";
-import Dashboard from "@/pages/User/DashboardTab";
 import Stats from "@/pages/User/StatsTab";
 import Posts from "@/pages/User/PostsTab";
 import Bookmarks from "@/pages/User/BookmarksTab";
@@ -38,7 +37,6 @@ const AppRoutes = () => {
         <Route path="/account" element={<UserAccountLayout />}>
           <Route index element={<UserAccountPage />} />
           <Route path="edit" element={<EditProfilePage />} />
-          <Route path="dashboard" element={<Dashboard />} />
           <Route path="stats" element={<Stats />} />
           <Route path="posts" element={<Posts />} />
           <Route path="bookmarks" element={<Bookmarks />} />

@@ -12,10 +12,9 @@ import { useEffect, useState } from "react";
 
 const tabs = [
   { name: "Profile", path: "/account" },
-  { name: "Dashboard", path: "/account/dashboard" },
-  { name: "Stats & Activity", path: "/account/stats" },
   { name: "Posts", path: "/account/posts" },
   { name: "Bookmarks", path: "/account/bookmarks" },
+  { name: "Stats & Activity", path: "/account/stats" },
   { name: "Settings", path: "/account/settings" },
 ];
 
