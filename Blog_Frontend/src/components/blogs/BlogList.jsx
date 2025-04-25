@@ -3,7 +3,12 @@ import BlogCard from "./BlogCard";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { Link } from "react-router";
 
-const BlogList = ({ status = "published", mode = "home" }) => {
+const BlogList = ({
+  status = "published",
+  mode = "home",
+  search = "",
+  sort = "latest",
+}) => {
   const [blogs, setBlogs] = useState([
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
   ]);
@@ -17,15 +22,21 @@ const BlogList = ({ status = "published", mode = "home" }) => {
 
   useEffect(() => {
     const fetchBlogs = async () => {
-      const res = await fetch(
-        `/api/blogs?status=${status}&page=${page}&limit=5`
-      );
+      const queryParams = new URLSearchParams({
+        status,
+        page,
+        limit: 5,
+        search,
+        sort,
+      });
+
+      const res = await fetch(`/api/blogs?${queryParams}`);
       const data = await res?.json();
       if (data?.length === 0) setHasMore(false);
       setBlogs((prev) => [...prev, ...data]);
     };
     fetchBlogs();
-  }, [page, status]);
+  }, [page, status, search, sort]);
 
   return (
     <>
