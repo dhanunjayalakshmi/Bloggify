@@ -59,7 +59,12 @@ const PostFilters = ({
         </SelectTrigger>
         <SelectContent className="dark:bg-gray-700">
           {sortOptions?.map((sortOption) => (
-            <SelectItem value={sortOption?.value} className="dark:bg-gray-800">
+            <SelectItem
+              value={sortOption?.value}
+              className={`hover:dark:bg-gray-800 ${
+                sortOption?.value === sort ? "dark:bg-gray-800" : ""
+              }`}
+            >
               {sortOption?.label}
             </SelectItem>
           ))}
@@ -71,14 +76,13 @@ const PostFilters = ({
           <SelectValue placeholder="Filter By Tag" />
         </SelectTrigger>
         <SelectContent className="dark:bg-gray-700">
-          {/* <SelectItem value="all" className="dark:bg-gray-800">
-            All Tags
-          </SelectItem> */}
           {tags.map((tag) => (
             <SelectItem
               key={tag}
               value={tag}
-              className="hover:dark:bg-gray-800"
+              className={`hover:dark:bg-gray-800 ${
+                tag === selectedTag ? "dark:bg-gray-800" : ""
+              }`}
             >
               {tag}
             </SelectItem>

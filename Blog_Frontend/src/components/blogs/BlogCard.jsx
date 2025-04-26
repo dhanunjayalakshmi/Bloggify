@@ -11,7 +11,6 @@ import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 
 const BlogCard = ({ blog, mode = "home", status }) => {
-  // Placeholder blog data (for testing/demo purposes)
   const {
     cover_image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s",
     title = "My first blog",
@@ -67,11 +66,15 @@ const BlogCard = ({ blog, mode = "home", status }) => {
               </div>
 
               <div className="flex gap-2">
-                <Button size="sm" variant="ghost">
+                <Button size="sm" variant="ghost" className="hover:dark:bg-gray-700">
                   <Edit size={16} className="mr-1" />
                   Edit
                 </Button>
-                <Button size="sm" variant="ghost" className="text-red-500">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-red-500 hover:dark:bg-gray-700"
+                >
                   <Trash2 size={16} className="mr-1" />
                   Delete
                 </Button>

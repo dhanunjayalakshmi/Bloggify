@@ -57,13 +57,13 @@ const Navbar = () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="dark:bg-gray-900 ">
             <DropdownMenuItem
-              onClick={() => navigate("/user/1")}
+              onClick={() => navigate("/account")}
               className="dark:hover:bg-gray-800"
             >
               Profile
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/account/settings")}
               className="dark:hover:bg-gray-800"
             >
               Settings
