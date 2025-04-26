@@ -1,4 +1,3 @@
-// src/components/user/posts/PostFilters.jsx
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -8,25 +7,44 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState, useEffect } from "react";
+import DateRangePicker from "@/components/ui/date-range-picker";
+import { Tag } from "lucide-react";
 
-const PostFilters = ({ onSearchChange, onSortChange }) => {
+const PostFilters = ({
+  onSearchChange,
+  onSortChange,
+  onTagChange,
+  onDateChange,
+  tags = [],
+  sortOptions = [],
+}) => {
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("latest");
+  const [sort, setSort] = useState("recent");
+  const [selectedTag, setSelectedTag] = useState("All Tags");
+  const [dateRange, setDateRange] = useState({ from: null, to: null });
 
   useEffect(() => {
     const timeout = setTimeout(() => {
       onSearchChange(search);
     }, 300);
     return () => clearTimeout(timeout);
-  }, [search, onSearchChange]);
+  }, [search]);
+
+  useEffect(() => {
+    onTagChange(selectedTag);
+  }, [selectedTag]);
+
+  useEffect(() => {
+    onDateChange(dateRange);
+  }, [dateRange]);
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-2">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between py-2">
       <Input
         placeholder="Search by title..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full sm:max-w-sm"
+        className="sm:max-w-sm w-full"
       />
 
       <Select
@@ -36,17 +54,43 @@ const PostFilters = ({ onSearchChange, onSortChange }) => {
           onSortChange(val);
         }}
       >
-        <SelectTrigger className="w-full sm:w-48">
+        <SelectTrigger className="w-full sm:w-40">
           <SelectValue placeholder="Sort by" />
         </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="latest">Latest</SelectItem>
-          <SelectItem value="oldest">Oldest</SelectItem>
-          <SelectItem value="views">Most Viewed</SelectItem>
-          <SelectItem value="title-asc">Title A–Z</SelectItem>
-          <SelectItem value="title-desc">Title Z–A</SelectItem>
+        <SelectContent className="dark:bg-gray-700">
+          {sortOptions?.map((sortOption) => (
+            <SelectItem value={sortOption?.value} className="dark:bg-gray-800">
+              {sortOption?.label}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
+
+      <Select value={selectedTag} onValueChange={(val) => setSelectedTag(val)}>
+        <SelectTrigger className="w-full sm:w-40">
+          <SelectValue placeholder="Filter By Tag" />
+        </SelectTrigger>
+        <SelectContent className="dark:bg-gray-700">
+          {/* <SelectItem value="all" className="dark:bg-gray-800">
+            All Tags
+          </SelectItem> */}
+          {tags.map((tag) => (
+            <SelectItem
+              key={tag}
+              value={tag}
+              className="hover:dark:bg-gray-800"
+            >
+              {tag}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <DateRangePicker
+        value={dateRange}
+        onChange={setDateRange}
+        placeholder="Filter by date"
+      />
     </div>
   );
 };

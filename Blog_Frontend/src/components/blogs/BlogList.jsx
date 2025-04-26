@@ -7,7 +7,9 @@ const BlogList = ({
   status = "published",
   mode = "home",
   search = "",
-  sort = "latest",
+  sort = "recent",
+  tag = "All Tags",
+  date = {},
 }) => {
   const [blogs, setBlogs] = useState([
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
@@ -28,6 +30,9 @@ const BlogList = ({
         limit: 5,
         search,
         sort,
+        tag,
+        from: date.from || "",
+        to: date.to || "",
       });
 
       const res = await fetch(`/api/blogs?${queryParams}`);
@@ -36,7 +41,7 @@ const BlogList = ({
       setBlogs((prev) => [...prev, ...data]);
     };
     fetchBlogs();
-  }, [page, status, search, sort]);
+  }, [page, status, search, sort, tag, date]);
 
   return (
     <>
