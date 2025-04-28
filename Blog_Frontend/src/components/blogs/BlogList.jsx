@@ -18,6 +18,19 @@ const BlogList = ({
   const [hasMore, setHasMore] = useState(true);
   const loaderRef = useRef();
 
+  const mockBlog = {
+    cover_image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s",
+    title: "My first blog",
+    description: "Welcome to my first blog",
+    author: "Dhanunjaya",
+    tags: ["first", "blog"],
+    rating: 20,
+    views: 123,
+    lastEdited: "2025-04-19",
+    scheduledFor: "2025-04-25",
+  };
+
   useInfiniteScroll(loaderRef, () => {
     if (hasMore) setPage((prev) => prev + 1);
   });
@@ -48,7 +61,8 @@ const BlogList = ({
       <div className="space-y-4">
         {blogs?.map((blog) => (
           <Link key={blog} to={`/blogs/${blog}`}>
-            <BlogCard blog={blog} mode={mode} status={status} />
+            {/* <BlogCard blog={blog} mode={mode} status={status} /> */}
+            <BlogCard blog={mockBlog} footerVariant={mode} status={status} />
           </Link>
         ))}
       </div>

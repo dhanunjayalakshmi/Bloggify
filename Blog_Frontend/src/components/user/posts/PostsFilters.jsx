@@ -60,6 +60,7 @@ const PostFilters = ({
         <SelectContent className="dark:bg-gray-700">
           {sortOptions?.map((sortOption) => (
             <SelectItem
+              key={sortOption?.value}
               value={sortOption?.value}
               className={`hover:dark:bg-gray-800 ${
                 sortOption?.value === sort ? "dark:bg-gray-800" : ""
