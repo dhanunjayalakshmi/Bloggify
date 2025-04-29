@@ -11,14 +11,12 @@ const BlogList = ({
   tag = "All Tags",
   date = {},
 }) => {
-  const [blogs, setBlogs] = useState([
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-  ]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const loaderRef = useRef();
 
   const mockBlog = {
+    id: 1,
     cover_image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s",
     title: "My first blog",
@@ -30,6 +28,10 @@ const BlogList = ({
     lastEdited: "2025-04-19",
     scheduledFor: "2025-04-25",
   };
+
+  const [blogs, setBlogs] = useState(
+    Array.from({ length: 10 }, (_, i) => ({ ...mockBlog, id: i + 1 }))
+  );
 
   useInfiniteScroll(loaderRef, () => {
     if (hasMore) setPage((prev) => prev + 1);
@@ -48,10 +50,25 @@ const BlogList = ({
         to: date.to || "",
       });
 
-      const res = await fetch(`/api/blogs?${queryParams}`);
-      const data = await res?.json();
-      if (data?.length === 0) setHasMore(false);
-      setBlogs((prev) => [...prev, ...data]);
+      console.log(queryParams);
+
+      // const res = await fetch(`/api/blogs?${queryParams}`);
+      // if (!res.ok) {
+      //   console.error("API failed!", res.status);
+      //   setHasMore(false);
+      //   return;
+      // }
+      // const data = await res?.json();
+      // if (data?.length === 0) setHasMore(false);
+      if (blogs?.length === 25) {
+        setHasMore(false);
+      } else {
+        const newMocks = Array.from({ length: 5 }, (_, i) => ({
+          ...mockBlog,
+          id: blogs.length + i + 1,
+        }));
+        setBlogs((prev) => [...prev, ...newMocks]);
+      }
     };
     fetchBlogs();
   }, [page, status, search, sort, tag, date]);
@@ -60,9 +77,8 @@ const BlogList = ({
     <>
       <div className="space-y-4">
         {blogs?.map((blog) => (
-          <Link key={blog} to={`/blogs/${blog}`}>
-            {/* <BlogCard blog={blog} mode={mode} status={status} /> */}
-            <BlogCard blog={mockBlog} footerVariant={mode} status={status} />
+          <Link key={blog.id} to={`/blogs/${blog.id}`}>
+            <BlogCard blog={blog} footerVariant={mode} status={status} />
           </Link>
         ))}
       </div>

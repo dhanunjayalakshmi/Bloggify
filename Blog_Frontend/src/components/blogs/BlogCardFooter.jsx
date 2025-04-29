@@ -65,7 +65,7 @@ const BlogCardFooter = ({ blog, variant = "home", status }) => {
         <Button
           variant="icon"
           onClick={toggleBookmark}
-          className="hover:text-primary cursor-pointer"
+          className="transition-transform transform hover:scale-110 active:scale-90"
         >
           <Bookmark
             size={18}
@@ -74,11 +74,10 @@ const BlogCardFooter = ({ blog, variant = "home", status }) => {
             } stroke-current`}
           />
         </Button>
-      </div>
+      </div>    
     );
   }
 
-  // Default home footer
   return (
     <div className="flex justify-between items-center text-sm text-muted-foreground mt-2">
       <span>By {blog.author}</span>
