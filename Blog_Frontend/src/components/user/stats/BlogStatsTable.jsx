@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 
-export default function BlogStatsTable({ blogs }) {
+const BlogStatsTable = ({ blogs }) => {
   return (
-    <div className="overflow-x-auto w-full bg-background p-4 rounded-xl shadow">
+    <div className="overflow-x-auto w-full bg-background p-4 rounded-xl shadow dark:bg-gray-900">
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className="text-sm text-muted-foreground border-b">
@@ -38,4 +38,6 @@ export default function BlogStatsTable({ blogs }) {
       </table>
     </div>
   );
-}
+};
+
+export default BlogStatsTable;

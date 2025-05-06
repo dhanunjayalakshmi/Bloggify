@@ -3,7 +3,7 @@ import { BarChart3, Eye, MessageCircle, ThumbsUp } from "lucide-react";
 import KpiCard from "./KpiCard";
 import StatsChart from "./StatsChart";
 import BlogAnalytics from "./BlogAnalytics";
-import BlogStatsTable from "./BlogsTable";
+import BlogStatsTable from "./BlogStatsTable";
 
 const dummyEngagement = [
   { date: "Apr 1", engagement: 10 },
@@ -36,15 +36,15 @@ const dummyAnalytics = [
 const StatsContainer = () => {
   return (
     <div className="p-4 space-y-6">
-      <Tabs defaultValue="overview">
-        <TabsList className="flex gap-2">
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList className="flex gap-4 dark:bg-gray-800">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="blog-stats">Blog Stats</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
             <KpiCard icon={BarChart3} label="Total Blogs" value="12" />
             <KpiCard icon={Eye} label="Total Views" value="1,540" />
             <KpiCard icon={MessageCircle} label="Total Comments" value="210" />

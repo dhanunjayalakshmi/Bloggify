@@ -6,18 +6,18 @@ export default function BlogAnalytics({ analytics }) {
       {analytics.map((item) => (
         <Card key={item.id} className="dark:bg-gray-900">
           <CardContent className="p-4 space-y-2">
-            <h3 className="text-lg font-semibold">{item.title}</h3>
+            <h3 className="text-xl font-semibold">{item.title}</h3>
             <p className="text-sm text-muted-foreground">
               Avg Read Time: {item.readTime} mins
             </p>
-            <div className="text-sm">
-              <p>Traffic:</p>
-              <ul className="list-disc ml-4">
-                <li>Direct: {item.traffic.direct}</li>
-                <li>Search: {item.traffic.search}</li>
-                <li>Social: {item.traffic.social}</li>
+            <div className="text-md space-y-2">
+              <p className="font-semibold">Traffic :</p>
+              <ul className="list-disc ml-4 space-y-1">
+                <li>Direct : {item.traffic.direct}</li>
+                <li>Search : {item.traffic.search}</li>
+                <li>Social : {item.traffic.social}</li>
                 <li className="text-muted-foreground italic">
-                  Referral: Coming soon
+                  Referral : Coming soon
                 </li>
               </ul>
             </div>
