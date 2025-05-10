@@ -1,41 +1,57 @@
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 
-const BlogStatsTable = ({ blogs }) => {
+const BlogTable = ({ blogs }) => {
   return (
-    <div className="overflow-x-auto w-full bg-background p-4 rounded-xl shadow dark:bg-gray-900">
-      <table className="w-full text-left border-collapse">
-        <thead>
-          <tr className="text-sm text-muted-foreground border-b">
-            <th className="p-2">Title</th>
-            <th className="p-2">Views</th>
-            <th className="p-2">Upvotes</th>
-            <th className="p-2">Comments</th>
-            <th className="p-2">Status</th>
-            <th className="p-2">Updated</th>
-            <th className="p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {blogs.map((blog) => (
-            <tr key={blog.id} className="border-b hover:bg-muted/10">
-              <td className="p-2">{blog.title}</td>
-              <td className="p-2">{blog.views}</td>
-              <td className="p-2">{blog.upvotes}</td>
-              <td className="p-2">{blog.comments}</td>
-              <td className="p-2">{blog.status}</td>
-              <td className="p-2">{blog.updated}</td>
-              <td className="p-2 flex gap-2">
+    <Table className="w-full text-left table-auto border-collapse">
+      <TableHeader>
+        <TableRow className="text-sm text-muted-foreground border-b">
+          <TableHead className="p-2">Title</TableHead>
+          <TableHead className="p-2">Views</TableHead>
+          <TableHead className="p-2">Upvotes</TableHead>
+          <TableHead className="p-2">Comments</TableHead>
+          <TableHead className="p-2">Status</TableHead>
+          <TableHead className="p-2">Updated</TableHead>
+          <TableHead className="p-2">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {blogs.map((blog) => (
+          <TableRow key={blog.id} className="border-b hover:bg-muted/10">
+            <TableCell className="p-2">{blog.title}</TableCell>
+            <TableCell className="p-2">{blog.views}</TableCell>
+            <TableCell className="p-2">{blog.upvotes}</TableCell>
+            <TableCell className="p-2">{blog.comments}</TableCell>
+            <TableCell className="p-2">{blog.status}</TableCell>
+            <TableCell className="p-2">{blog.updated}</TableCell>
+            <TableCell className="p-2">
+              <div className="flex gap-2">
                 <Button variant="outline" size="sm">
                   Edit
                 </Button>
                 <Button variant="destructive" size="sm">
                   Delete
                 </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
+
+const BlogStatsTable = ({ blogs }) => {
+  return (
+    <div className="w-full rounded-xl px-4 shadow bg-background dark:bg-gray-900 overflow-x-auto">
+      <BlogTable blogs={blogs} />
     </div>
   );
 };
