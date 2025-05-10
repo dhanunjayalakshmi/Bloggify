@@ -15,7 +15,7 @@ import UserAccountPage from "@/pages/User/UserProfilePage";
 import Stats from "@/pages/User/StatsTab";
 import Posts from "@/pages/User/PostsTab";
 import Bookmarks from "@/pages/User/BookmarksTab";
-import { Settings } from "lucide-react";
+import Settings from "@/pages/User/SettingsTab";
 import EditProfilePage from "@/pages/User/EditProfilePage";
 
 const AppRoutes = () => {
