@@ -7,9 +7,6 @@ const AuthLayout = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-200 dark:bg-gray-900 px-4 relative">
       <div className="absolute top-4 left-4 flex items-center gap-2">
         <Logo />
-        <span className="text-xl font-bold text-gray-800 dark:text-gray-100 tracking-wide">
-          Blogify
-        </span>
       </div>
       <div className="absolute top-4 right-4">
         <ThemeToggle />

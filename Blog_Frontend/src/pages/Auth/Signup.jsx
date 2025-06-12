@@ -38,6 +38,7 @@ const Signup = () => {
   } = useForm({ resolver: zodResolver(signupSchema) });
 
   const onSubmit = async (formData) => {
+    console.log(formData);
     try {
       const { data: res, error } = await supabase.auth.signUp({
         email: formData?.email,
@@ -47,6 +48,23 @@ const Signup = () => {
       if (error) throw error;
       const { user, session } = res;
       if (session) {
+        const { access_token } = session;
+
+        await fetch("/api/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${access_token}`,
+          },
+          body: JSON.stringify({
+            id: user.id,
+            email: user.email,
+            name: "New User",
+            bio: "",
+            avatar: user.user_metadata?.avatar_url || null,
+          }),
+        });
+
         setUser(user, session.access_token);
         navigate("/");
       } else {

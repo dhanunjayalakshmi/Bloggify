@@ -10,11 +10,13 @@ function App() {
 
   useEffect(() => {
     const initSession = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
-        setUser(data.user);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser(session.user, session.access_token);
       } else {
-        setUser(null);
+        setUser(null, null);
       }
     };
     initSession();

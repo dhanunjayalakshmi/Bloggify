@@ -24,7 +24,8 @@ router.get("/:id", async (req, res) => {
 //Save user details after Signup
 router.post("/", async (req, res) => {
   try {
-    const { id, email, name, bio, avatar } = req?.body;
+    const { id, email, name = "New User", bio = "", avatar = "" } = req?.body;
+    
     const { data: existingUser, error: fetchError } = await supabase
       .from("users")
       .select("*")
