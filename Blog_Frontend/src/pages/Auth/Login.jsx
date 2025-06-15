@@ -40,7 +40,22 @@ const Login = () => {
       if (error) throw error;
       const { user, session } = userData;
       setUser(user, session?.access_token);
-      navigate("/");
+
+      const { data: profile, error: profileError } = await supabase
+        .from("users")
+        .select("name, bio")
+        .eq("auth_id", user.id)
+        .single();
+
+      if (profileError) throw profileError;
+      const isProfileIncomplete =
+        !profile?.name || profile.name === "New User" || !profile?.bio;
+
+      if (isProfileIncomplete) {
+        navigate("/account/edit");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       setError("root", { message: error?.message });
     }
