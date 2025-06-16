@@ -41,13 +41,20 @@ const Login = () => {
       const { user, session } = userData;
       setUser(user, session?.access_token);
 
-      const { data: profile, error: profileError } = await supabase
-        .from("users")
-        .select("name, bio")
-        .eq("auth_id", user.id)
-        .single();
+      console.log(user);
 
-      if (profileError) throw profileError;
+      const response = await fetch(`/api/users/${user?.id}`, {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+      });
+
+      if (!response?.ok) throw new Error("Failed to fetch user profile");
+
+      const profile = await response.json();
+
+      console.log(profile);
+
       const isProfileIncomplete =
         !profile?.name || profile.name === "New User" || !profile?.bio;
 

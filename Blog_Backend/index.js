@@ -14,14 +14,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/auth", authRoutes);
-app.use("/users", usersRoutes);
-app.use("/blogs", blogsRoutes);
-app.use("/comments", commentsRoutes);
-app.use("/votes", votesRoutes);
-app.use("/bookmarks", bookmarksRoutes);
-app.use("/follows", followsRoutes);
-app.use("/reports", reportsRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/users", usersRoutes);
+app.use("/api/blogs", blogsRoutes);
+app.use("/api/comments", commentsRoutes);
+app.use("/api/votes", votesRoutes);
+app.use("/api/bookmarks", bookmarksRoutes);
+app.use("/api/follows", followsRoutes);
+app.use("/api/reports", reportsRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
