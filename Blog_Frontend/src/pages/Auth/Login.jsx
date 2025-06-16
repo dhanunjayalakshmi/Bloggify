@@ -9,6 +9,7 @@ import { z } from "zod";
 import { supabase } from "@/lib/supabaseClient";
 import { useEffect } from "react";
 import { useAuthStore } from "@/stores/authStore";
+import api from "@/lib/api";
 
 const schema = z.object({
   email: z.string().email("Email address must not empty"),
@@ -38,22 +39,14 @@ const Login = () => {
         password: formData?.password,
       });
       if (error) throw error;
+
       const { user, session } = userData;
+
       setUser(user, session?.access_token);
 
-      console.log(user);
+      const res = await api.get(`/users/${user?.id}`);
 
-      const response = await fetch(`/api/users/${user?.id}`, {
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-      });
-
-      if (!response?.ok) throw new Error("Failed to fetch user profile");
-
-      const profile = await response.json();
-
-      console.log(profile);
+      const profile = res.data;
 
       const isProfileIncomplete =
         !profile?.name || profile.name === "New User" || !profile?.bio;
@@ -64,7 +57,11 @@ const Login = () => {
         navigate("/");
       }
     } catch (error) {
-      setError("root", { message: error?.message });
+      const message =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        error?.message;
+      setError("root", { message });
     }
   };
 
