@@ -15,7 +15,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const logout = useAuthStore((state) => state?.logoutUser);
+  const logout = useAuthStore((state) => state?.clearAuth);
 
   const handleLogout = async () => {
     try {

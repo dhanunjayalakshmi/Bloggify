@@ -19,6 +19,7 @@ const schema = z.object({
 const Login = () => {
   const navigate = useNavigate();
   const setUser = useAuthStore((state) => state.setUser);
+  const setProfile = useAuthStore((state) => state.setProfile);
   const user = useAuthStore((state) => state?.user);
 
   useEffect(() => {
@@ -46,22 +47,18 @@ const Login = () => {
 
       const res = await api.get(`/users/${user?.id}`);
 
-      const profile = res.data;
+      const profile = res?.data;
+
+      setProfile(profile);
 
       const isProfileIncomplete =
         !profile?.name || profile.name === "New User" || !profile?.bio;
 
-      if (isProfileIncomplete) {
-        navigate("/account/edit");
-      } else {
-        navigate("/");
-      }
+      navigate(isProfileIncomplete ? "/account/edit" : "/");
     } catch (error) {
-      const message =
-        error?.response?.data?.error ||
-        error?.response?.data?.message ||
-        error?.message;
-      setError("root", { message });
+      setError("root", {
+        message: error?.response?.data?.error || error.message,
+      });
     }
   };
 
