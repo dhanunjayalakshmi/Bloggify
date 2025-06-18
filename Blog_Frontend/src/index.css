@@ -217,7 +217,7 @@ img.align-center {
 
 @layer base {
   [data-sonner-toast] {
-    @apply px-6 py-4 text-base min-w-[500px] rounded-xl shadow-lg;
+    @apply px-6 py-4 text-base rounded-xl shadow-lg;
   }
 
   [data-sonner-toast] [data-title] {

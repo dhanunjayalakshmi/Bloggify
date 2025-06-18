@@ -9,7 +9,7 @@ import { z } from "zod";
 import { supabase } from "@/lib/supabaseClient";
 import { useEffect } from "react";
 import { useAuthStore } from "@/stores/authStore";
-import api from "@/lib/api";
+import { toast } from "sonner";
 
 const schema = z.object({
   email: z.string().email("Email address must not empty"),
@@ -18,13 +18,9 @@ const schema = z.object({
 
 const Login = () => {
   const navigate = useNavigate();
-  const setUser = useAuthStore((state) => state.setUser);
-  const setProfile = useAuthStore((state) => state.setProfile);
+  const setUser = useAuthStore((state) => state?.setUser);
+  const profile = useAuthStore((state) => state?.profile);
   const user = useAuthStore((state) => state?.user);
-
-  useEffect(() => {
-    if (user) navigate("/");
-  }, [user]);
 
   const {
     register,
@@ -33,30 +29,30 @@ const Login = () => {
     formState: { errors },
   } = useForm({ resolver: zodResolver(schema) });
 
+  useEffect(() => {
+    if (!user || !profile) return;
+
+    const isProfileIncomplete =
+      !profile?.name || profile.name === "New User" || !profile?.bio;
+    toast.success("Login successful!");
+
+    navigate(isProfileIncomplete ? "/account/edit" : "/");
+  }, [profile, user]);
+
   const onSubmit = async (formData) => {
     try {
       const { data: userData, error } = await supabase.auth.signInWithPassword({
         email: formData?.email,
         password: formData?.password,
       });
-      if (error) throw error;
+      if (error) {
+        toast.error(error.message);
+        throw error;
+      }
 
       const { user, session } = userData;
 
       setUser(user, session?.access_token);
-
-      const res = await api.get(`/users/${user?.id}`);
-
-      console.log(userData, error);
-
-      const profile = res?.data;
-
-      setProfile(profile);
-
-      const isProfileIncomplete =
-        !profile?.name || profile.name === "New User" || !profile?.bio;
-
-      navigate(isProfileIncomplete ? "/account/edit" : "/");
     } catch (error) {
       setError("root", {
         message: error?.response?.data?.error || error.message,

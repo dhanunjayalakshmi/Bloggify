@@ -1,26 +1,10 @@
 import { BrowserRouter } from "react-router";
 import AppRoutes from "./routes/AppRoutes";
 import { Toaster } from "@/components/ui/sonner";
-import { useEffect } from "react";
-import { supabase } from "./lib/supabaseClient";
-import { useAuthStore } from "./stores/authStore";
+import useAuthInit from "./hooks/useAuthInit";
 
 function App() {
-  const setUser = useAuthStore((state) => state?.setUser);
-
-  useEffect(() => {
-    const initSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user, session.access_token);
-      } else {
-        setUser(null, null);
-      }
-    };
-    initSession();
-  }, []);
+  useAuthInit();
 
   return (
     <>
