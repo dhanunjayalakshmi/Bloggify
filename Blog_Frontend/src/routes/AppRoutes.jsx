@@ -17,6 +17,7 @@ import Posts from "@/pages/User/PostsTab";
 import Bookmarks from "@/pages/User/BookmarksTab";
 import Settings from "@/pages/User/SettingsTab";
 import EditProfilePage from "@/pages/User/EditProfilePage";
+import PrivateRoute from "@/components/PrivateRoute";
 
 const AppRoutes = () => {
   return (
@@ -28,19 +29,21 @@ const AppRoutes = () => {
         <Route path="/update-password" element={<UpdatePassword />} />
       </Route>
 
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/create" element={<CreateEditBlog />} />
-        <Route path="/blogs/:id" element={<BlogDetails />} />
-        <Route path="/preview" element={<PreviewPage />} />
-        <Route path="/user/:id" element={<AuthorProfilePage />} />
-        <Route path="/account" element={<UserAccountLayout />}>
-          <Route index element={<UserAccountPage />} />
-          <Route path="edit" element={<EditProfilePage />} />
-          <Route path="stats" element={<Stats />} />
-          <Route path="posts" element={<Posts />} />
-          <Route path="bookmarks" element={<Bookmarks />} />
-          <Route path="settings" element={<Settings />} />
+      <Route element={<PrivateRoute />}>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/create" element={<CreateEditBlog />} />
+          <Route path="/blogs/:id" element={<BlogDetails />} />
+          <Route path="/preview" element={<PreviewPage />} />
+          <Route path="/user/:id" element={<AuthorProfilePage />} />
+          <Route path="/account" element={<UserAccountLayout />}>
+            <Route index element={<UserAccountPage />} />
+            <Route path="edit" element={<EditProfilePage />} />
+            <Route path="stats" element={<Stats />} />
+            <Route path="posts" element={<Posts />} />
+            <Route path="bookmarks" element={<Bookmarks />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
         </Route>
       </Route>
     </Routes>
