@@ -85,19 +85,13 @@ const UpdatePassword = () => {
                 </p>
               )}
             </div>
-            <Button className="w-full">Sign Up</Button>
+            <Button className="w-full">Update Password</Button>
             {errors?.root && (
               <p className="text-red-500 text-sm mt-1">
                 {errors?.root?.message}
               </p>
             )}
           </form>
-          <p className="text-center text-sm mt-4 text-gray-900 dark:text-gray-100">
-            Or{" "}
-            <Link to="/login" className="text-blue-500 dark:text-blue-400">
-              Login
-            </Link>
-          </p>
         </CardContent>
       </Card>
     </div>

@@ -18,15 +18,20 @@ import Bookmarks from "@/pages/User/BookmarksTab";
 import Settings from "@/pages/User/SettingsTab";
 import EditProfilePage from "@/pages/User/EditProfilePage";
 import PrivateRoute from "@/components/PrivateRoute";
+import PublicRoute from "@/components/PublicRoute";
 
 const AppRoutes = () => {
   return (
     <Routes>
       <Route element={<AuthLayout />}>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/forgot-password" element={<Forgotpassword />} />
-        <Route path="/update-password" element={<UpdatePassword />} />
+        <Route element={<PublicRoute />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<Forgotpassword />} />
+        </Route>
+        <Route element={<PrivateRoute />}>
+          <Route path="/update-password" element={<UpdatePassword />} />
+        </Route>
       </Route>
 
       <Route element={<PrivateRoute />}>
