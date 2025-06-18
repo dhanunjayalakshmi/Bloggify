@@ -214,3 +214,17 @@ img.align-center {
 .input-compact {
   @apply text-sm py-2 md:py-2.5;
 }
+
+@layer base {
+  [data-sonner-toast] {
+    @apply px-6 py-4 text-base min-w-[500px] rounded-xl shadow-lg;
+  }
+
+  [data-sonner-toast] [data-title] {
+    @apply text-base font-semibold;
+  }
+
+  [data-sonner-toast] [data-description] {
+    @apply text-sm text-gray-600 dark:text-gray-300;
+  }
+}

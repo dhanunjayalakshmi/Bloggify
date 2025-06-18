@@ -47,6 +47,8 @@ const Login = () => {
 
       const res = await api.get(`/users/${user?.id}`);
 
+      console.log(userData, error);
+
       const profile = res?.data;
 
       setProfile(profile);

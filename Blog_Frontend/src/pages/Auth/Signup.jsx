@@ -44,16 +44,33 @@ const Signup = () => {
         password: formData?.password,
       });
 
-      if (error) throw error;
-      const { user, session } = res;
-      if (session) {
-        const { access_token } = session;
+      if (error) {
+        toast.error(error.message || "Signup failed");
+        return;
+      }
 
+      console.log(res, error);
+
+      const { user, session } = res;
+
+      if (user && session === null && user?.identities?.length === 0) {
+        toast.error("This email is already registered. Please log in.");
+        navigate("/login");
+        return;
+      }
+
+      if (user && session === null) {
+        toast.success(
+          "Signup successful! Please check your email to confirm your account."
+        );
+        navigate("/login");
+        return;
+      }
+
+      if (user && session) {
+        const { access_token } = session;
         setUser(user, access_token);
         navigate("/");
-      } else {
-        toast("Please check your email to confirm your account");
-        navigate("/login");
       }
     } catch (error) {
       setError("root", { message: error?.message });
