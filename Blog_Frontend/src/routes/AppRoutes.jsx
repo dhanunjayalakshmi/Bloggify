@@ -19,10 +19,12 @@ import Settings from "@/pages/User/SettingsTab";
 import EditProfilePage from "@/pages/User/EditProfilePage";
 import PrivateRoute from "@/components/PrivateRoute";
 import PublicRoute from "@/components/PublicRoute";
+import LandingPage from "@/pages/LandingPage/LandingPage";
 
 const AppRoutes = () => {
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
       <Route element={<AuthLayout />}>
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<Login />} />
