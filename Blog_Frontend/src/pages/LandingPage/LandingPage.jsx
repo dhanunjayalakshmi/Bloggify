@@ -1,3 +1,4 @@
+import BlogPreviewSection from "@/components/landingPage/BlogPreviewSection";
 import FeaturesSection from "@/components/landingPage/FeaturesSection";
 import HeroSection from "@/components/landingPage/HeroSection";
 import PublicNavbar from "@/components/landingPage/PublicNavbar";
@@ -21,6 +22,7 @@ const LandingPage = () => {
       <PublicNavbar />
       <HeroSection />
       <FeaturesSection />
+      <BlogPreviewSection />
     </div>
   );
 };
