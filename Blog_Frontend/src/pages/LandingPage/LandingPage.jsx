@@ -1,5 +1,6 @@
 import BlogPreviewSection from "@/components/landingPage/BlogPreviewSection";
 import FeaturesSection from "@/components/landingPage/FeaturesSection";
+import Footer from "@/components/landingPage/Footer";
 import HeroSection from "@/components/landingPage/HeroSection";
 import PublicNavbar from "@/components/landingPage/PublicNavbar";
 import { useAuthStore } from "@/stores/authStore";
@@ -23,6 +24,7 @@ const LandingPage = () => {
       <HeroSection />
       <FeaturesSection />
       <BlogPreviewSection />
+      <Footer />
     </div>
   );
 };
