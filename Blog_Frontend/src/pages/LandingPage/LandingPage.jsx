@@ -24,7 +24,6 @@ const LandingPage = () => {
       <HeroSection />
       <FeaturesSection />
       <BlogPreviewSection />
-      <Footer />
     </div>
   );
 };

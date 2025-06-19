@@ -3,12 +3,14 @@ import { useEffect } from "react";
 import { useAuthStore } from "@/stores/authStore"; // corrected path
 import api from "@/lib/api";
 import { supabase } from "@/lib/supabaseClient";
+import useThemeStore from "@/stores/themeStore";
 
 const useAuthInit = () => {
-  const setUser = useAuthStore((s) => s.setUser);
-  const setProfile = useAuthStore((s) => s.setProfile);
-  const user = useAuthStore((s) => s.user);
-  const token = useAuthStore((s) => s.token);
+  const setUser = useAuthStore((store) => store?.setUser);
+  const setProfile = useAuthStore((store) => store?.setProfile);
+  const user = useAuthStore((store) => store?.user);
+  const token = useAuthStore((store) => store?.token);
+  const { theme, setTheme } = useThemeStore();
 
   useEffect(() => {
     const initSession = async () => {
@@ -44,6 +46,10 @@ const useAuthInit = () => {
 
     fetchProfile();
   }, [user, token, setProfile]);
+
+  useEffect(() => {
+    setTheme(theme);
+  }, []);
 };
 
 export default useAuthInit;

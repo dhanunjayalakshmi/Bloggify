@@ -1,8 +1,8 @@
-import AuthLayout from "@/layouts/AuthLayout";
+// import AuthLayout from "@/layouts/AuthLayout";
 import MainLayout from "@/layouts/MainLayout";
-import ForgotPassword from "@/pages/Auth/ForgotPassword";
-import Login from "@/pages/Auth/Login";
-import Signup from "@/pages/Auth/Signup";
+// import ForgotPassword from "@/pages/Auth/ForgotPassword";
+// import Login from "@/pages/Auth/Login";
+// import Signup from "@/pages/Auth/Signup";
 import UpdatePassword from "@/pages/Auth/UpdatePassword";
 import BlogDetails from "@/pages/Blog/BlogDetails";
 import CreateEditBlog from "@/pages/Blog/CreateEditBlog";
@@ -23,32 +23,21 @@ import LandingPage from "@/pages/LandingPage/LandingPage";
 import AboutPage from "@/pages/LandingPage/AboutPage";
 import ContactPage from "@/pages/LandingPage/ContactPage";
 import TermsPage from "@/pages/LandingPage/TermsPage";
+import PublicLayout from "@/layouts/PublicLayout";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public Landing Page */}
-      <Route path="/" element={<LandingPage />} />
-
-      {/* Public Static Pages */}
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/contact" element={<ContactPage />} />
-      <Route path="/terms" element={<TermsPage />} />
-
-      {/* Auth Routes */}
-      <Route element={<AuthLayout />}>
-        <Route element={<PublicRoute />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-        </Route>
-        <Route element={<PrivateRoute />}>
-          <Route path="/update-password" element={<UpdatePassword />} />
-        </Route>
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/terms" element={<TermsPage />} />
       </Route>
 
       {/* Protected Routes */}
       <Route element={<PrivateRoute />}>
+        <Route path="/update-password" element={<UpdatePassword />} />
         <Route element={<MainLayout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/create" element={<CreateEditBlog />} />
