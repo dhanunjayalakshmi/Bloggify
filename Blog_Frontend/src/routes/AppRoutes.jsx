@@ -1,6 +1,6 @@
 import AuthLayout from "@/layouts/AuthLayout";
 import MainLayout from "@/layouts/MainLayout";
-import Forgotpassword from "@/pages/Auth/ForgotPassword";
+import ForgotPassword from "@/pages/Auth/ForgotPassword";
 import Login from "@/pages/Auth/Login";
 import Signup from "@/pages/Auth/Signup";
 import UpdatePassword from "@/pages/Auth/UpdatePassword";
@@ -20,29 +20,42 @@ import EditProfilePage from "@/pages/User/EditProfilePage";
 import PrivateRoute from "@/components/PrivateRoute";
 import PublicRoute from "@/components/PublicRoute";
 import LandingPage from "@/pages/LandingPage/LandingPage";
+import AboutPage from "@/pages/LandingPage/AboutPage";
+import ContactPage from "@/pages/LandingPage/ContactPage";
+import TermsPage from "@/pages/LandingPage/TermsPage";
 
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* Public Landing Page */}
       <Route path="/" element={<LandingPage />} />
+
+      {/* Public Static Pages */}
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/terms" element={<TermsPage />} />
+
+      {/* Auth Routes */}
       <Route element={<AuthLayout />}>
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<Forgotpassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         </Route>
         <Route element={<PrivateRoute />}>
           <Route path="/update-password" element={<UpdatePassword />} />
         </Route>
       </Route>
 
+      {/* Protected Routes */}
       <Route element={<PrivateRoute />}>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/create" element={<CreateEditBlog />} />
           <Route path="/blogs/:id" element={<BlogDetails />} />
           <Route path="/preview" element={<PreviewPage />} />
           <Route path="/user/:id" element={<AuthorProfilePage />} />
+
           <Route path="/account" element={<UserAccountLayout />}>
             <Route index element={<UserAccountPage />} />
             <Route path="edit" element={<EditProfilePage />} />
