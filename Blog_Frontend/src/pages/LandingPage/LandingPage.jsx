@@ -1,3 +1,4 @@
+import FeaturesSection from "@/components/landingPage/FeaturesSection";
 import HeroSection from "@/components/landingPage/HeroSection";
 import PublicNavbar from "@/components/landingPage/PublicNavbar";
 import { useAuthStore } from "@/stores/authStore";
@@ -19,6 +20,7 @@ const LandingPage = () => {
     <div className="min-h-screen bg-white dark:bg-gray-800 text-black dark:text-white">
       <PublicNavbar />
       <HeroSection />
+      <FeaturesSection />
     </div>
   );
 };
