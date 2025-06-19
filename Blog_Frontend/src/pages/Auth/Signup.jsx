@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useEffect } from "react";
 import { useAuthStore } from "@/stores/authStore";
 import { toast } from "sonner";
+import { useModalStore } from "@/stores/modalStore";
 
 const signupSchema = z
   .object({
@@ -23,6 +24,7 @@ const signupSchema = z
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { openModal, closeModal } = useModalStore();
   const setUser = useAuthStore((state) => state.setUser);
   const user = useAuthStore((state) => state?.user);
 
@@ -70,7 +72,9 @@ const Signup = () => {
       if (user && session) {
         const { access_token } = session;
         setUser(user, access_token);
-        navigate("/");
+
+        closeModal();
+        navigate("/home");
       }
     } catch (error) {
       setError("root", { message: error?.message });
@@ -153,9 +157,13 @@ const Signup = () => {
           </form>
           <p className="text-center text-md mt-4 text-gray-900 dark:text-gray-100">
             Already have an account?{" "}
-            <Link to="/login" className="text-blue-500 dark:text-blue-400">
+            <Button
+              variant="ghostButton"
+              className="text-base"
+              onClick={() => openModal("login")}
+            >
               Login
-            </Link>
+            </Button>
           </p>
         </CardContent>
       </Card>

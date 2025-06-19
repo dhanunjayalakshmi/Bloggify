@@ -1,7 +1,9 @@
+import { useModalStore } from "@/stores/modalStore";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router";
 
 const HeroSection = () => {
+  const { openModal } = useModalStore();
   const navigate = useNavigate();
 
   return (
@@ -15,7 +17,7 @@ const HeroSection = () => {
       <div className="mt-6 flex gap-4 flex-wrap justify-center">
         <Button
           className="px-6 py-2 text-base"
-          onClick={() => navigate("/signup")}
+          onClick={() => openModal("login")}
         >
           Get Started
         </Button>

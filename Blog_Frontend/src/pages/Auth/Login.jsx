@@ -10,6 +10,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useEffect } from "react";
 import { useAuthStore } from "@/stores/authStore";
 import { toast } from "sonner";
+import { useModalStore } from "@/stores/modalStore";
 
 const schema = z.object({
   email: z.string().email("Email address must not empty"),
@@ -18,6 +19,7 @@ const schema = z.object({
 
 const Login = () => {
   const navigate = useNavigate();
+  const { openModal, closeModal } = useModalStore();
   const setUser = useAuthStore((state) => state?.setUser);
   const profile = useAuthStore((state) => state?.profile);
   const user = useAuthStore((state) => state?.user);
@@ -34,7 +36,9 @@ const Login = () => {
 
     const isProfileIncomplete =
       !profile?.name || profile.name === "New User" || !profile?.bio;
+
     toast.success("Login successful!");
+    closeModal();
 
     navigate(isProfileIncomplete ? "/account/edit" : "/");
   }, [profile, user]);
@@ -62,7 +66,7 @@ const Login = () => {
 
   return (
     <div className="flex justify-center items-center">
-      <Card className="w-96 p-6 shadow-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700">
+      <Card className="w-96 p-6  bg-white dark:bg-gray-900">
         <h2 className="text-2xl font-bold text-center">Login</h2>
         {errors?.root && (
           <p className="text-red-500 dark:text-red-400 text-center text-lg mt-1">
@@ -133,9 +137,13 @@ const Login = () => {
           </div>
           <p className="text-center text-md mt-4 text-gray-900 dark:text-gray-100">
             Dont have an account ?{" "}
-            <Link to="/signup" className="text-blue-500 dark:text-blue-400">
-              Sign Up
-            </Link>
+            <Button
+              variant="ghostButton"
+              className="text-base"
+              onClick={() => openModal("signup")}
+            >
+              Signup
+            </Button>
           </p>
         </CardContent>
       </Card>

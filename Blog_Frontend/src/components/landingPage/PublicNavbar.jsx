@@ -1,10 +1,10 @@
-import { useNavigate } from "react-router";
 import { Button } from "../ui/button";
 import ThemeToggle from "../ThemeToggle";
 import Logo from "../Logo";
+import { useModalStore } from "@/stores/modalStore";
 
 const PublicNavbar = () => {
-  const navigate = useNavigate();
+  const { openModal } = useModalStore();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow px-4 py-4 flex items-center justify-between">
@@ -16,14 +16,14 @@ const PublicNavbar = () => {
         <Button
           variant="ghost"
           className="text-sm font-medium"
-          onClick={() => navigate("/login")}
+          onClick={() => openModal("login")}
         >
           Login
         </Button>
 
         <Button
           className="text-sm font-medium"
-          onClick={() => navigate("/signup")}
+          onClick={() => openModal("signup")}
         >
           Sign Up
         </Button>
