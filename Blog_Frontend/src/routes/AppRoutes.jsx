@@ -1,5 +1,4 @@
 import MainLayout from "@/layouts/MainLayout";
-// import ForgotPassword from "@/pages/Auth/ForgotPassword";
 import UpdatePassword from "@/pages/Auth/UpdatePassword";
 import BlogDetails from "@/pages/Blog/BlogDetails";
 import CreateEditBlog from "@/pages/Blog/CreateEditBlog";
@@ -15,7 +14,6 @@ import Bookmarks from "@/pages/User/BookmarksTab";
 import Settings from "@/pages/User/SettingsTab";
 import EditProfilePage from "@/pages/User/EditProfilePage";
 import PrivateRoute from "@/components/PrivateRoute";
-import PublicRoute from "@/components/PublicRoute";
 import LandingPage from "@/pages/LandingPage/LandingPage";
 import AboutPage from "@/pages/LandingPage/AboutPage";
 import ContactPage from "@/pages/LandingPage/ContactPage";

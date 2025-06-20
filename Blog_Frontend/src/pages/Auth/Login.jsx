@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
-// import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Lock, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/lib/supabaseClient";
@@ -40,12 +39,11 @@ const Login = () => {
     toast.success("Login successful!");
     closeModal();
 
-    navigate(isProfileIncomplete ? "/account/edit" : "/");
+    navigate(isProfileIncomplete ? "/account/edit" : "/home");
   }, [profile, user]);
 
   const onSubmit = async (formData) => {
     try {
-      console.log(formData);
       const { data: userData, error } = await supabase.auth.signInWithPassword({
         email: formData?.email,
         password: formData?.password,
@@ -57,7 +55,6 @@ const Login = () => {
 
       const { user, session } = userData;
       setUser(user, session?.access_token);
-      closeModal();
     } catch (error) {
       setError("root", {
         message: error?.response?.data?.error || error.message,
