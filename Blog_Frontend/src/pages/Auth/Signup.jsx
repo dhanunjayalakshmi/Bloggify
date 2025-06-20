@@ -24,7 +24,7 @@ const signupSchema = z
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { openModal, closeModal } = useModalStore();
+  const { setMode, closeModal } = useModalStore();
   const setUser = useAuthStore((state) => state.setUser);
   const user = useAuthStore((state) => state?.user);
 
@@ -81,7 +81,7 @@ const Signup = () => {
 
   return (
     <div className="flex justify-center items-center">
-      <div className="w-full max-w-md p-8 shadow-lg bg-white dark:bg-gray-900">
+      <div className="w-full max-w-md p-8 bg-white dark:bg-gray-900">
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
           Sign Up
         </h2>
@@ -158,7 +158,7 @@ const Signup = () => {
             <Button
               variant="ghostButton"
               className="text-base"
-              onClick={() => openModal("login")}
+              onClick={() => setMode("login")}
             >
               Login
             </Button>

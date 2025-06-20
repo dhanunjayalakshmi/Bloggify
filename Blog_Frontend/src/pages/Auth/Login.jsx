@@ -19,7 +19,7 @@ const schema = z.object({
 
 const Login = () => {
   const navigate = useNavigate();
-  const { openModal, closeModal } = useModalStore();
+  const { closeModal, setMode } = useModalStore();
   const setUser = useAuthStore((state) => state?.setUser);
   const profile = useAuthStore((state) => state?.profile);
   const user = useAuthStore((state) => state?.user);
@@ -67,7 +67,7 @@ const Login = () => {
 
   return (
     <div className="flex justify-center items-center">
-      <div className="w-full max-w-md p-8 shadow-lg bg-white dark:bg-gray-900">
+      <div className="w-full max-w-md p-8 bg-white dark:bg-gray-900">
         <h2 className="text-2xl font-bold text-center">Login</h2>
         {errors?.root && (
           <p className="text-red-500 dark:text-red-400 text-center text-lg mt-1">
@@ -115,12 +115,13 @@ const Login = () => {
               )}
             </div>
             <div className="text-right text-sm">
-              <Link
-                to="/forgot-password"
+              <Button
+                variant="ghostButton"
+                onClick={() => setMode("forgot")}
                 className="text-blue-500 dark:text-blue-400"
               >
                 Forgot Password
-              </Link>
+              </Button>
             </div>
             <Button className="w-full">Login</Button>
           </form>
@@ -141,7 +142,7 @@ const Login = () => {
             <Button
               variant="ghostButton"
               className="text-base"
-              onClick={() => openModal("signup")}
+              onClick={() => setMode("signup")}
             >
               Signup
             </Button>

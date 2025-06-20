@@ -1,31 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/lib/supabaseClient";
-import { useEffect } from "react";
-import { useAuthStore } from "@/stores/authStore";
+import { useModalStore } from "@/stores/modalStore";
+import { toast } from "sonner";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email"),
 });
 
 const ForgotPassword = () => {
+  const { setMode } = useModalStore();
   const {
     register,
     handleSubmit,
     setError,
     formState: { errors },
   } = useForm({ resolver: zodResolver(forgotPasswordSchema) });
-  const navigate = useNavigate();
-  const user = useAuthStore((state) => state?.user);
-
-  useEffect(() => {
-    if (user) navigate("/");
-  }, [user]);
 
   const onSubmit = async (formData) => {
     try {
@@ -35,21 +30,29 @@ const ForgotPassword = () => {
           redirectTo: "http://localhost:5173/update-password",
         }
       );
-      if (error) throw error;
+
+      if (error) {
+        throw error;
+      } else {
+        setMode("login");
+        toast.success(
+          "Password reset link sent to your email. Please check your email!!"
+        );
+      }
     } catch (error) {
       setError("root", { message: error?.message });
     }
   };
   return (
-    <div className="flex justify-center items-center p-4">
-      <Card className="w-full max-w-md p-6 shadow-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700">
+    <div className="flex justify-center items-center p-6">
+      <div className="w-full max-w-md p-8 bg-white dark:bg-gray-900">
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
           Reset Password
         </h2>
         <p className="text-gray-500 dark:text-gray-400 text-center mb-4">
           Enter your email to recieve a reset link
         </p>
-        <CardContent className="space-y-4">
+        <div className="space-y-4">
           <form
             onSubmit={handleSubmit(onSubmit)}
             auto-complete="new-password"
@@ -80,12 +83,17 @@ const ForgotPassword = () => {
             )}
           </form>
           <p className="text-center text-sm mt-4 text-gray-900 dark:text-gray-100">
-            <Link to="/" className="text-blue-500 dark:text-blue-400">
-              Back to Login
-            </Link>
+            Back to{" "}
+            <Button
+              variant="ghostButton"
+              onClick={() => setMode("login")}
+              className="text-blue-500 dark:text-blue-400"
+            >
+              Login
+            </Button>
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };

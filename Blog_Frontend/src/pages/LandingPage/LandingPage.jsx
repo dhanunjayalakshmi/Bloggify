@@ -1,4 +1,3 @@
-import AuthModal from "@/components/AuthModal";
 import BlogPreviewSection from "@/components/landingPage/BlogPreviewSection";
 import FeaturesSection from "@/components/landingPage/FeaturesSection";
 import HeroSection from "@/components/landingPage/HeroSection";
