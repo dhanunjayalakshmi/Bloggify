@@ -51,13 +51,11 @@ const Signup = () => {
         return;
       }
 
-      console.log(res, error);
-
       const { user, session } = res;
 
       if (user && session === null && user?.identities?.length === 0) {
         toast.error("This email is already registered. Please log in.");
-        navigate("/login");
+        closeModal();
         return;
       }
 
@@ -65,7 +63,7 @@ const Signup = () => {
         toast.success(
           "Signup successful! Please check your email to confirm your account."
         );
-        navigate("/login");
+        closeModal();
         return;
       }
 
@@ -82,8 +80,8 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex justify-center items-center p-4">
-      <Card className="w-full max-w-md p-6 shadow-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700">
+    <div className="flex justify-center items-center">
+      <div className="w-full max-w-md p-8 shadow-lg bg-white dark:bg-gray-900">
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
           Sign Up
         </h2>
@@ -96,7 +94,7 @@ const Signup = () => {
             {errors?.root?.message}
           </p>
         )}
-        <CardContent className="space-y-4">
+        <div className="space-y-4">
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-4"
@@ -165,8 +163,8 @@ const Signup = () => {
               Login
             </Button>
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };

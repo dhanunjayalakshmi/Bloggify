@@ -1,8 +1,5 @@
-// import AuthLayout from "@/layouts/AuthLayout";
 import MainLayout from "@/layouts/MainLayout";
 // import ForgotPassword from "@/pages/Auth/ForgotPassword";
-// import Login from "@/pages/Auth/Login";
-// import Signup from "@/pages/Auth/Signup";
 import UpdatePassword from "@/pages/Auth/UpdatePassword";
 import BlogDetails from "@/pages/Blog/BlogDetails";
 import CreateEditBlog from "@/pages/Blog/CreateEditBlog";

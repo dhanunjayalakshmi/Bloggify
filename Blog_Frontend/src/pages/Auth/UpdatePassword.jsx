@@ -33,7 +33,7 @@ const UpdatePassword = () => {
       });
 
       if (error) throw error;
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       setError("root", { message: error?.message });
     }

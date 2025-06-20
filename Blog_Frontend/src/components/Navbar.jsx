@@ -24,7 +24,7 @@ const Navbar = () => {
       if (error) throw error;
 
       logout();
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       console.log(error?.message);
     }

@@ -80,7 +80,7 @@ const ForgotPassword = () => {
             )}
           </form>
           <p className="text-center text-sm mt-4 text-gray-900 dark:text-gray-100">
-            <Link to="/login" className="text-blue-500 dark:text-blue-400">
+            <Link to="/" className="text-blue-500 dark:text-blue-400">
               Back to Login
             </Link>
           </p>

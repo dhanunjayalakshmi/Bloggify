@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+// import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Lock, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -45,6 +45,7 @@ const Login = () => {
 
   const onSubmit = async (formData) => {
     try {
+      console.log(formData);
       const { data: userData, error } = await supabase.auth.signInWithPassword({
         email: formData?.email,
         password: formData?.password,
@@ -55,8 +56,8 @@ const Login = () => {
       }
 
       const { user, session } = userData;
-
       setUser(user, session?.access_token);
+      closeModal();
     } catch (error) {
       setError("root", {
         message: error?.response?.data?.error || error.message,
@@ -66,14 +67,14 @@ const Login = () => {
 
   return (
     <div className="flex justify-center items-center">
-      <Card className="w-96 p-6  bg-white dark:bg-gray-900">
+      <div className="w-full max-w-md p-8 shadow-lg bg-white dark:bg-gray-900">
         <h2 className="text-2xl font-bold text-center">Login</h2>
         {errors?.root && (
           <p className="text-red-500 dark:text-red-400 text-center text-lg mt-1">
             {errors?.root?.message}
           </p>
         )}
-        <CardContent className="space-y-4">
+        <div className="space-y-4">
           <form
             onSubmit={handleSubmit(onSubmit)}
             autoComplete="new-password"
@@ -145,8 +146,8 @@ const Login = () => {
               Signup
             </Button>
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };

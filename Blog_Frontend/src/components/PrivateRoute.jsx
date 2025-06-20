@@ -6,7 +6,7 @@ const PrivateRoute = () => {
   const token = useAuthStore((state) => state?.token);
 
   if (!user || !token) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <Outlet />;

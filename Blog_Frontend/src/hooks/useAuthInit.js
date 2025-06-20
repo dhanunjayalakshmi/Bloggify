@@ -1,6 +1,5 @@
-// src/hooks/useAuthInit.js
 import { useEffect } from "react";
-import { useAuthStore } from "@/stores/authStore"; // corrected path
+import { useAuthStore } from "@/stores/authStore";
 import api from "@/lib/api";
 import { supabase } from "@/lib/supabaseClient";
 import useThemeStore from "@/stores/themeStore";
