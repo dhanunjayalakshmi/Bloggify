@@ -1,5 +1,3 @@
-// src/services/bookmarkService.js
-
 export async function addBookmark(blogId) {
   try {
     const res = await fetch(`/api/bookmarks`, {

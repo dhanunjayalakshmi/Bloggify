@@ -11,68 +11,104 @@ const upload = multer();
 // Get all blogs
 router.get("/", async (req, res) => {
   try {
-    let { page, limit, search, sort, tags, authorId } = req?.query;
+    let { page, limit, search, sort, tags, authorId } = req.query;
 
-    page = page ? parseInt(page) : 1;
-    limit = limit ? parseInt(limit) : 10;
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 5;
     const offset = (page - 1) * limit;
 
+    // Get reported blog IDs
     const { data: reportedBlogs, error: reportError } = await supabase
       .from("reports")
       .select("content_id");
 
     if (reportError) throw reportError;
 
-    const reportedBlogIds = reportedBlogs.map((report) => report.content_id);
+    const reportedIds = reportedBlogs?.map((r) => r.content_id) || [];
 
-    let query = supabase
+    // Base query
+    let baseQuery = supabase
       .from("blogs")
-      .select("*", { count: "exact" })
+      .select("*", { count: "exact", head: true })
       .eq("is_published", true);
 
     if (authorId) {
-      query = query.eq("user_id", authorId);
+      baseQuery = baseQuery.eq("user_id", authorId);
     }
 
     if (search) {
-      query = query.or(
-        `title.ilike.%${search.toLowerCase()}%, content.ilike.%${search.toLowerCase()}%`
+      baseQuery = baseQuery.or(
+        `title.ilike.%${search.toLowerCase()}%,content.ilike.%${search.toLowerCase()}%`
       );
     }
 
     if (tags) {
       const tagsArray = tags.includes(",") ? tags.split(",") : [tags];
       const tagsLowerCase = tagsArray.map((tag) => tag.toLowerCase());
-      query = query.contains("tags", tagsLowerCase);
+      baseQuery = baseQuery.contains("tags", tagsLowerCase);
     }
 
-    if (sort === "newest") {
+    // Get total count of matching blogs
+    const { count, error: countError } = await baseQuery;
+    if (countError) throw countError;
+
+    const totalPages = Math.ceil(count / limit);
+    if (page > totalPages && totalPages !== 0) {
+      return res.status(200).json({
+        blogs: [],
+        total: count,
+        page,
+        limit,
+        totalPages,
+      });
+    }
+
+    // Build query
+    let query = supabase
+      .from("blogs")
+      .select("*", { count: "exact" })
+      .eq("is_published", true);
+
+    if (authorId) query = query.eq("user_id", authorId);
+
+    if (search) {
+      const q = search.toLowerCase();
+      query = query.or(`title.ilike.%${q}%,content.ilike.%${q}%`);
+    }
+
+    if (tags && tags !== "All Tags") {
+      const tagsArray = tags.split(",").map((tag) => tag.trim().toLowerCase());
+      query = query.contains("tags", tagsArray);
+    }
+
+    if (sort === "newest")
       query = query.order("published_at", { ascending: false });
-    } else if (sort === "oldest") {
+    else if (sort === "oldest")
       query = query.order("published_at", { ascending: true });
-    } else if (sort === "read_time") {
+    else if (sort === "read_time")
       query = query.order("read_time", { ascending: true });
+
+    // Exclude reported blogs
+    if (reportedIds.length > 0) {
+      query = query.not("id", "in", `(${reportedIds.join(",")})`);
     }
 
+    // Add pagination
     query = query.range(offset, offset + limit - 1);
 
-    const { data, error } = await query;
-
+    const { data: blogs, error } = await query;
     if (error) throw error;
 
-    const filteredBlogs = data.filter(
-      (blog) => !reportedBlogIds.includes(blog.id)
-    );
-
     res.status(200).json({
-      blogs: filteredBlogs,
-      total: filteredBlogs?.length,
+      blogs,
+      total: count || 0,
       page,
       limit,
-      totalPages: Math.ceil(filteredBlogs?.length / limit),
+      totalPages: Math.ceil((count || 0) / limit),
     });
   } catch (error) {
-    res.status(500).json({ error: error?.message });
+    console.error("Fetch Blogs Error:", error?.message);
+    res.status(500).json({ error: error?.message || "Server error" });
   }
 });
 
