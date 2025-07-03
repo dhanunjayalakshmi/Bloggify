@@ -13,7 +13,7 @@ export const useAuthStore = create(
     }),
     {
       name: "auth-storage",
-      getStorage: () => sessionStorage,
+      getStorage: () => localStorage,
     }
   )
 );

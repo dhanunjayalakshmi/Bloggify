@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import BlogList from "../../blogs/BlogList2";
+import BlogList from "../../blogs/BlogList";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import PostFilters from "./PostsFilters";
 

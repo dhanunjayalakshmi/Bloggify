@@ -3,8 +3,10 @@ import DescriptionInput from "@/components/blogEditor/DescriptionInput";
 import TagInput from "@/components/blogEditor/TagInput";
 import TitleInput from "@/components/blogEditor/TitleInput";
 import { Button } from "@/components/ui/button";
+import api from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 const CreateEditBlog = () => {
   const [title, setTitle] = useState("");
@@ -26,9 +28,31 @@ const CreateEditBlog = () => {
         tags,
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (!title || !content) {
+        alert("Title and content are required.");
+        return;
+      }
+
+      const payload = {
+        title,
+        description,
+        content,
+        tags: tags?.join(","),
+        read_time: Math?.ceil(content?.split(" ").length / 200),
+        is_published: status === "published",
+        is_public: true,
+      };
+
+      const res = await api.post("/blogs/", payload);
+      console.log(res);
+
+      if (res?.statusText === "Created") {
+        console.log("Blog saved:", res?.data?.message);
+        toast.success("Blog created successfully!!!!");
+        navigate("/");
+      }
     } catch (error) {
-      console.error("Error saving blog:", error);
+      console.error("Error saving blog:", error?.response?.data || error);
     } finally {
       setIsSaving(false);
     }
