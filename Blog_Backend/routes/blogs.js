@@ -128,11 +128,11 @@ router.get("/:blogId", verifyToken, async (req, res) => {
       return res.status(404).json({ error: "Blog not found" });
     }
 
-    if (!blog.is_published && (!userId || blog.user_id !== userId)) {
+    if (!blog?.is_published && (!userId || blog?.user_id !== userId)) {
       return res.status(404).json({ error: "Access denied" });
     }
 
-    if (blog.is_published && !blog.is_public && !userId) {
+    if (blog?.is_published && !blog?.is_public && !userId) {
       return res.status(403).json({ error: "Authentication required" });
     }
 
@@ -143,8 +143,7 @@ router.get("/:blogId", verifyToken, async (req, res) => {
 });
 
 // Create new blog
-// router.post("/", verifyToken, upload.single("image"), async (req, res) => {
-router.post("/", verifyToken, async (req, res) => {
+router.post("/", verifyToken, upload.single("image"), async (req, res) => {
   try {
     const user = req?.user;
 
@@ -161,20 +160,21 @@ router.post("/", verifyToken, async (req, res) => {
       is_public,
     } = req?.body;
 
-    // const file = req?.file;
+    const file = req?.file;
 
     const { validationError } = validateBlog(title, content);
     if (validationError) {
       return res.status(400).json({ validationError });
     }
 
-    // const imageUrl = await uploadImage(file);
+    const imageUrl = await uploadImage(file);
 
     const { data, error: insertError } = await req?.supabase
       .from("blogs")
       .insert({
         title,
         content,
+        cover_image: imageUrl,
         tags: Array.isArray(tags) ? tags : String(tags).split(","),
         read_time: read_time ? parseInt(read_time) : null,
         user_id,
