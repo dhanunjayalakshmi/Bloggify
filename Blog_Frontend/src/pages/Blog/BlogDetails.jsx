@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router";
+import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
@@ -8,15 +11,38 @@ import {
   ThumbsDown,
   ThumbsUp,
 } from "lucide-react";
-import { useNavigate } from "react-router";
 
 const BlogDetails = () => {
-  const navigate = useNavigate("");
+  const { blogId } = useParams();
+  const navigate = useNavigate();
+  const [blog, setBlog] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        console.log(blogId);
+        const res = await api.get(`/blogs/${blogId}`);
+        setBlog(res?.data);
+      } catch (err) {
+        console.error("Failed to fetch blog", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlog();
+  }, [blogId]);
+
+  if (loading) return <div className="p-4">Loading...</div>;
+  if (!blog) return <div className="p-4">Blog not found.</div>;
+
+  const { title, content, tags, published_at, read_time, users } = blog;
 
   return (
     <div className="max-w-4xl mx-auto p-8 my-8 rounded-lg">
       <h1 className="text-4xl font-bold leading-tight tracking-tight text-foreground dark:text-white">
-        Understanding the Future of Technology
+        {title}
       </h1>
       <p className="text-lg mt-4 text-muted-foreground">
         Explore the latest trends in technology and how they are shaping our
@@ -31,7 +57,10 @@ const BlogDetails = () => {
           >
             <AvatarImage
               className="w-10 h-10 rounded-full object-cover"
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s"
+              src={
+                users?.avatar ||
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s"
+              }
             />
           </Avatar>
           <div className="flex flex-col">
@@ -39,9 +68,12 @@ const BlogDetails = () => {
               className="font-medium text-foreground dark:text-white cursor-pointer"
               onClick={() => navigate("/user/1")}
             >
-              Alex Johnson
+              {users?.name || "Unknown Author"}
             </span>
-            <span className="text-xs">Jan 22, 2024 • 10 min read</span>
+            <span className="text-xs">
+              {new Date(published_at).toLocaleDateString()} • {read_time} min
+              read
+            </span>
           </div>
         </div>
         <Button size="sm">Follow</Button>
@@ -49,24 +81,25 @@ const BlogDetails = () => {
       <div className="flex items-center gap-4 mt-4">
         <Button variant="ghostButton" aria-label="Like">
           <ThumbsUp className="h-5 w-5" />
-          <span className="sr-only">Like</span>
+          {/* <span className="sr-only">Like</span> */}
           <span>120</span>
         </Button>
         <Button variant="ghostButton" aria-label="Comment">
           <MessageCircle className="h-5 w-5" />{" "}
-          <span className="sr-only">Comment</span>
+          {/* <span className="sr-only">Comment</span> */}
           <span>56</span>
         </Button>
         <Button size="icon" variant="ghostButton" aria-label="Bookmark">
           <Bookmark className="h-5 w-5" />{" "}
-          <span className="sr-only">Bookmark</span>
+          {/* <span className="sr-only">Bookmark</span> */}
         </Button>
         <Button size="icon" variant="ghostButton" aria-label="Share">
-          <Share2 className="h-5 w-5" /> <span className="sr-only">Share</span>
+          <Share2 className="h-5 w-5" />
+          {/* <span className="sr-only">Share</span> */}
         </Button>
       </div>
 
-      <div className="prose prose-neutral dark:prose-invert max-w-none mt-6 space-y-2">
+      {/* <div className="prose prose-neutral dark:prose-invert max-w-none mt-6 space-y-2">
         <h3 className="text-xl font-semibold">Synopsis</h3>
         <p className="text-lg">
           Explore the latest trends in technology and how they are shaping our
@@ -79,7 +112,14 @@ const BlogDetails = () => {
           emerging every day. In this article, we delve into some of the most
           exciting developments...
         </p>
-      </div>
+      </div> */}
+
+      <div
+        className="prose prose-neutral dark:prose-invert max-w-none mt-6 space-y-2"
+        dangerouslySetInnerHTML={{ __html: content }}
+      />
+
+      <div className="mt-4">{tags?.join(",")}</div>
 
       <div className="mt-10 space-y-2">
         <div className="flex items-center gap-3">

@@ -120,7 +120,15 @@ router.get("/:blogId", verifyToken, async (req, res) => {
 
     const { data: blog, error } = await supabase
       .from("blogs")
-      .select("*")
+      .select(
+        `
+        *,
+        users (
+          name,
+          avatar
+        )
+      `
+      )
       .eq("id", blogId)
       .single();
 
