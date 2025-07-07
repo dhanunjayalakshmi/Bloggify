@@ -4,7 +4,7 @@ import TagInput from "@/components/blogEditor/TagInput";
 import TitleInput from "@/components/blogEditor/TitleInput";
 import { Button } from "@/components/ui/button";
 import api from "@/lib/api";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
@@ -17,21 +17,27 @@ const CreateEditBlog = () => {
   const [lastSavedState, setLastSavedState] = useState({});
   const [errors] = useState({});
   const navigate = useNavigate();
+  const lastSavedRef = useRef({ title, description, content, tags });
 
-  const saveBlog = async (status = "draft") => {
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const current = { title, description, content, tags };
+      const hasChanged =
+        JSON.stringify(current) !== JSON.stringify(lastSavedRef.current);
+
+      if (hasChanged && title.trim() && content.trim()) {
+        saveBlog("draft", true);
+        lastSavedRef.current = current;
+      }
+    }, 5000);
+
+    return () => clearTimeout(timeout);
+  }, [title, description, content, tags]);
+
+  const saveBlog = async (status = "draft", silent = false) => {
     setIsSaving(true);
     try {
-      console.log(`Saving blog as ${status}...`, {
-        title,
-        description,
-        content,
-        tags,
-      });
-
-      if (!title || !content) {
-        alert("Title and content are required.");
-        return;
-      }
+      if (!title?.trim() && !content?.trim()) return;
 
       const payload = {
         title,
@@ -44,12 +50,17 @@ const CreateEditBlog = () => {
       };
 
       const res = await api.post("/blogs/", payload);
-      console.log(res);
-
       if (res?.statusText === "Created") {
-        console.log("Blog saved:", res?.data?.message);
-        toast.success("Blog created successfully!!!!");
-        navigate("/");
+        if (!silent) {
+          toast.success(
+            status === "published" ? "Blog published!" : "Draft saved."
+          );
+        }
+
+        if (status === "published") {
+          localStorage.removeItem("unsavedDraft");
+          navigate("/");
+        }
       }
     } catch (error) {
       console.error("Error saving blog:", error?.response?.data || error);
@@ -84,7 +95,7 @@ const CreateEditBlog = () => {
   return (
     <div className="flex flex-col max-w-4xl min-h-screen mx-auto py-8 px-4 space-y-6">
       <div className="text-lg py-2">
-        {isSaving ? "Saving..." : "All changes saved"}
+        {isSaving && <p className="text-xs text-white">Saving draft...</p>}
       </div>
 
       <div className="flex-grow space-y-6">
