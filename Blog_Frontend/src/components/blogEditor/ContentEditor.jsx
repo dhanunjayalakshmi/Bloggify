@@ -53,6 +53,7 @@ const extensions = [
 ];
 
 const ContentEditor = ({ content, onChange }) => {
+  console.log(content);
   const initialContent =
     !content || content.includes("<ul></ul>")
       ? "<p>Start writing your blog...</p>"
@@ -68,10 +69,10 @@ const ContentEditor = ({ content, onChange }) => {
 
   useEffect(() => {
     if (!editor) return;
-    if (editor && content && editor.getHTML() !== content) {
+    if (content && editor.getHTML().trim() !== content.trim()) {
       editor.commands.setContent(content, false);
     }
-  }, [editor]);
+  }, [editor, content]);
 
   return (
     <div className="space-y-2">

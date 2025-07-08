@@ -24,10 +24,10 @@ const PreviewPage = () => {
 
       <div className="w-full flex-grow">
         <BlogContentRenderer
-          title={state.title}
-          description={state.description}
-          content={state.content}
-          tags={state.tags}
+          title={state?.title}
+          description={state?.description}
+          content={state?.content}
+          tags={state?.tags}
         />
       </div>
 
