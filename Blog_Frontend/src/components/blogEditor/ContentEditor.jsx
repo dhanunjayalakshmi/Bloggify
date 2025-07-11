@@ -53,7 +53,6 @@ const extensions = [
 ];
 
 const ContentEditor = ({ content, onChange }) => {
-  console.log(content);
   const initialContent =
     !content || content.includes("<ul></ul>")
       ? "<p>Start writing your blog...</p>"

@@ -21,7 +21,6 @@ const BlogDetails = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        console.log(blogId);
         const res = await api.get(`/blogs/${blogId}`);
         setBlog(res?.data);
       } catch (err) {

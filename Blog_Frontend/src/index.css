@@ -134,7 +134,7 @@
 }
 
 .tiptap p {
-  margin: 0 0 0.8em;
+  margin: 0 0 1em;
   font-size: 1.2em;
 }
 
@@ -196,6 +196,14 @@
 
 .tiptap pre code {
   all: unset;
+}
+
+.is-editor-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #a0aec0;
+  pointer-events: none;
+  height: 0;
 }
 
 img.align-center {

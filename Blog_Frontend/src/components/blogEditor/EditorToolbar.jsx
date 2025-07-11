@@ -82,7 +82,8 @@ const EditorToolbar = ({ editor }) => {
 
   return (
     <div className="relative">
-      <div className="flex flex-wrap gap-2 border-b px-4 py-2 bg-muted dark:bg-gray-800">
+      <div className="bg-background/90 dark:bg-gray-800 border rounded shadow-md p-2 flex gap-2">
+        {/* <div className="flex flex-wrap gap-2 px-4 py-2 bg-muted dark:bg-gray-900"> */}
         <Button
           size="icon"
           variant="ghost"

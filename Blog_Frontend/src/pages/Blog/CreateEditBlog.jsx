@@ -1,4 +1,4 @@
-import ContentEditor from "@/components/blogEditor/ContentEditor";
+import ContentEditor from "@/pages/Blog/CreateEditBlog2";
 import DescriptionInput from "@/components/blogEditor/DescriptionInput";
 import TagInput from "@/components/blogEditor/TagInput";
 import TitleInput from "@/components/blogEditor/TitleInput";
@@ -29,11 +29,9 @@ const CreateEditBlog = () => {
   // Load from localStorage or preview
   useEffect(() => {
     const saved = localStorage?.getItem(LOCAL_STORAGE_KEY);
-    // console.log(saved);
     if (saved) {
       try {
         const draft = JSON.parse(saved);
-        console.log(draft);
         setTitle(draft?.title || "");
         setDescription(draft?.description || "");
         setContent(draft?.content || "");
@@ -42,15 +40,14 @@ const CreateEditBlog = () => {
       } catch (err) {
         console.error("Failed to parse saved draft:", err);
       }
+    } else if (location?.state) {
+      const { title, description, content, tags } = location.state;
+      setTitle(title);
+      setDescription(description);
+      setContent(content);
+      setTags(tags);
+      lastSavedRef.current = { title, description, content, tags };
     }
-    // else if (location?.state) {
-    //   const { title, description, content, tags } = location.state;
-    //   setTitle(title);
-    //   setDescription(description);
-    //   setContent(content);
-    //   setTags(tags);
-    //   lastSavedRef.current = { title, description, content, tags };
-    // }
   }, [location.state]);
 
   const hasUnsavedChanges = () => {
