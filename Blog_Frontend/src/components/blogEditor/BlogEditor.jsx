@@ -55,28 +55,33 @@ const BlogEditor = ({ content = "", onChange, title, setTitle }) => {
     },
   });
 
-  // 🧠 Handle Selection & Double Click for Toolbar
+  // 📌 Unified Selection Logic
+  const showToolbarAtSelection = () => {
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed) {
+      setShowToolbar(false);
+      return;
+    }
+
+    const text = selection.toString().trim();
+    if (!text) {
+      setShowToolbar(false);
+      return;
+    }
+
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+
+    setToolbarPosition({
+      top: rect.top + window.scrollY - 50,
+      left: rect.left + window.scrollX,
+    });
+
+    setShowToolbar(true);
+  };
+
   useEffect(() => {
     if (!editor) return;
-
-    const showToolbarAtSelection = () => {
-      const selection = window.getSelection();
-      if (!selection || selection.isCollapsed) return;
-
-      const text = selection.toString().trim();
-      if (!text) return;
-
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-
-      // Show toolbar near selection
-      setToolbarPosition({
-        top: rect.top + window.scrollY - 50,
-        left: rect.left + window.scrollX,
-      });
-
-      setShowToolbar(true);
-    };
 
     const handleDoubleClick = (e) => {
       const range = document.caretRangeFromPoint(e.clientX, e.clientY);
@@ -96,14 +101,19 @@ const BlogEditor = ({ content = "", onChange, title, setTitle }) => {
     };
 
     const handleMouseUp = () => {
-      // Add slight delay to let selection settle
+      setTimeout(() => {
+        showToolbarAtSelection();
+      }, 50);
+    };
+
+    const handleSelectionChange = () => {
+      // keyboard-based selection
       setTimeout(() => {
         showToolbarAtSelection();
       }, 50);
     };
 
     const handleClick = (e) => {
-      // Don’t hide if clicked inside toolbar
       if (!e.target.closest(".tiptap-toolbar")) {
         setShowToolbar(false);
       }
@@ -111,18 +121,20 @@ const BlogEditor = ({ content = "", onChange, title, setTitle }) => {
 
     document.addEventListener("dblclick", handleDoubleClick);
     document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("selectionchange", handleSelectionChange);
     document.addEventListener("click", handleClick);
 
     return () => {
       document.removeEventListener("dblclick", handleDoubleClick);
       document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("selectionchange", handleSelectionChange);
       document.removeEventListener("click", handleClick);
     };
   }, [editor]);
 
   return (
     <div className="bg-white dark:bg-gray-800 min-h-[calc(100vh-13em)] my-6 pt-6">
-      {/* 🎯 Floating Toolbar */}
+      {/* ✨ Floating Toolbar */}
       {editor && showToolbar && (
         <div
           className="tiptap-toolbar absolute z-50 bg-background dark:bg-gray-800 rounded shadow-md transition-all"
@@ -135,7 +147,7 @@ const BlogEditor = ({ content = "", onChange, title, setTitle }) => {
         </div>
       )}
 
-      <div ref={editorRef} className="w-full mx-auto px-4 pb-16 relative">
+      <div ref={editorRef} className="w-full mx-auto px-4 pb-16">
         <input
           type="text"
           value={title}
