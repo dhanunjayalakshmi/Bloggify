@@ -1,61 +1,13 @@
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Placeholder from "@tiptap/extension-placeholder";
-import TextAlign from "@tiptap/extension-text-align";
-import Underline from "@tiptap/extension-underline";
-import Highlight from "@tiptap/extension-highlight";
-import Image from "@tiptap/extension-image";
+// BlogEditor.jsx
+import { EditorContent } from "@tiptap/react";
 import { useEffect, useRef, useState } from "react";
 import EditorToolbar from "./EditorToolbar";
 
-const BlogEditor = ({ content = "", onChange, title, setTitle }) => {
+const BlogEditor = ({ editor, title, setTitle }) => {
   const [showToolbar, setShowToolbar] = useState(false);
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
   const editorRef = useRef(null);
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
-      Placeholder.configure({
-        placeholder: "Write something...",
-        showOnlyWhenEditable: true,
-        showOnlyCurrent: false,
-        emptyEditorClass: "is-editor-empty",
-      }),
-      TextAlign.configure({ types: ["heading", "paragraph"] }),
-      Underline,
-      Highlight,
-      Image,
-    ],
-    content: content?.trim() || "<p></p>",
-    autofocus: "start",
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
-    },
-    editorProps: {
-      attributes: {
-        class:
-          "prose prose-lg dark:prose-invert max-w-3xl mx-auto px-4 focus:outline-none",
-      },
-      handleDOMEvents: {
-        keydown: (view, event) => {
-          const { $from } = view.state.selection;
-
-          // Prevent multiple empty paragraphs before typing
-          if (
-            event.key === "Enter" &&
-            $from.parent.type.name === "paragraph" &&
-            $from.parent.textContent.trim() === "" &&
-            $from.pos > 5
-          ) {
-            return true;
-          }
-        },
-      },
-    },
-  });
-
-  // 📌 Unified Selection Logic
   const showToolbarAtSelection = () => {
     const selection = window.getSelection();
     if (!selection || selection.isCollapsed) {
@@ -107,7 +59,6 @@ const BlogEditor = ({ content = "", onChange, title, setTitle }) => {
     };
 
     const handleSelectionChange = () => {
-      // keyboard-based selection
       setTimeout(() => {
         showToolbarAtSelection();
       }, 50);
@@ -133,7 +84,7 @@ const BlogEditor = ({ content = "", onChange, title, setTitle }) => {
   }, [editor]);
 
   return (
-    <div className="bg-white dark:bg-gray-800 min-h-[calc(100vh-13em)] my-6 pt-6">
+    <div className="bg-white dark:bg-gray-800 min-h-[calc(100vh-15em)] mt-6 pt-6">
       {/* ✨ Floating Toolbar */}
       {editor && showToolbar && (
         <div
