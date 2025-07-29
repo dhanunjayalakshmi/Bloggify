@@ -1,11 +1,18 @@
-// BlogEditor.jsx
 import { EditorContent } from "@tiptap/react";
 import { useEffect, useRef, useState } from "react";
 import EditorToolbar from "./EditorToolbar";
+import CoverImageUpload from "./CoverImageUpload";
 
-const BlogEditor = ({ editor, title, setTitle }) => {
+const BlogEditor = ({
+  editor,
+  title,
+  setTitle,
+  coverImageUrl,
+  setCoverImageUrl,
+}) => {
   const [showToolbar, setShowToolbar] = useState(false);
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+
   const editorRef = useRef(null);
 
   const showToolbarAtSelection = () => {
@@ -84,8 +91,7 @@ const BlogEditor = ({ editor, title, setTitle }) => {
   }, [editor]);
 
   return (
-    <div className="bg-white dark:bg-gray-800 min-h-[calc(100vh-15em)] mt-6 pt-6">
-      {/* ✨ Floating Toolbar */}
+    <div className="bg-white dark:bg-gray-800 mt-6 pt-6 rounded-lg">
       {editor && showToolbar && (
         <div
           className="tiptap-toolbar absolute z-50 bg-background dark:bg-gray-800 rounded shadow-md transition-all"
@@ -106,6 +112,12 @@ const BlogEditor = ({ editor, title, setTitle }) => {
           placeholder="Title..."
           className="w-full text-4xl px-2 font-bold bg-transparent border-none outline-none mb-4 placeholder:text-gray-400 dark:placeholder:text-gray-500"
         />
+        <CoverImageUpload
+          coverImageUrl={coverImageUrl}
+          setCoverImageUrl={setCoverImageUrl}
+          editor={editor}
+        />
+
         <EditorContent editor={editor} />
       </div>
     </div>

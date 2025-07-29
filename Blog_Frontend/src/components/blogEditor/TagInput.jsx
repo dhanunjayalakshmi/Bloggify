@@ -60,21 +60,24 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap gap-1">
-        {selectedTags?.map((tag, index) => (
+      <div className="flex flex-wrap gap-1 mt-2">
+        {selectedTags?.map((tag) => (
           <Badge
+            key={tag}
             variant="secondary"
-            key={index}
-            className="flex items-center gap-1 px-2 py-1 text-sm bg-gray-100 dark:bg-gray-700 dark:text-white"
+            className="flex items-center gap-1 p-1 text-sm bg-gray-100 dark:bg-gray-700 dark:text-white"
           >
             {tag}
+
             <Button
-              variant="icon"
-              className="hover:text-gray-400"
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-5 w-5 p-0 hover:text-gray-400"
               onClick={() => handleRemoveTag(tag)}
               aria-label="Remove tag"
             >
-              <X className="h-3 w-3" />
+              <X size={14} />
             </Button>
           </Badge>
         ))}
@@ -87,12 +90,12 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
         <Input
           type="text"
           className={`${
-            selectedTags.length >= MAX_TAGS
+            selectedTags?.length >= MAX_TAGS
               ? "opacity-50 cursor-not-allowed"
               : ""
           } text-lg bg-white dark:bg-gray-800 border-1 border-gray-300 shadow-sm hover:shadow-md dark:border-none`}
           placeholder={
-            selectedTags.length >= MAX_TAGS
+            selectedTags?.length >= MAX_TAGS
               ? `Tag limit reached (${MAX_TAGS})`
               : "Type and press Enter to add tags..."
           }
