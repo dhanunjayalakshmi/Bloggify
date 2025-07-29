@@ -55,7 +55,7 @@ const CreateEditBlog = () => {
   const editor = useEditor({
     extensions,
     autofocus: "start",
-    content: "<h1></h1><p></p>", // Blank initial document
+    content: "<h1></h1><p></p>",
     editorProps: {
       attributes: {
         class:
@@ -63,7 +63,14 @@ const CreateEditBlog = () => {
       },
     },
     onUpdate({ editor }) {
-      localStorage.setItem("unsavedDraft", editor.getHTML());
+      const html = editor.getHTML();
+      const draftData = {
+        html,
+        title,
+        tags: selectedTags,
+        coverImageUrl,
+      };
+      localStorage.setItem("unsavedDraft", JSON.stringify(draftData));
     },
   });
 
@@ -113,28 +120,33 @@ const CreateEditBlog = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const saved = localStorage.getItem("unsavedDraft");
-  //   if (editor && saved) {
-  //     editor.commands.setContent(saved);
-  //   }
-  // }, [editor]);
-
   useEffect(() => {
     if (!editor) return;
 
     const autoSaveInterval = setInterval(() => {
-      const currentContent = editor.getHTML();
-      localStorage.setItem("unsavedDraft", currentContent);
+      const html = editor.getHTML();
+      const draftData = {
+        html,
+        title,
+        tags: selectedTags,
+        coverImageUrl,
+      };
+      localStorage.setItem("unsavedDraft", JSON.stringify(draftData));
       console.log("Auto-saved draft to localStorage");
     }, 30000);
 
+    return () => clearInterval(autoSaveInterval);
+  }, [editor]);
+
+  useEffect(() => {
     const saved = localStorage.getItem("unsavedDraft");
     if (editor && saved) {
-      editor.commands.setContent(saved);
+      const { html, title, tags, coverImageUrl } = JSON.parse(saved);
+      editor.commands.setContent(html);
+      setTitle(title || "");
+      setSelectedTags(tags || []);
+      setCoverImageUrl(coverImageUrl || "");
     }
-
-    return () => clearInterval(autoSaveInterval);
   }, [editor]);
 
   return (
