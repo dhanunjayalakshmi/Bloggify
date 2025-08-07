@@ -2,6 +2,8 @@ import { EditorContent } from "@tiptap/react";
 import { useEffect, useRef, useState } from "react";
 import EditorToolbar from "./EditorToolbar";
 import CoverImageUpload from "./CoverImageUpload";
+import { useEditorImageUpload } from "@/hooks/useEditorImageUpload";
+import FloatingPlusMenu from "./FloatingPlusMenu";
 
 const BlogEditor = ({
   editor,
@@ -12,6 +14,7 @@ const BlogEditor = ({
 }) => {
   const [showToolbar, setShowToolbar] = useState(false);
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+  const { handleImageUpload } = useEditorImageUpload(editor);
 
   const editorRef = useRef(null);
 
@@ -37,6 +40,12 @@ const BlogEditor = ({
     });
 
     setShowToolbar(true);
+  };
+
+  const handleInsertImage = async () => {
+    if (!editor) return;
+    console.log("handleInsertImage called");
+    await handleImageUpload({ insertToEditor: true });
   };
 
   useEffect(() => {
@@ -117,6 +126,9 @@ const BlogEditor = ({
           setCoverImageUrl={setCoverImageUrl}
           editor={editor}
         />
+        {editor && (
+          <FloatingPlusMenu editor={editor} onPlusClick={handleInsertImage} />
+        )}
 
         <EditorContent editor={editor} />
       </div>

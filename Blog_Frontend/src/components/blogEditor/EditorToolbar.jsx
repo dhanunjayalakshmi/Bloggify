@@ -3,7 +3,6 @@ import {
   Code,
   Heading1,
   Heading2,
-  ImageIcon,
   Italic,
   List,
   ListOrdered,
@@ -21,12 +20,8 @@ import {
 } from "lucide-react";
 
 import { Button } from "../ui/button";
-import { useEditorImageUpload } from "@/hooks/useEditorImageUpload";
 
 const EditorToolbar = ({ editor }) => {
-  const { handleImageUpload, uploading, ImageSizeToolbar } =
-    useEditorImageUpload(editor);
-
   return (
     <div className="relative">
       <div className="bg-background/90 dark:bg-gray-800 border rounded shadow-md p-2 flex gap-2">
@@ -127,7 +122,6 @@ const EditorToolbar = ({ editor }) => {
           <Quote size={18} />
         </Button>
 
-        {/* Horizontal rule */}
         <Button
           size="icon"
           variant="ghost"
@@ -135,16 +129,6 @@ const EditorToolbar = ({ editor }) => {
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
         >
           <Minus size={18} />
-        </Button>
-
-        <Button
-          disabled={uploading}
-          size="icon"
-          variant="ghost"
-          className="hover:bg-gray-200 dark:hover:bg-gray-700"
-          onClick={async () => await handleImageUpload()}
-        >
-          <ImageIcon size={18} />
         </Button>
 
         <Button
@@ -197,7 +181,6 @@ const EditorToolbar = ({ editor }) => {
           <Redo size={18} />
         </Button>
       </div>
-      {ImageSizeToolbar}
     </div>
   );
 };

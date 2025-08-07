@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { useEditor } from "@tiptap/react";
+import { ReactNodeViewRenderer, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import BlogEditor from "@/components/blogEditor/BlogEditor";
 import TagInput from "@/components/blogEditor/TagInput";
 import Image from "@tiptap/extension-image";
+import ImageWithToolbar from "@/components/blogEditor/ImageWithToolbar";
 
 const CustomImage = Image.extend({
   addAttributes() {
@@ -33,6 +34,9 @@ const CustomImage = Image.extend({
       },
     };
   },
+  addNodeView() {
+    return ReactNodeViewRenderer(ImageWithToolbar);
+  },
 });
 
 const extensions = [
@@ -55,7 +59,7 @@ const CreateEditBlog = () => {
   const editor = useEditor({
     extensions,
     autofocus: "start",
-    content: "<h1></h1><p></p>",
+    content: "<h1></h1><p></p><p></p>",
     editorProps: {
       attributes: {
         class:
@@ -81,10 +85,8 @@ const CreateEditBlog = () => {
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = html;
 
-    // const titleElement = tempDiv.querySelector("h1");
     const contentElements = tempDiv.querySelectorAll("p, h2, h3, ul, ol");
 
-    // const extractedTitle = titleElement?.textContent || "";
     const extractedTitle = title.trim();
     const content = [...contentElements].map((el) => el.outerHTML).join("");
 

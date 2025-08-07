@@ -19,8 +19,6 @@ const CoverImageUpload = ({ coverImageUrl, setCoverImageUrl, editor }) => {
     }
   };
 
-  console.log("CoverImageUpload re-rendered. coverImageUrl =", coverImageUrl);
-
   return (
     <>
       <div
