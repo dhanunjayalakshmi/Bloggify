@@ -163,7 +163,7 @@ const CreateEditBlog = () => {
 
       <TagInput selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
 
-      <div className="p-4 flex justify-around gap-2">
+      <div className="p-4 flex justify-around gap-2 mt-2">
         <Button variant="outline" onClick={() => saveBlog("draft")}>
           Save Draft
         </Button>
