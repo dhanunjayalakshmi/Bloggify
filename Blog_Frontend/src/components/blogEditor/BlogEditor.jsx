@@ -9,13 +9,13 @@ const BlogEditor = ({
   editor,
   title,
   setTitle,
+  draftId,
   coverImageUrl,
   setCoverImageUrl,
 }) => {
   const [showToolbar, setShowToolbar] = useState(false);
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
-  const { handleImageUpload } = useEditorImageUpload(editor);
-
+  const { handleImageUpload } = useEditorImageUpload(editor, draftId);
   const editorRef = useRef(null);
 
   const showToolbarAtSelection = () => {
@@ -43,41 +43,19 @@ const BlogEditor = ({
   };
 
   const handleInsertImage = async () => {
-    if (!editor) return;
-    console.log("handleInsertImage called");
+    if (!editor || !draftId) return;
     await handleImageUpload({ insertToEditor: true });
   };
 
   useEffect(() => {
     if (!editor) return;
 
-    const handleDoubleClick = (e) => {
-      const range = document.caretRangeFromPoint(e.clientX, e.clientY);
-      if (!range) return;
-
-      const rect = range.getBoundingClientRect();
-      const pos = editor.view.posAtCoords({ left: e.clientX, top: e.clientY });
-      const node = pos ? editor.view.state.doc.nodeAt(pos.pos) : null;
-
-      if (node && node.textContent?.trim().length > 0) {
-        setToolbarPosition({
-          top: rect.top + window.scrollY - 50,
-          left: rect.left + window.scrollX,
-        });
-        setShowToolbar(true);
-      }
-    };
-
     const handleMouseUp = () => {
-      setTimeout(() => {
-        showToolbarAtSelection();
-      }, 50);
+      setTimeout(showToolbarAtSelection, 50);
     };
 
     const handleSelectionChange = () => {
-      setTimeout(() => {
-        showToolbarAtSelection();
-      }, 50);
+      setTimeout(showToolbarAtSelection, 50);
     };
 
     const handleClick = (e) => {
@@ -86,13 +64,11 @@ const BlogEditor = ({
       }
     };
 
-    document.addEventListener("dblclick", handleDoubleClick);
     document.addEventListener("mouseup", handleMouseUp);
     document.addEventListener("selectionchange", handleSelectionChange);
     document.addEventListener("click", handleClick);
 
     return () => {
-      document.removeEventListener("dblclick", handleDoubleClick);
       document.removeEventListener("mouseup", handleMouseUp);
       document.removeEventListener("selectionchange", handleSelectionChange);
       document.removeEventListener("click", handleClick);
@@ -121,11 +97,13 @@ const BlogEditor = ({
           placeholder="Title..."
           className="w-full text-4xl px-2 font-bold bg-transparent border-none outline-none mb-4 placeholder:text-gray-400 dark:placeholder:text-gray-500"
         />
+
         <CoverImageUpload
           coverImageUrl={coverImageUrl}
           setCoverImageUrl={setCoverImageUrl}
-          editor={editor}
+          draftId={draftId}
         />
+
         {editor && (
           <FloatingPlusMenu editor={editor} onPlusClick={handleInsertImage} />
         )}

@@ -1,150 +1,257 @@
-import ContentEditor from "@/pages/Blog/CreateEditBlog2";
-import DescriptionInput from "@/components/blogEditor/DescriptionInput";
-import TagInput from "@/components/blogEditor/TagInput";
-import TitleInput from "@/components/blogEditor/TitleInput";
+import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router";
+import { ReactNodeViewRenderer, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Placeholder from "@tiptap/extension-placeholder";
 import { Button } from "@/components/ui/button";
 import api from "@/lib/api";
-import { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
+import BlogEditor from "@/components/blogEditor/BlogEditor";
+import TagInput from "@/components/blogEditor/TagInput";
+import Image from "@tiptap/extension-image";
+import ImageWithToolbar from "@/components/blogEditor/ImageWithToolbar";
 
-const LOCAL_STORAGE_KEY = "unsavedDraft";
+const CustomImage = Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      width: {
+        default: "auto",
+        parseHTML: (element) => element.getAttribute("width") || "auto",
+        renderHTML: (attributes) => ({ width: attributes.width }),
+      },
+      align: {
+        default: "center",
+        parseHTML: () => "center",
+        renderHTML: () => ({
+          "data-align": "center",
+          class: "align-center",
+        }),
+      },
+    };
+  },
+  addNodeView() {
+    return ReactNodeViewRenderer(ImageWithToolbar);
+  },
+});
+
+const extensions = [
+  StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
+  Placeholder.configure({
+    placeholder: ({ node }) =>
+      node.type.name === "heading" ? "Title..." : "Tell your story...",
+    showOnlyWhenEditable: true,
+    showOnlyCurrent: false,
+  }),
+  CustomImage,
+];
+
+const randomDraftId = () => {
+  return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
+    (
+      c ^
+      (crypto.getRandomValues(new Uint8Array(1)) & (15 >> (c / 4)))
+    ).toString(16)
+  );
+};
+
+const DRAFT_KEY = "unsavedDraft";
 
 const CreateEditBlog = () => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [content, setContent] = useState("");
-  const [tags, setTags] = useState([]);
-  const [isSaving, setIsSaving] = useState(false);
-  const [errors] = useState({});
   const navigate = useNavigate();
-  const location = useLocation();
-  const lastSavedRef = useRef({
-    title: "",
-    description: "",
-    content: "",
-    tags: [],
-  });
+  const [title, setTitle] = useState("");
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [coverImageUrl, setCoverImageUrl] = useState("");
+  const [draftId, setDraftId] = useState("");
+  const [initialContent, setInitialContent] = useState(
+    "<h1></h1><p></p><p></p>"
+  );
+  const [isDraftLoaded, setIsDraftLoaded] = useState(false);
 
-  // Load from localStorage or preview
-  useEffect(() => {
-    const saved = localStorage?.getItem(LOCAL_STORAGE_KEY);
-    if (saved) {
-      try {
-        const draft = JSON.parse(saved);
-        setTitle(draft?.title || "");
-        setDescription(draft?.description || "");
-        setContent(draft?.content || "");
-        setTags(draft?.tags || []);
-        lastSavedRef.current = draft;
-      } catch (err) {
-        console.error("Failed to parse saved draft:", err);
-      }
-    } else if (location?.state) {
-      const { title, description, content, tags } = location.state;
-      setTitle(title);
-      setDescription(description);
-      setContent(content);
-      setTags(tags);
-      lastSavedRef.current = { title, description, content, tags };
-    }
-  }, [location.state]);
-
-  const hasUnsavedChanges = () => {
-    return (
-      JSON.stringify({ title, description, content, tags }) !==
-      JSON.stringify(lastSavedRef.current)
-    );
-  };
-
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (hasUnsavedChanges()) {
-        e.preventDefault();
-        e.returnValue = "";
-      }
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [title, description, content, tags]);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (hasUnsavedChanges()) {
-        const draft = { title, description, content, tags };
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(draft));
-        lastSavedRef.current = draft;
-      }
-    }, 5000);
-    return () => clearTimeout(timeout);
-  }, [title, description, content, tags]);
-
-  const saveBlog = async (status = "draft", silent = false) => {
-    if (!title.trim() || !content.trim()) return;
-
-    setIsSaving(true);
+  // Load draft data from localStorage
+  const loadDraft = useCallback(() => {
     try {
-      const payload = {
+      const savedDraft = localStorage.getItem(DRAFT_KEY);
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft);
+        return {
+          html: parsed.html || "<h1></h1><p></p><p></p>",
+          title: parsed.title || "",
+          tags: Array.isArray(parsed.tags) ? parsed.tags : [],
+          coverImageUrl: parsed.coverImageUrl || "",
+          draftId: parsed.draftId || randomDraftId(),
+        };
+      }
+    } catch (error) {
+      console.error("Failed to parse saved draft:", error);
+    }
+    return null;
+  }, []);
+
+  // Save draft data to localStorage
+  const saveDraft = useCallback((data) => {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+    } catch (error) {
+      console.error("Failed to save draft:", error);
+    }
+  }, []);
+
+  // Load draft on component mount BEFORE editor initialization
+  useEffect(() => {
+    const draft = loadDraft();
+    if (draft) {
+      setTitle(draft.title);
+      setSelectedTags(draft.tags);
+      setCoverImageUrl(draft.coverImageUrl);
+      setDraftId(draft.draftId);
+      setInitialContent(draft.html);
+    } else {
+      const newDraftId = randomDraftId();
+      setDraftId(newDraftId);
+      saveDraft({
+        draftId: newDraftId,
+        html: "<h1></h1><p></p><p></p>",
+        title: "",
+        tags: [],
+        coverImageUrl: "",
+        lastUpdated: new Date().toISOString(),
+      });
+    }
+    setIsDraftLoaded(true);
+  }, [loadDraft, saveDraft]);
+
+  // Initialize editor AFTER draft is loaded
+  const editor = useEditor(
+    {
+      extensions,
+      autofocus: "start",
+      content: initialContent,
+      editorProps: {
+        attributes: {
+          class:
+            "focus:outline-none prose dark:prose-invert prose-lg max-w-3xl mx-auto py-12 px-4",
+        },
+      },
+      onUpdate({ editor }) {
+        // Auto-save on every change
+        const html = editor.getHTML();
+        const draftData = {
+          html,
+          title,
+          tags: selectedTags,
+          coverImageUrl,
+          draftId,
+          lastUpdated: new Date().toISOString(),
+        };
+        saveDraft(draftData);
+      },
+    },
+    [initialContent, isDraftLoaded]
+  ); // Re-create editor when content changes
+
+  // Auto-save interval
+  useEffect(() => {
+    if (!editor || !isDraftLoaded) return;
+
+    const autoSaveInterval = setInterval(() => {
+      const html = editor.getHTML();
+      const draftData = {
+        html,
         title,
-        description,
-        content,
-        tags: tags?.join(","),
-        read_time: Math?.ceil(content?.split(" ").length / 200),
-        is_published: status === "published",
-        is_public: true,
+        tags: selectedTags,
+        coverImageUrl,
+        draftId,
+        lastUpdated: new Date().toISOString(),
       };
+      saveDraft(draftData);
+      console.log("Auto-saved draft to localStorage");
+    }, 30000);
 
+    return () => clearInterval(autoSaveInterval);
+  }, [
+    editor,
+    isDraftLoaded,
+    title,
+    selectedTags,
+    coverImageUrl,
+    draftId,
+    saveDraft,
+  ]);
+
+  const saveBlog = async (status = "draft") => {
+    if (!editor) return;
+
+    const html = editor.getHTML();
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html;
+
+    const contentElements = tempDiv.querySelectorAll("p, h2, h3, ul, ol");
+    const extractedTitle = title.trim();
+    const content = [...contentElements].map((el) => el.outerHTML).join("");
+
+    if (!extractedTitle || !content.trim()) {
+      toast.error("Title and content are required.");
+      return;
+    }
+
+    const payload = {
+      title: extractedTitle,
+      content: `<h1>${extractedTitle}</h1>${content}`,
+      description: content.replace(/<[^>]*>/g, "").substring(0, 150),
+      tags: selectedTags,
+      coverImageUrl,
+      read_time: Math.ceil(content.split(" ").length / 200),
+      is_published: status === "published",
+      is_public: true,
+      draftId,
+    };
+
+    try {
       const res = await api.post("/blogs/", payload);
+      if (res?.status === 201) {
+        toast.success(
+          status === "published" ? "Blog published!" : "Draft saved."
+        );
 
-      if (res?.statusText === "Created") {
-        localStorage.removeItem(LOCAL_STORAGE_KEY);
-        lastSavedRef.current = { title, description, content, tags };
-
-        if (!silent) {
-          toast.success(
-            status === "published" ? "Blog published!" : "Draft saved."
-          );
-        }
+        localStorage.removeItem(DRAFT_KEY);
 
         if (status === "published") {
           navigate("/");
         }
       }
-    } catch (error) {
-      console.error("Error saving blog:", error?.response?.data || error);
-    } finally {
-      setIsSaving(false);
+    } catch (err) {
+      console.error("Save blog error:", err);
+      toast.error("Failed to save blog.");
     }
   };
 
-  const handlePreview = () => {
-    const current = { title, description, content, tags };
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(current));
-    navigate("/preview", { state: current });
-  };
+  if (!isDraftLoaded || !editor) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading draft...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col max-w-4xl min-h-screen mx-auto py-8 px-4 space-y-6">
-      <div className="text-lg py-2">
-        {isSaving && <p className="text-xs text-white">Saving draft...</p>}
-      </div>
+    <div className="">
+      <BlogEditor
+        editor={editor}
+        title={title}
+        setTitle={setTitle}
+        draftId={draftId}
+        coverImageUrl={coverImageUrl}
+        setCoverImageUrl={setCoverImageUrl}
+      />
 
-      <div className="flex-grow space-y-6">
-        <TitleInput value={title} onChange={setTitle} error={errors?.title} />
-        <DescriptionInput
-          value={description}
-          onChange={setDescription}
-          error={errors?.description}
-        />
-        <ContentEditor content={content} onChange={setContent} />
-        <TagInput selectedTags={tags} setSelectedTags={setTags} />
-      </div>
+      <TagInput selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
 
-      <div className="p-4 flex justify-around gap-2">
+      <div className="p-4 flex justify-around gap-2 mt-2">
         <Button variant="outline" onClick={() => saveBlog("draft")}>
           Save Draft
         </Button>
-        <Button variant="outline" onClick={handlePreview}>
+        <Button variant="outline" onClick={() => navigate("/preview")}>
           Preview
         </Button>
         <Button onClick={() => saveBlog("published")}>Save & Publish</Button>

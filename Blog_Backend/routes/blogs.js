@@ -1,12 +1,14 @@
 const express = require("express");
-const multer = require("multer");
 const supabase = require("../config/supabaseClient");
 const { validateBlog } = require("../utils/validators");
 const { uploadImage } = require("../utils/uploadImage");
 const { verifyToken } = require("../middlewares/authMiddleware");
-
+const path = require("path");
+const crypto = require("crypto");
 const router = express.Router();
-const upload = multer();
+
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Get all blogs
 router.get("/", async (req, res) => {
@@ -151,54 +153,158 @@ router.get("/:blogId", verifyToken, async (req, res) => {
 });
 
 // Create new blog
-router.post("/", verifyToken, upload.single("image"), async (req, res) => {
+// router.post("/", verifyToken, upload.single("image"), async (req, res) => {
+//   try {
+//     const user = req?.user;
+
+//     if (!user) return res.status(401).json({ error: "Unautorized!!" });
+
+//     const user_id = user?.id;
+//     const {
+//       title,
+//       description,
+//       content,
+//       tags,
+//       read_time,
+//       is_published,
+//       is_public,
+//     } = req?.body;
+
+//     const file = req?.file;
+
+//     const { validationError } = validateBlog(title, content);
+//     if (validationError) {
+//       return res.status(400).json({ validationError });
+//     }
+
+//     const imageUrl = await uploadImage(file);
+
+//     const { data, error: insertError } = await req?.supabase
+//       .from("blogs")
+//       .insert({
+//         title,
+//         content,
+//         cover_image: imageUrl,
+//         tags: Array.isArray(tags) ? tags : String(tags).split(","),
+//         read_time: read_time ? parseInt(read_time) : null,
+//         user_id,
+//         is_published,
+//         published_at: is_published ? new Date().toISOString() : null,
+//         is_public,
+//       })
+//       .select();
+
+//     if (insertError) throw insertError;
+
+//     res.status(201).json({ message: "Blog created Successfully", data });
+//   } catch (error) {
+//     res.status(500).json({ error: error?.message });
+//   }
+// });
+
+// No more file upload handling in blog creation
+router.post("/", verifyToken, async (req, res) => {
   try {
     const user = req?.user;
+    if (!user) return res.status(401).json({ error: "Unauthorized!" });
 
-    if (!user) return res.status(401).json({ error: "Unautorized!!" });
-
-    const user_id = user?.id;
     const {
       title,
+      content, // Contains HTML with image URLs
       description,
-      content,
+      coverImageUrl, // Already uploaded via separate endpoint
       tags,
       read_time,
       is_published,
       is_public,
     } = req?.body;
 
-    const file = req?.file;
-
+    // Validate blog data
     const { validationError } = validateBlog(title, content);
     if (validationError) {
       return res.status(400).json({ validationError });
     }
 
-    const imageUrl = await uploadImage(file);
+    const blogData = {
+      title: title.trim(),
+      content, // HTML with permanent image URLs
+      description:
+        description?.trim() ||
+        content.replace(/<[^>]*>/g, "").substring(0, 150),
+      cover_image: coverImageUrl, // Pre-uploaded URL
+      tags: Array.isArray(tags) ? tags : tags?.split(",").map((t) => t.trim()),
+      read_time: read_time || Math.ceil(content.split(" ").length / 200),
+      user_id: user.id,
+      is_published: Boolean(is_published),
+      published_at: is_published ? new Date().toISOString() : null,
+      is_public: Boolean(is_public),
+    };
 
-    const { data, error: insertError } = await req?.supabase
+    const { data, error } = await req?.supabase
       .from("blogs")
-      .insert({
-        title,
-        content,
-        cover_image: imageUrl,
-        tags: Array.isArray(tags) ? tags : String(tags).split(","),
-        read_time: read_time ? parseInt(read_time) : null,
-        user_id,
-        is_published,
-        published_at: is_published ? new Date().toISOString() : null,
-        is_public,
-      })
+      .insert(blogData)
       .select();
 
-    if (insertError) throw insertError;
+    if (error) throw error;
 
-    res.status(201).json({ message: "Blog created Successfully", data });
+    res.status(201).json({
+      message: "Blog created successfully",
+      data: data[0],
+    });
   } catch (error) {
+    console.error("Blog creation error:", error);
     res.status(500).json({ error: error?.message });
   }
 });
+
+// Single route handles both cover and content images
+router.post(
+  "/upload-image",
+  verifyToken,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const user = req?.user;
+      if (!user) return res.status(401).json({ error: "Unauthorized!" });
+
+      const { draftId } = req?.body;
+      const file = req?.file;
+
+      if (!draftId) return res.status(400).json({ error: "Missing draftId" });
+      if (!file) return res.status(400).json({ error: "No file provided" });
+
+      const fileExt = path.extname(file.originalname);
+      const fileName = crypto.randomUUID() + fileExt;
+      const storagePath = `${draftId}/${fileName}`;
+
+      const { data, error: uploadError } = await supabase.storage
+        .from("blog-images")
+        .upload(storagePath, file.buffer, {
+          contentType: file.mimetype,
+          upsert: false,
+        });
+
+      if (uploadError) {
+        console.error("Upload Error:", uploadError);
+        return res.status(400).json({ error: uploadError.message });
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from("blog-images")
+        .getPublicUrl(storagePath);
+
+      return res.status(201).json({
+        success: true,
+        imageUrl: publicUrlData.publicUrl,
+        storagePath,
+        message: "Image uploaded successfully",
+      });
+    } catch (error) {
+      console.error("Image upload error:", error);
+      res.status(500).json({ error: error?.message });
+    }
+  }
+);
 
 //Update the blog
 router.put("/:blogId", verifyToken, async (req, res) => {

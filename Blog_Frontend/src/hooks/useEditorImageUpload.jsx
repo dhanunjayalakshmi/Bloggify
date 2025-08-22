@@ -1,39 +1,44 @@
+import api from "@/lib/api";
 import { useState } from "react";
 
-export const useEditorImageUpload = (editor) => {
+export const useEditorImageUpload = (editor, draftId) => {
   const [uploading, setUploading] = useState(false);
 
-  const uploadImage = async (file) => {
-    setUploading(true);
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(URL.createObjectURL(file));
-        setUploading(false);
-      }, 1000);
-    });
-  };
-
   const handleImageUpload = async (options = { insertToEditor: true }) => {
-    const imageUrl = await new Promise((resolve) => {
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = "image/*";
+    try {
+      setUploading(true);
 
-      input.onchange = async () => {
-        const file = input.files?.[0];
-        if (!file) return resolve(null);
+      const file = await new Promise((resolve) => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.onchange = () => resolve(input.files?.[0]);
+        input.click();
+      });
 
-        const uploadedUrl = await uploadImage(file);
-        if (uploadedUrl && editor && options.insertToEditor) {
-          editor.chain().focus().setImage({ src: uploadedUrl }).run();
-        }
-        resolve(uploadedUrl);
-      };
+      if (!file || !draftId) return null;
 
-      input.click();
-    });
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append("draftId", draftId);
 
-    return imageUrl;
+      const response = await api.post("/blogs/upload-image", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      const { imageUrl } = response.data;
+
+      if (imageUrl && editor && options.insertToEditor) {
+        editor.chain().focus().setImage({ src: imageUrl }).run();
+      }
+
+      return imageUrl;
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      return null;
+    } finally {
+      setUploading(false);
+    }
   };
 
   return { handleImageUpload, uploading };
