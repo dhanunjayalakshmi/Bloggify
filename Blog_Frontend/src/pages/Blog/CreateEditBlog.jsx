@@ -180,18 +180,15 @@ const CreateEditBlog = () => {
   ]);
 
   const handlePreview = () => {
-    // Build your complete blog object (matching Preview data needs)
     const html = editor.getHTML();
     const blog = {
       title,
-      description: html.replace(/<[^>]*>/g, "").substring(0, 150),
       content: html,
       tags: selectedTags,
       coverImageUrl,
       read_time: Math.ceil(editor.getHTML().split(" ").length / 200),
     };
 
-    // Navigate to preview with state
     navigate("/preview", { state: blog });
   };
 
@@ -199,25 +196,22 @@ const CreateEditBlog = () => {
     if (!editor) return;
 
     const html = editor.getHTML();
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html;
 
-    const contentElements = tempDiv.querySelectorAll("p, h2, h3, ul, ol");
     const extractedTitle = title.trim();
-    const content = [...contentElements].map((el) => el.outerHTML).join("");
 
-    if (!extractedTitle || !content.trim()) {
+    if (!extractedTitle || !html.trim()) {
       toast.error("Title and content are required.");
       return;
     }
 
     const payload = {
       title: extractedTitle,
-      content: `<h1>${extractedTitle}</h1>${content}`,
-      description: content.replace(/<[^>]*>/g, "").substring(0, 150),
+      content: html,
       tags: selectedTags,
       coverImageUrl,
-      read_time: Math.ceil(content.split(" ").length / 200),
+      read_time: Math.ceil(
+        html.replace(/<[^>]*>/g, " ").split(/\s+/).length / 200
+      ),
       is_published: status === "published",
       is_public: true,
       draftId,
@@ -229,12 +223,8 @@ const CreateEditBlog = () => {
         toast.success(
           status === "published" ? "Blog published!" : "Draft saved."
         );
-
         localStorage.removeItem(DRAFT_KEY);
-
-        if (status === "published") {
-          navigate("/");
-        }
+        navigate("/");
       }
     } catch (err) {
       console.error("Save blog error:", err);

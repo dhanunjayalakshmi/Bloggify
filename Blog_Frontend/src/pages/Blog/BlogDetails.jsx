@@ -11,6 +11,7 @@ import {
   ThumbsDown,
   ThumbsUp,
 } from "lucide-react";
+import BlogContentRenderer from "@/components/blogEditor/BlogContentRenderer";
 
 const BlogDetails = () => {
   const { blogId } = useParams();
@@ -36,23 +37,31 @@ const BlogDetails = () => {
   if (loading) return <div className="p-4">Loading...</div>;
   if (!blog) return <div className="p-4">Blog not found.</div>;
 
-  const { title, content, tags, published_at, read_time, users } = blog;
+  const {
+    title,
+    content,
+    tags,
+    published_at,
+    read_time,
+    users,
+    cover_image: coverImageUrl,
+  } = blog;
+
+  console.log("Rendered blog content:", content);
 
   return (
-    <div className="max-w-4xl mx-auto p-8 my-8 rounded-lg">
-      <h1 className="text-4xl font-bold leading-tight tracking-tight text-foreground dark:text-white">
+    <div className="max-w-4xl mx-auto p-8 my-8 rounded-lg dark:bg-gray-800 bg-white text-gray-900 dark:text-white">
+      {/* Title */}
+      <h1 className="text-4xl font-bold leading-tight tracking-tight mb-4">
         {title}
       </h1>
-      <p className="text-lg mt-4 text-muted-foreground">
-        Explore the latest trends in technology and how they are shaping our
-        future. From AI advancements to sustainable tech solutions, discover
-        what's next in the tech world.
-      </p>
+
+      {/* Author info and meta */}
       <div className="flex flex-wrap items-center mt-6 gap-4 text-sm text-muted-foreground">
         <div className="flex items-center gap-3">
           <Avatar
             className="h-10 w-10 cursor-pointer"
-            onClick={() => navigate("/user/1")}
+            onClick={() => navigate(`/user/${users?.id || 1}`)}
           >
             <AvatarImage
               className="w-10 h-10 rounded-full object-cover"
@@ -64,8 +73,8 @@ const BlogDetails = () => {
           </Avatar>
           <div className="flex flex-col">
             <span
-              className="font-medium text-foreground dark:text-white cursor-pointer"
-              onClick={() => navigate("/user/1")}
+              className="font-medium cursor-pointer"
+              onClick={() => navigate(`/user/${users?.id || 1}`)}
             >
               {users?.name || "Unknown Author"}
             </span>
@@ -77,72 +86,60 @@ const BlogDetails = () => {
         </div>
         <Button size="sm">Follow</Button>
       </div>
+
+      {/* Social actions */}
       <div className="flex items-center gap-4 mt-4">
         <Button variant="ghostButton" aria-label="Like">
           <ThumbsUp className="h-5 w-5" />
-          {/* <span className="sr-only">Like</span> */}
           <span>120</span>
         </Button>
         <Button variant="ghostButton" aria-label="Comment">
-          <MessageCircle className="h-5 w-5" />{" "}
-          {/* <span className="sr-only">Comment</span> */}
+          <MessageCircle className="h-5 w-5" />
           <span>56</span>
         </Button>
         <Button size="icon" variant="ghostButton" aria-label="Bookmark">
-          <Bookmark className="h-5 w-5" />{" "}
-          {/* <span className="sr-only">Bookmark</span> */}
+          <Bookmark className="h-5 w-5" />
         </Button>
         <Button size="icon" variant="ghostButton" aria-label="Share">
           <Share2 className="h-5 w-5" />
-          {/* <span className="sr-only">Share</span> */}
         </Button>
       </div>
 
-      {/* <div className="prose prose-neutral dark:prose-invert max-w-none mt-6 space-y-2">
-        <h3 className="text-xl font-semibold">Synopsis</h3>
-        <p className="text-lg">
-          Explore the latest trends in technology and how they are shaping our
-          future. From AI advancements to sustainable tech solutions, discover
-          what's next in the tech world.
-        </p>
-        <h3 className="text-xl font-semibold">Content</h3>
-        <p className="text-lg">
-          The world of technology is ever-evolving, with new innovations
-          emerging every day. In this article, we delve into some of the most
-          exciting developments...
-        </p>
-      </div> */}
-
-      <div
-        className="prose prose-neutral dark:prose-invert max-w-none mt-6 space-y-2"
-        dangerouslySetInnerHTML={{ __html: content }}
-      />
-
-      <div className="mt-4">{tags?.join(",")}</div>
-
-      <div className="mt-10 space-y-2">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10">
-            <AvatarImage
-              className="w-10 h-10 rounded-full object-cover"
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s"
-            />
-          </Avatar>
-          <div className="flex flex-col">
-            <span className="font-medium text-foreground dark:text-white">
-              John Doe
-            </span>
-          </div>
+      {/* Cover Image */}
+      {coverImageUrl && (
+        <div className="mt-6 mb-8">
+          <img
+            src={coverImageUrl}
+            alt="Cover"
+            className="w-full max-h-96 object-cover rounded-lg shadow-lg"
+          />
         </div>
-        <Textarea
-          placeholder="Write your thoughts Here..."
-          className="shadow-lg dark:shadow-md dark:border-none resize-none"
-        />
-        <Button className="mt-2">Post comment</Button>
+      )}
+
+      {/* Blog Content */}
+      <div className="prose prose-lg dark:prose-invert tiptap max-w-none mt-6 space-y-2">
+        <BlogContentRenderer content={content} />
       </div>
 
-      <div className="mt-8 flex flex-col gap-4">
+      {/* Tags */}
+      {tags?.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {tags.map((tag, idx) => (
+            <span
+              key={idx}
+              className="inline-block bg-muted text-muted-foreground px-2 py-1 rounded text-xs"
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Comments Section */}
+      <div className="mt-10 space-y-4">
         <h3 className="text-lg font-semibold">Comments (23)</h3>
+
+        {/* Example single comment */}
         <div className="flex gap-3 items-start">
           <Avatar>
             <AvatarImage
@@ -172,11 +169,14 @@ const BlogDetails = () => {
           </div>
         </div>
 
+        {/* Add your other comments here */}
+
         <Button className="mt-4 mx-auto block w-1/2 max-w-xs">
           See all comments
         </Button>
       </div>
 
+      {/* Other Articles from Author */}
       <div className="mt-10">
         <h3 className="text-xl font-semibold">
           Other Suggested Articles from Author
@@ -197,6 +197,7 @@ const BlogDetails = () => {
         <Button className="mt-4">See More</Button>
       </div>
 
+      {/* Other Platform Suggestions */}
       <div className="mt-10">
         <h3 className="text-xl font-semibold">
           Other Suggestions from Platform

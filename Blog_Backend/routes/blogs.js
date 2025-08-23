@@ -160,9 +160,8 @@ router.post("/", verifyToken, async (req, res) => {
 
     const {
       title,
-      content, // Contains HTML with image URLs
-      description,
-      coverImageUrl, // Already uploaded via separate endpoint
+      content,
+      coverImageUrl,
       tags,
       read_time,
       is_published,
@@ -178,18 +177,15 @@ router.post("/", verifyToken, async (req, res) => {
 
     const blogData = {
       title: title.trim(),
-      content, // HTML with permanent image URLs
-      description:
-        description?.trim() ||
-        content.replace(/<[^>]*>/g, "").substring(0, 150),
-      cover_image: coverImageUrl, // Pre-uploaded URL
+      content,
+      cover_image: coverImageUrl,
       tags: Array.isArray(tags) ? tags : tags?.split(",").map((t) => t.trim()),
       read_time: read_time || Math.ceil(content.split(" ").length / 200),
       user_id: user.id,
       is_published: Boolean(is_published),
       published_at: is_published ? new Date().toISOString() : null,
       is_public: Boolean(is_public),
-      draftId: draftId,
+      draft_id: draftId,
     };
 
     const { data, error } = await req?.supabase
