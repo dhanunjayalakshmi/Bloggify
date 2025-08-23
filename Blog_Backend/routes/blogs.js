@@ -152,57 +152,7 @@ router.get("/:blogId", verifyToken, async (req, res) => {
   }
 });
 
-// Create new blog
-// router.post("/", verifyToken, upload.single("image"), async (req, res) => {
-//   try {
-//     const user = req?.user;
-
-//     if (!user) return res.status(401).json({ error: "Unautorized!!" });
-
-//     const user_id = user?.id;
-//     const {
-//       title,
-//       description,
-//       content,
-//       tags,
-//       read_time,
-//       is_published,
-//       is_public,
-//     } = req?.body;
-
-//     const file = req?.file;
-
-//     const { validationError } = validateBlog(title, content);
-//     if (validationError) {
-//       return res.status(400).json({ validationError });
-//     }
-
-//     const imageUrl = await uploadImage(file);
-
-//     const { data, error: insertError } = await req?.supabase
-//       .from("blogs")
-//       .insert({
-//         title,
-//         content,
-//         cover_image: imageUrl,
-//         tags: Array.isArray(tags) ? tags : String(tags).split(","),
-//         read_time: read_time ? parseInt(read_time) : null,
-//         user_id,
-//         is_published,
-//         published_at: is_published ? new Date().toISOString() : null,
-//         is_public,
-//       })
-//       .select();
-
-//     if (insertError) throw insertError;
-
-//     res.status(201).json({ message: "Blog created Successfully", data });
-//   } catch (error) {
-//     res.status(500).json({ error: error?.message });
-//   }
-// });
-
-// No more file upload handling in blog creation
+// Create New blog
 router.post("/", verifyToken, async (req, res) => {
   try {
     const user = req?.user;
@@ -217,6 +167,7 @@ router.post("/", verifyToken, async (req, res) => {
       read_time,
       is_published,
       is_public,
+      draftId,
     } = req?.body;
 
     // Validate blog data
@@ -238,6 +189,7 @@ router.post("/", verifyToken, async (req, res) => {
       is_published: Boolean(is_published),
       published_at: is_published ? new Date().toISOString() : null,
       is_public: Boolean(is_public),
+      draftId: draftId,
     };
 
     const { data, error } = await req?.supabase
@@ -348,44 +300,55 @@ router.put("/:blogId", verifyToken, async (req, res) => {
   }
 });
 
-//Delete the blog
+// Delete the blog
 router.delete("/:blogId", verifyToken, async (req, res) => {
-  try {
-    const userId = req?.user?.id;
-    const { blogId } = req?.params;
+  const { blogId } = req?.params;
+  const userId = req?.user?.id;
 
-    const { data: blog, error: fetchError } = await supabase
-      .from("blogs")
-      .select("user_id, cover_image")
-      .eq("id", blogId)
-      .single();
+  // Find blog and its draftId (can also add auth checks)
+  const { data: blog, error } = await req.supabase
+    .from("blogs")
+    .select("user_id, draft_id")
+    .eq("id", blogId)
+    .single();
 
-    if (fetchError) throw fetchError;
+  if (error || !blog) return res.status(404).json({ error: "Blog not found" });
 
-    if (!blog || blog.user_id !== userId) {
-      return res.status(403).json({ error: "Unauthorized" });
-    }
-
-    if (blog.cover_image) {
-      const imagePath = blog.cover_image.split("/").pop();
-      const { error: storageError } = await supabase.storage
-        .from("blog-images")
-        .remove([imagePath]);
-
-      if (storageError) throw storageError;
-    }
-
-    const { error: deleteError } = await supabase
-      .from("blogs")
-      .delete()
-      .eq("id", blogId);
-
-    if (deleteError) throw deleteError;
-
-    res.status(200).json({ message: "Blog deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error?.message });
+  if (!blog || blog.user_id !== userId) {
+    return res.status(403).json({ error: "Unauthorized" });
   }
+
+  // Delete all images in the draftId folder
+  const { data: files, error: listError } = await supabase.storage
+    .from("blog-images")
+    .list(blog.draft_id);
+
+  if (!listError && files && files.length > 0) {
+    const pathsToDelete = files.map((file) => `${blog.draft_id}/${file.name}`);
+
+    const { error: deleteError } = await supabase.storage
+      .from("blog-images")
+      .remove(pathsToDelete);
+
+    if (deleteError) {
+      console.error(
+        "Failed to delete images for draftId:",
+        blog.draft_id,
+        deleteError
+      );
+    }
+  }
+
+  // Delete blog from db
+  const { error: deleteBlogError } = await req.supabase
+    .from("blogs")
+    .delete()
+    .eq("id", blogId);
+
+  if (deleteBlogError)
+    return res.status(500).json({ error: deleteBlogError.message });
+
+  res.json({ success: true, message: "Blog deleted successfully" });
 });
 
 module.exports = router;
