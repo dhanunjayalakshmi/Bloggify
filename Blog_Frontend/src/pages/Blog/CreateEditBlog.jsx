@@ -25,7 +25,7 @@ const CustomImage = Image.extend({
         parseHTML: () => "center",
         renderHTML: () => ({
           "data-align": "center",
-          class: "align-center",
+          class: "align-center rounded-lg",
         }),
       },
     };
@@ -166,7 +166,7 @@ const CreateEditBlog = () => {
       };
       saveDraft(draftData);
       console.log("Auto-saved draft to localStorage");
-    }, 30000);
+    }, 10000);
 
     return () => clearInterval(autoSaveInterval);
   }, [
@@ -178,6 +178,22 @@ const CreateEditBlog = () => {
     draftId,
     saveDraft,
   ]);
+
+  const handlePreview = () => {
+    // Build your complete blog object (matching Preview data needs)
+    const html = editor.getHTML();
+    const blog = {
+      title,
+      description: html.replace(/<[^>]*>/g, "").substring(0, 150),
+      content: html,
+      tags: selectedTags,
+      coverImageUrl,
+      read_time: Math.ceil(editor.getHTML().split(" ").length / 200),
+    };
+
+    // Navigate to preview with state
+    navigate("/preview", { state: blog });
+  };
 
   const saveBlog = async (status = "draft") => {
     if (!editor) return;
@@ -251,7 +267,7 @@ const CreateEditBlog = () => {
         <Button variant="outline" onClick={() => saveBlog("draft")}>
           Save Draft
         </Button>
-        <Button variant="outline" onClick={() => navigate("/preview")}>
+        <Button variant="outline" onClick={handlePreview}>
           Preview
         </Button>
         <Button onClick={() => saveBlog("published")}>Save & Publish</Button>
