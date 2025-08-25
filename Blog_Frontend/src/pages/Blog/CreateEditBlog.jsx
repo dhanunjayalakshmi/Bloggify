@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router";
 import { ReactNodeViewRenderer, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -63,10 +63,17 @@ const CreateEditBlog = () => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [draftId, setDraftId] = useState("");
-  const [initialContent, setInitialContent] = useState(
-    "<h1></h1><p></p><p></p>"
-  );
+  const [initialContent, setInitialContent] = useState("<p></p>");
   const [isDraftLoaded, setIsDraftLoaded] = useState(false);
+
+  const [dirty, setDirty] = useState(false);
+
+  const lastSavedDraft = useRef({
+    html: "",
+    title: "",
+    tags: [],
+    coverImageUrl: "",
+  });
 
   // Load draft data from localStorage
   const loadDraft = useCallback(() => {
@@ -75,7 +82,7 @@ const CreateEditBlog = () => {
       if (savedDraft) {
         const parsed = JSON.parse(savedDraft);
         return {
-          html: parsed.html || "<h1></h1><p></p><p></p>",
+          html: parsed.html || "<p></p>",
           title: parsed.title || "",
           tags: Array.isArray(parsed.tags) ? parsed.tags : [],
           coverImageUrl: parsed.coverImageUrl || "",
@@ -92,6 +99,12 @@ const CreateEditBlog = () => {
   const saveDraft = useCallback((data) => {
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+      lastSavedDraft.current = {
+        html: data.html,
+        title: data.title,
+        tags: data.tags,
+        coverImageUrl: data.coverImageUrl,
+      };
     } catch (error) {
       console.error("Failed to save draft:", error);
     }
@@ -106,20 +119,48 @@ const CreateEditBlog = () => {
       setCoverImageUrl(draft.coverImageUrl);
       setDraftId(draft.draftId);
       setInitialContent(draft.html);
+      lastSavedDraft.current = {
+        html: draft.html,
+        title: draft.title,
+        tags: draft.tags,
+        coverImageUrl: draft.coverImageUrl,
+      };
     } else {
       const newDraftId = randomDraftId();
       setDraftId(newDraftId);
       saveDraft({
         draftId: newDraftId,
-        html: "<h1></h1><p></p><p></p>",
+        html: "<p></p>",
         title: "",
         tags: [],
         coverImageUrl: "",
         lastUpdated: new Date().toISOString(),
       });
+      lastSavedDraft.current = {
+        html: "<p></p>",
+        title: "",
+        tags: [],
+        coverImageUrl: "",
+      };
     }
     setIsDraftLoaded(true);
   }, [loadDraft, saveDraft]);
+
+  // onUpdate handler to mark dirty only if content or title/tags/cover changed
+  const onUpdate = ({ editor }) => {
+    const html = editor.getHTML();
+
+    const hasContentChanged =
+      html !== lastSavedDraft.current.html ||
+      title !== lastSavedDraft.current.title ||
+      coverImageUrl !== lastSavedDraft.current.coverImageUrl ||
+      JSON.stringify(selectedTags) !==
+        JSON.stringify(lastSavedDraft.current.tags);
+
+    if (hasContentChanged) {
+      setDirty(true);
+    }
+  };
 
   // Initialize editor AFTER draft is loaded
   const editor = useEditor(
@@ -133,19 +174,7 @@ const CreateEditBlog = () => {
             "focus:outline-none prose dark:prose-invert prose-lg max-w-3xl mx-auto py-12 px-4",
         },
       },
-      onUpdate({ editor }) {
-        // Auto-save on every change
-        const html = editor.getHTML();
-        const draftData = {
-          html,
-          title,
-          tags: selectedTags,
-          coverImageUrl,
-          draftId,
-          lastUpdated: new Date().toISOString(),
-        };
-        saveDraft(draftData);
-      },
+      onUpdate,
     },
     [initialContent, isDraftLoaded]
   ); // Re-create editor when content changes
@@ -154,8 +183,15 @@ const CreateEditBlog = () => {
   useEffect(() => {
     if (!editor || !isDraftLoaded) return;
 
-    const autoSaveInterval = setInterval(() => {
+    const interval = setInterval(() => {
+      if (!dirty) return;
+
       const html = editor.getHTML();
+      if (!title.trim() && (!html || html === "<p></p>" || html === "")) {
+        // Prevent saving empty drafts
+        return;
+      }
+
       const draftData = {
         html,
         title,
@@ -164,11 +200,13 @@ const CreateEditBlog = () => {
         draftId,
         lastUpdated: new Date().toISOString(),
       };
+
       saveDraft(draftData);
-      console.log("Auto-saved draft to localStorage");
+      setDirty(false);
+      console.log("Auto-saved draft");
     }, 10000);
 
-    return () => clearInterval(autoSaveInterval);
+    return () => clearInterval(interval);
   }, [
     editor,
     isDraftLoaded,
@@ -176,10 +214,13 @@ const CreateEditBlog = () => {
     selectedTags,
     coverImageUrl,
     draftId,
+    dirty,
     saveDraft,
   ]);
 
   const handlePreview = () => {
+    if (!editor) return;
+
     const html = editor.getHTML();
     const blog = {
       title,
