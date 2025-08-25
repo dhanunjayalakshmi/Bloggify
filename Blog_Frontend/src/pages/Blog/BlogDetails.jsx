@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import {
   Bookmark,
@@ -49,12 +48,10 @@ const BlogDetails = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-8 my-8 rounded-lg dark:bg-gray-800 bg-white text-gray-900 dark:text-white">
-      {/* Title */}
       <h1 className="text-4xl font-bold leading-tight tracking-tight mb-4">
         {title}
       </h1>
 
-      {/* Author info and meta */}
       <div className="flex flex-wrap items-center mt-6 gap-4 text-sm text-muted-foreground">
         <div className="flex items-center gap-3">
           <Avatar
@@ -85,7 +82,6 @@ const BlogDetails = () => {
         <Button size="sm">Follow</Button>
       </div>
 
-      {/* Social actions */}
       <div className="flex items-center gap-4 mt-4">
         <Button variant="ghostButton" aria-label="Like">
           <ThumbsUp className="h-5 w-5" />
@@ -165,7 +161,6 @@ const BlogDetails = () => {
         </div>
 
         {/* Add your other comments here */}
-
         <Button className="mt-4 mx-auto block w-1/2 max-w-xs">
           See all comments
         </Button>

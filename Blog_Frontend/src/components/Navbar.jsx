@@ -16,9 +16,11 @@ import { supabase } from "@/lib/supabaseClient";
 const Navbar = () => {
   const navigate = useNavigate();
   const logout = useAuthStore((state) => state?.clearAuth);
+  const setManualLogout = useAuthStore((state) => state?.setManualLogout);
 
   const handleLogout = async () => {
     try {
+      setManualLogout(true);
       const { error } = await supabase.auth.signOut();
 
       if (error) throw error;

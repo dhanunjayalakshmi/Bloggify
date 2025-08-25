@@ -3,6 +3,8 @@ import { useAuthStore } from "@/stores/authStore";
 import api from "@/lib/api";
 import { supabase } from "@/lib/supabaseClient";
 import useThemeStore from "@/stores/themeStore";
+import { toast } from "sonner";
+import { useModalStore } from "@/stores/modalStore";
 
 const useAuthInit = () => {
   const setUser = useAuthStore((store) => store?.setUser);
@@ -11,6 +13,11 @@ const useAuthInit = () => {
   const token = useAuthStore((store) => store?.token);
   const { theme, setTheme } = useThemeStore();
 
+  const { openModal } = useModalStore();
+
+  const isManualLogout = useAuthStore((state) => state?.isManualLogout);
+  const setManualLogout = useAuthStore((state) => state?.setManualLogout);
+
   useEffect(() => {
     const initSession = async () => {
       const {
@@ -18,13 +25,35 @@ const useAuthInit = () => {
       } = await supabase.auth.getSession();
 
       if (session?.user) {
-        setUser(session.user, session.access_token);
+        setUser(session?.user, session?.access_token);
       } else {
         setUser(null, null);
       }
     };
 
     initSession();
+  }, [setUser]);
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (!session?.user) {
+          setUser(null, null);
+          if (!isManualLogout) {
+            openModal("login");
+            toast.error("Session expired. Please log in again.");
+          } else {
+            setManualLogout(false);
+          }
+        } else {
+          setUser(session?.user, session?.access_token);
+        }
+      }
+    );
+
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
   }, [setUser]);
 
   useEffect(() => {
@@ -48,7 +77,7 @@ const useAuthInit = () => {
 
   useEffect(() => {
     setTheme(theme);
-  }, []);
+  }, [theme]);
 };
 
 export default useAuthInit;

@@ -5,7 +5,7 @@ const BlogCard = ({ blog, footerVariant = "home", status }) => {
   const {
     cover_image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s",
     title = "My first blog",
-    description = "Welcome to my first blog",
+    content,
   } = blog;
 
   return (
@@ -20,7 +20,10 @@ const BlogCard = ({ blog, footerVariant = "home", status }) => {
         <div className="flex-1 flex flex-col justify-between">
           <div className="space-y-1">
             <h2 className="font-semibold text-lg">{title}</h2>
-            <p className="text-muted-foreground">{description}</p>
+            <p className="text-muted-foreground">
+              {content?.replace(/<[^>]*>/g, "").substring(0, 150) + "..." ||
+                "Welcome to my blog"}
+            </p>
           </div>
 
           {/* Footer Section */}

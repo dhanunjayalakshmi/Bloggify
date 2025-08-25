@@ -19,7 +19,7 @@ export const fetchBlogs = async ({
     if (authorId) params.append("authorId", authorId);
 
     const { data, error } = await api.get(`/blogs?${params}`);
-    console.log(data);
+    // console.log(data);
 
     if (error) throw error;
 
