@@ -10,6 +10,31 @@ import BlogEditor from "@/components/blogEditor/BlogEditor";
 import TagInput from "@/components/blogEditor/TagInput";
 import Image from "@tiptap/extension-image";
 import ImageWithToolbar from "@/components/blogEditor/ImageWithToolbar";
+import { deleteDraftImages } from "@/services/blogStorage";
+
+// --- Utility to detect real empty editor content ---
+const isEmptyContent = (html) => {
+  if (!html || html === "<p></p>" || html.trim() === "") return true;
+  return html.replace(/<[^>]*>/g, "").trim().length === 0;
+};
+
+// Check if there are any images in the HTML content
+const hasImagesInContent = (html) => {
+  if (!html) return false;
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = html;
+  return tempDiv.querySelectorAll("img").length > 0;
+};
+
+// Combined check for draft emptiness: no meaningful text content, no title, and no images
+const isDraftEmpty = (html, title, coverImageUrl) => {
+  return (
+    isEmptyContent(html) &&
+    !title.trim() &&
+    !hasImagesInContent(html) &&
+    !coverImageUrl
+  );
+};
 
 const CustomImage = Image.extend({
   addAttributes() {
@@ -65,9 +90,9 @@ const CreateEditBlog = () => {
   const [draftId, setDraftId] = useState("");
   const [initialContent, setInitialContent] = useState("<p></p>");
   const [isDraftLoaded, setIsDraftLoaded] = useState(false);
+  const draftWasReset = useRef(false);
 
   const [dirty, setDirty] = useState(false);
-
   const lastSavedDraft = useRef({
     html: "",
     title: "",
@@ -100,62 +125,83 @@ const CreateEditBlog = () => {
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
       lastSavedDraft.current = {
-        html: data.html,
-        title: data.title,
-        tags: data.tags,
-        coverImageUrl: data.coverImageUrl,
+        html: data?.html,
+        title: data?.title,
+        tags: data?.tags,
+        coverImageUrl: data?.coverImageUrl,
       };
     } catch (error) {
       console.error("Failed to save draft:", error);
     }
   }, []);
 
-  // Load draft on component mount BEFORE editor initialization
+  // Load draft on mount BEFORE editor initialization
   useEffect(() => {
-    const draft = loadDraft();
-    if (draft) {
-      setTitle(draft.title);
-      setSelectedTags(draft.tags);
-      setCoverImageUrl(draft.coverImageUrl);
-      setDraftId(draft.draftId);
-      setInitialContent(draft.html);
-      lastSavedDraft.current = {
-        html: draft.html,
-        title: draft.title,
-        tags: draft.tags,
-        coverImageUrl: draft.coverImageUrl,
-      };
-    } else {
-      const newDraftId = randomDraftId();
-      setDraftId(newDraftId);
-      saveDraft({
-        draftId: newDraftId,
-        html: "<p></p>",
-        title: "",
-        tags: [],
-        coverImageUrl: "",
-        lastUpdated: new Date().toISOString(),
-      });
-      lastSavedDraft.current = {
-        html: "<p></p>",
-        title: "",
-        tags: [],
-        coverImageUrl: "",
-      };
-    }
-    setIsDraftLoaded(true);
+    (async () => {
+      const draft = loadDraft();
+
+      if (draft) {
+        // Clean up if draft is truly empty (including no images)
+        if (isDraftEmpty(draft?.html, draft?.title, draft?.coverImageUrl)) {
+          localStorage.removeItem(DRAFT_KEY);
+          await deleteDraftImages(draft.draftId);
+          const newDraftId = randomDraftId();
+          setDraftId(newDraftId);
+          setTitle("");
+          setSelectedTags([]);
+          setCoverImageUrl("");
+          setInitialContent("<p></p>");
+          lastSavedDraft.current = {
+            html: "<p></p>",
+            title: "",
+            tags: [],
+            coverImageUrl: "",
+          };
+        } else {
+          setTitle(draft?.title);
+          setSelectedTags(draft?.tags);
+          setCoverImageUrl(draft?.coverImageUrl);
+          setDraftId(draft?.draftId);
+          setInitialContent(draft?.html);
+          lastSavedDraft.current = {
+            html: draft?.html,
+            title: draft?.title,
+            tags: draft?.tags,
+            coverImageUrl: draft?.coverImageUrl,
+          };
+        }
+      } else {
+        const newDraftId = randomDraftId();
+        setDraftId(newDraftId);
+        saveDraft({
+          draftId: newDraftId,
+          html: "<p></p>",
+          title: "",
+          tags: [],
+          coverImageUrl: "",
+          lastUpdated: new Date().toISOString(),
+        });
+        lastSavedDraft.current = {
+          html: "<p></p>",
+          title: "",
+          tags: [],
+          coverImageUrl: "",
+        };
+      }
+      setIsDraftLoaded(true);
+    })();
   }, [loadDraft, saveDraft]);
 
   // onUpdate handler to mark dirty only if content or title/tags/cover changed
   const onUpdate = ({ editor }) => {
-    const html = editor.getHTML();
+    const html = editor?.getHTML();
 
     const hasContentChanged =
-      html !== lastSavedDraft.current.html ||
-      title !== lastSavedDraft.current.title ||
-      coverImageUrl !== lastSavedDraft.current.coverImageUrl ||
+      html !== lastSavedDraft?.current?.html ||
+      title !== lastSavedDraft?.current?.title ||
+      coverImageUrl !== lastSavedDraft?.current?.coverImageUrl ||
       JSON.stringify(selectedTags) !==
-        JSON.stringify(lastSavedDraft.current.tags);
+        JSON.stringify(lastSavedDraft?.current?.tags);
 
     if (hasContentChanged) {
       setDirty(true);
@@ -177,34 +223,52 @@ const CreateEditBlog = () => {
       onUpdate,
     },
     [initialContent, isDraftLoaded]
-  ); // Re-create editor when content changes
+  );
 
-  // Auto-save interval
+  // --- Updated Auto-save logic including cleanup ---
   useEffect(() => {
     if (!editor || !isDraftLoaded) return;
 
-    const interval = setInterval(() => {
-      if (!dirty) return;
+    const interval = setInterval(async () => {
+      if (draftWasReset?.current) return;
 
-      const html = editor.getHTML();
-      if (!title.trim() && (!html || html === "<p></p>" || html === "")) {
-        // Prevent saving empty drafts
-        return;
+      const html = editor?.getHTML();
+      const contentIsEmpty = isDraftEmpty(html, title, coverImageUrl);
+
+      if (dirty || contentIsEmpty) {
+        if (contentIsEmpty) {
+          localStorage.removeItem(DRAFT_KEY);
+
+          await deleteDraftImages(draftId);
+
+          // Reset to new draft (without triggering editor re-mount if possible)
+          const newDraftId = randomDraftId();
+          setDraftId(newDraftId);
+          setTitle("");
+          setSelectedTags([]);
+          setCoverImageUrl("");
+          setInitialContent("<p></p>");
+          setIsDraftLoaded(true);
+          setDirty(false);
+          // toast.info("Empty draft deleted. Starting a new draft.");
+          draftWasReset.current = true;
+          return;
+        }
+
+        // Otherwise, save as usual
+        const draftData = {
+          html,
+          title,
+          tags: selectedTags,
+          coverImageUrl,
+          draftId,
+          lastUpdated: new Date().toISOString(),
+        };
+        saveDraft(draftData);
+        setDirty(false);
+        console.log("Auto-saved draft");
       }
-
-      const draftData = {
-        html,
-        title,
-        tags: selectedTags,
-        coverImageUrl,
-        draftId,
-        lastUpdated: new Date().toISOString(),
-      };
-
-      saveDraft(draftData);
-      setDirty(false);
-      console.log("Auto-saved draft");
-    }, 10000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [
@@ -218,33 +282,50 @@ const CreateEditBlog = () => {
     saveDraft,
   ]);
 
+  // Cleanup draft and images on page/unload if draft empty
+  useEffect(() => {
+    const handleCleanup = async () => {
+      if (!draftWasReset.current) {
+        const draft = loadDraft();
+        if (draft && isDraftEmpty(draft.html, draft.title)) {
+          localStorage.removeItem(DRAFT_KEY);
+          await deleteDraftImages(draft.draftId);
+          draftWasReset.current = true;
+          // toast.info("Empty draft deleted. Starting a new draft.");
+        }
+      }
+    };
+
+    window.addEventListener("beforeunload", handleCleanup);
+    return () => {
+      window.removeEventListener("beforeunload", handleCleanup);
+    };
+  }, [loadDraft]);
+
   const handlePreview = () => {
     if (!editor) return;
-
     const html = editor.getHTML();
     const blog = {
       title,
       content: html,
       tags: selectedTags,
       coverImageUrl,
-      read_time: Math.ceil(editor.getHTML().split(" ").length / 200),
+      read_time: Math.ceil(
+        html.replace(/<[^>]*>/g, " ").split(/\s+/).length / 200
+      ),
     };
-
     navigate("/preview", { state: blog });
   };
 
   const saveBlog = async (status = "draft") => {
     if (!editor) return;
 
-    const html = editor.getHTML();
-
-    const extractedTitle = title.trim();
-
+    const html = editor?.getHTML();
+    const extractedTitle = title?.trim();
     if (!extractedTitle || !html.trim()) {
       toast.error("Title and content are required.");
       return;
     }
-
     const payload = {
       title: extractedTitle,
       content: html,
@@ -257,7 +338,6 @@ const CreateEditBlog = () => {
       is_public: true,
       draftId,
     };
-
     try {
       const res = await api.post("/blogs/", payload);
       if (res?.status === 201) {
@@ -282,7 +362,7 @@ const CreateEditBlog = () => {
   }
 
   return (
-    <div className="">
+    <div>
       <BlogEditor
         editor={editor}
         title={title}
