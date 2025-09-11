@@ -8,11 +8,10 @@ export const useAuthStore = create(
       token: null,
       profile: null,
       isManualLogout: false,
-      setManualLogout: (val) => set({ isManualLogout: val }),
       setUser: (user, token) => set({ user: user, token }),
       setProfile: (profile) => set({ profile }),
-      clearAuth: () =>
-        set({ user: null, token: null, profile: null, isManualLogout: true }),
+      clearAuth: () => set({ user: null, token: null, profile: null }),
+      setManualLogout: (val) => set({ isManualLogout: val }),
     }),
     {
       name: "auth-storage",

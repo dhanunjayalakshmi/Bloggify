@@ -4,7 +4,7 @@ import api from "@/lib/api";
 import { supabase } from "@/lib/supabaseClient";
 import useThemeStore from "@/stores/themeStore";
 import { toast } from "sonner";
-import { useModalStore } from "@/stores/modalStore";
+import { useNavigate } from "react-router";
 
 const useAuthInit = () => {
   const setUser = useAuthStore((store) => store?.setUser);
@@ -12,8 +12,7 @@ const useAuthInit = () => {
   const user = useAuthStore((store) => store?.user);
   const token = useAuthStore((store) => store?.token);
   const { theme, setTheme } = useThemeStore();
-
-  const { openModal } = useModalStore();
+  const navigate = useNavigate();
 
   const isManualLogout = useAuthStore((state) => state?.isManualLogout);
   const setManualLogout = useAuthStore((state) => state?.setManualLogout);
@@ -40,11 +39,10 @@ const useAuthInit = () => {
         if (!session?.user) {
           setUser(null, null);
           if (!isManualLogout) {
-            openModal("login");
-            toast.error("Session expired. Please log in again.");
-          } else {
-            setManualLogout(false);
+            toast.success("You are logged out. Please log in again.");
           }
+          setManualLogout(false);
+          navigate("/", { replace: true });
         } else {
           setUser(session?.user, session?.access_token);
         }
@@ -54,14 +52,14 @@ const useAuthInit = () => {
     return () => {
       authListener?.subscription?.unsubscribe();
     };
-  }, [setUser]);
+  }, [setUser, isManualLogout, setManualLogout, navigate]);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         if (!user || !token) return;
 
-        const res = await api.get(`/users/${user.id}`);
+        const res = await api.get(`/users/${user?.id}`);
 
         const profile = res?.data;
         if (profile) {

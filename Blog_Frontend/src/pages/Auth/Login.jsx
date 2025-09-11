@@ -36,7 +36,6 @@ const Login = () => {
     const isProfileIncomplete =
       !profile?.name || profile.name === "New User" || !profile?.bio;
 
-    toast.success("Login successful!");
     closeModal();
 
     navigate(isProfileIncomplete ? "/account/edit" : "/home");

@@ -24,7 +24,6 @@ const Navbar = () => {
       const { error } = await supabase.auth.signOut();
 
       if (error) throw error;
-
       logout();
       navigate("/");
     } catch (error) {
