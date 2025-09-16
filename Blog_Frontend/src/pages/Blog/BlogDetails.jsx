@@ -11,6 +11,7 @@ import {
   ThumbsUp,
 } from "lucide-react";
 import BlogContentRenderer from "@/components/blogEditor/BlogContentRenderer";
+import BlogVotes from "@/components/blogs/BlogVotes";
 
 const BlogDetails = () => {
   const { blogId } = useParams();
@@ -125,6 +126,8 @@ const BlogDetails = () => {
           ))}
         </div>
       )}
+
+      <BlogVotes blogId={blogId} />
 
       {/* Comments Section */}
       <div className="mt-10 space-y-4">
