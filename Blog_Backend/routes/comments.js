@@ -10,7 +10,7 @@ router.post("/", verifyToken, async (req, res) => {
     const { blog_id, content, parent_id } = req?.body;
     const user_id = req?.user?.id;
 
-    const { data, error } = await supabase
+    const { data, error } = await req?.supabase
       .from("comments")
       .insert([{ blog_id, user_id, content, parent_id }])
       .select();
@@ -32,7 +32,7 @@ router.get("/:blogId", async (req, res) => {
     const { page = 1, limit = 10 } = req?.query;
     const offset = (page - 1) * limit;
 
-    const { data, error } = await supabase
+    const { data, error } = await req?.supabase
       .from("comments")
       .select("*, users(name)")
       .eq("blog_id", blogId)

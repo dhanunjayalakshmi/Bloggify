@@ -17,7 +17,7 @@ const verifyToken = async (req, res, next) => {
 
     const { data: userData, error: userError } = await supabaseBase
       .from("users")
-      .select("id")
+      .select("id, auth_id")
       .eq("auth_id", data?.user?.id)
       .single();
 

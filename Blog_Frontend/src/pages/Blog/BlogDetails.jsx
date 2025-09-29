@@ -11,7 +11,8 @@ import {
   ThumbsUp,
 } from "lucide-react";
 import BlogContentRenderer from "@/components/blogEditor/BlogContentRenderer";
-import BlogVotes from "@/components/blogs/BlogVotes";
+// import BlogVotes from "@/components/blogs/BlogVotes";
+import BlogComments from "@/components/blogs/BlogComments";
 
 const BlogDetails = () => {
   const { blogId } = useParams();
@@ -127,13 +128,12 @@ const BlogDetails = () => {
         </div>
       )}
 
-      <BlogVotes blogId={blogId} />
+      {/* <BlogVotes blogId={blogId} /> */}
 
       {/* Comments Section */}
-      <div className="mt-10 space-y-4">
+      {/* <div className="mt-10 space-y-4">
         <h3 className="text-lg font-semibold">Comments (23)</h3>
 
-        {/* Example single comment */}
         <div className="flex gap-3 items-start">
           <Avatar>
             <AvatarImage
@@ -164,10 +164,11 @@ const BlogDetails = () => {
         </div>
 
         {/* Add your other comments here */}
-        <Button className="mt-4 mx-auto block w-1/2 max-w-xs">
-          See all comments
-        </Button>
-      </div>
+      <Button className="mt-4 mx-auto block w-1/2 max-w-xs">
+        See all comments
+      </Button>
+      {/* </div> */}
+      <BlogComments blogId={blogId} />
 
       {/* Other Articles from Author */}
       <div className="mt-10">
