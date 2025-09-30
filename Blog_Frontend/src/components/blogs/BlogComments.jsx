@@ -18,15 +18,21 @@ const CommentEditor = ({
     try {
       if (!content.trim()) return;
       setLoading(true);
-      const { error } = await api.post("/comments", {
+
+      if (onSubmit) {
+        await onSubmit(content);
+        setContent("");
+        setLoading(false);
+        return;
+      }
+
+      await api.post("/comments", {
         blog_id: blogId,
         content,
         parent_id: parentId || null,
       });
-      if (error) throw error;
       setContent("");
       setLoading(false);
-      onSubmit?.();
     } catch (error) {
       console.log("Unable to post a comment ... ", error?.message);
     }
@@ -73,11 +79,11 @@ const CommentItem = ({ comment, blogId, refresh }) => {
     refresh();
   };
 
-  const handleEdit = async (newContent) => {
-    await api?.put(`/comments/${comment?.id}`, { content: newContent });
-    setShowEdit(false);
-    refresh();
-  };
+  // const handleEdit = async (newContent) => {
+  //   await api?.put(`/comments/${comment?.id}`, { content: newContent });
+  //   setShowEdit(false);
+  //   refresh();
+  // };
 
   return (
     <div className="flex gap-3 mb-4">
@@ -95,11 +101,17 @@ const CommentItem = ({ comment, blogId, refresh }) => {
             blogId={blogId}
             parentId={comment?.parent_id}
             initial={comment?.content}
-            onSubmit={() => handleEdit(comment?.content)}
+            onSubmit={async (newContent) => {
+              await api.put(`/comments/${comment.id}`, { content: newContent });
+              setShowEdit(false);
+              refresh();
+            }}
             onCancel={() => setShowEdit(false)}
           />
         ) : (
-          <ReactMarkdown className="prose">{comment?.content}</ReactMarkdown>
+          <div className="prose">
+            <ReactMarkdown>{comment?.content}</ReactMarkdown>
+          </div>
         )}
         <div className="flex gap-2 mt-1">
           <Button
@@ -163,10 +175,10 @@ const BlogComments = ({ blogId }) => {
   useEffect(() => {
     try {
       const fetchComments = async () => {
-        const { res, error } = await api.get(`/comments/${blogId}`);
+        const res = await api.get(`/comments/${blogId}`);
 
-        if (error) throw error;
-        setComments(res?.data?.comments);
+        console.log("Response from comments..", res);
+        setComments(res?.data?.comments || []);
       };
       fetchComments();
     } catch (error) {

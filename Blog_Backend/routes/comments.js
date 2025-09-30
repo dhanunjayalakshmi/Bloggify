@@ -26,7 +26,7 @@ router.post("/", verifyToken, async (req, res) => {
 });
 
 // Get comments for a blog
-router.get("/:blogId", async (req, res) => {
+router.get("/:blogId", verifyToken, async (req, res) => {
   try {
     const { blogId } = req?.params;
     const { page = 1, limit = 10 } = req?.query;
@@ -48,13 +48,13 @@ router.get("/:blogId", async (req, res) => {
 });
 
 // Get replies for a comment
-router.get("/:blogId/replies/:commentId", async (req, res) => {
+router.get("/:blogId/replies/:commentId", verifyToken, async (req, res) => {
   try {
     const { blogId, commentId } = req?.params;
     const { page = 1, limit = 5 } = req?.query;
     const offset = (page - 1) * limit;
 
-    const { data, error } = await supabase
+    const { data, error } = await req?.supabase
       .from("comments")
       .select("*, users(name)")
       .eq("parent_id", commentId)
@@ -75,7 +75,7 @@ router.put("/:id", verifyToken, async (req, res) => {
     const { content } = req?.body;
     const userId = req?.user?.id;
 
-    const { data: comment, error: fetchError } = await supabase
+    const { data: comment, error: fetchError } = await req?.supabase
       .from("comments")
       .select("user_id")
       .eq("id", id)
@@ -87,7 +87,7 @@ router.put("/:id", verifyToken, async (req, res) => {
       return res.status(403).json({ error: "Unauthorized" });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await req?.supabase
       .from("comments")
       .update({ content })
       .eq("id", id)
@@ -108,7 +108,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
     const { id } = req?.params;
     const userId = req?.user?.id;
 
-    const { data: comment, error: fetchError } = await supabase
+    const { data: comment, error: fetchError } = await req?.supabase
       .from("comments")
       .select("user_id")
       .eq("id", id)
@@ -120,7 +120,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
       return res.status(403).json({ error: "Unauthorized" });
     }
 
-    const { error } = await supabase
+    const { error } = await req?.supabase
       .from("comments")
       .delete()
       .eq("id", id)
