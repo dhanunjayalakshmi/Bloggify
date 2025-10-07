@@ -200,21 +200,29 @@ const CommentItem = ({ comment, blogId, refresh }) => {
 
 const BlogComments = ({ blogId }) => {
   const [comments, setComments] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [forceReload, setForceReload] = useState(0);
 
   useEffect(() => {
-    try {
-      const fetchComments = async () => {
-        const res = await api.get(`/comments/${blogId}`);
-
-        // console.log("Response from comments..", res);
-        setComments(res?.data?.comments || []);
-      };
-      fetchComments();
-    } catch (error) {
-      console.log("Unable to fetch Comments", error?.message);
-    }
+    const fetchComments = async () => {
+      const res = await api.get(`/comments/${blogId}?page=1&limit=10`);
+      setComments(res?.data?.comments || []);
+      setPage(2);
+      setHasMore((res?.data?.comments?.length || 0) === 10);
+    };
+    fetchComments();
   }, [blogId, forceReload]);
+
+  const loadMoreComments = async () => {
+    const res = await api.get(`/comments/${blogId}?page=${page}&limit=1`);
+    const newComments = (res?.data?.comments || []).filter(
+      (newC) => !comments.some((oldC) => oldC.id === newC.id)
+    );
+    setComments((comments) => [...comments, ...newComments]);
+    setPage((page) => page + 1);
+    setHasMore((res?.data?.comments?.length || 0) === 10);
+  };
 
   const refresh = () => setForceReload((v) => v + 1);
 
@@ -232,9 +240,14 @@ const BlogComments = ({ blogId }) => {
           />
         ))}
 
-        <Button className="mt-4 mx-auto block w-1/2 max-w-xs">
-          See all comments
-        </Button>
+        {hasMore && (
+          <Button
+            className="mt-4 mx-auto block w-1/2 max-w-xs"
+            onClick={loadMoreComments}
+          >
+            Show More Comments
+          </Button>
+        )}
       </div>
     </div>
   );
