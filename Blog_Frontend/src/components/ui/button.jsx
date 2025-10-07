@@ -23,7 +23,7 @@ const buttonVariants = cva(
         primaryButton:
           "text-md font-bold text-gray-100 dark:text-white bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700",
         ghostButton:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-gray-800",
+          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-gray-900",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

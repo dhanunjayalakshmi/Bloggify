@@ -23,7 +23,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/logout", async (req, res) => {
-  const { access_token } = req.body; // Token received during login
+  const { access_token } = req?.body;
 
   if (!access_token) {
     return res.status(400).json({ error: "Access token is required" });

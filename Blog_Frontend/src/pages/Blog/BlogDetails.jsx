@@ -164,9 +164,7 @@ const BlogDetails = () => {
         </div>
 
         {/* Add your other comments here */}
-      <Button className="mt-4 mx-auto block w-1/2 max-w-xs">
-        See all comments
-      </Button>
+      
       {/* </div> */}
       <BlogComments blogId={blogId} />
 

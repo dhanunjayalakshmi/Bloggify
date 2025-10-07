@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import api from "@/lib/api";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
-// import { Avatar } from "@/components/ui/avatar"; // use your Avatar implementation
+import { format } from "timeago.js";
+
+import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
+import { Textarea } from "../ui/textarea";
+import { useAuthStore } from "@/stores/authStore";
 
 const CommentEditor = ({
   blogId,
@@ -15,39 +19,40 @@ const CommentEditor = ({
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
+    if (!content.trim()) return;
+    setLoading(true);
+
     try {
-      if (!content.trim()) return;
-      setLoading(true);
+      if (initial === "") {
+        await api.post("/comments", {
+          blog_id: blogId,
+          content,
+          parent_id: parentId || null,
+        });
 
-      if (onSubmit) {
-        await onSubmit(content);
-        setContent("");
-        setLoading(false);
-        return;
+        onSubmit?.();
+      } else {
+        onSubmit?.(content);
       }
-
-      await api.post("/comments", {
-        blog_id: blogId,
-        content,
-        parent_id: parentId || null,
-      });
       setContent("");
       setLoading(false);
+      onCancel?.();
     } catch (error) {
-      console.log("Unable to post a comment ... ", error?.message);
+      console.log("Unable to submit comment ...", error?.message);
+      setLoading(false);
     }
   };
 
   return (
     <div>
-      <textarea
+      <Textarea
         className="border w-full p-2 rounded"
         rows={3}
         value={content}
-        onChange={(e) => setContent(e.target.value)}
+        onChange={(e) => setContent(e?.target?.value)}
         placeholder="Write a comment (Markdown supported)..."
       />
-      <div className="flex gap-2 mt-2">
+      <div className="flex gap-2 mt-4">
         <Button onClick={handleSubmit} disabled={loading || !content.trim()}>
           {initial ? "Update" : "Comment"}
         </Button>
@@ -67,11 +72,21 @@ const CommentItem = ({ comment, blogId, refresh }) => {
   const [replies, setReplies] = useState([]);
   const [repliesLoaded, setRepliesLoaded] = useState(false);
 
+  const userId = useAuthStore((state) => state?.profile?.id);
+
   const fetchReplies = async () => {
-    if (repliesLoaded) return;
-    const res = await api?.get(`/comments/${blogId}/replies/${comment?.id}`);
-    setReplies(res?.data?.replies);
-    setRepliesLoaded(true);
+    if (repliesLoaded) {
+      setRepliesLoaded(false);
+      return;
+    }
+    if (!repliesLoaded && replies?.length === 0) {
+      const res = await api?.get(`/comments/${blogId}/replies/${comment?.id}`);
+      setReplies(res?.data?.replies);
+      setRepliesLoaded(true);
+    } else {
+      setRepliesLoaded(false);
+      setReplies([]);
+    }
   };
 
   const handleDelete = async () => {
@@ -79,64 +94,80 @@ const CommentItem = ({ comment, blogId, refresh }) => {
     refresh();
   };
 
-  // const handleEdit = async (newContent) => {
-  //   await api?.put(`/comments/${comment?.id}`, { content: newContent });
-  //   setShowEdit(false);
-  //   refresh();
-  // };
+  const handleEdit = async (newContent) => {
+    console.log("Came here for update", newContent);
+    await api.put(`/comments/${comment.id}`, { content: newContent });
+    setShowEdit(false);
+    refresh();
+  };
 
   return (
-    <div className="flex gap-3 mb-4">
-      {/* Replace with your Avatar UI */}
-      {/* <Avatar src={comment.users?.avatar} /> */}
-      <div className="flex-1">
-        <div className="text-sm font-medium">
-          {comment?.users?.name ?? "User"}
-        </div>
-        <div className="text-xs text-gray-500">
-          {new Date(comment?.created_at).toLocaleString()}
+    <div className="flex gap-3 mb-8">
+      <div className="flex-1 rounded-lg dark:bg-gray-800 shadow-lg px-4 py-3">
+        <div className="flex items-center gap-3">
+          <Avatar
+            className="h-10 w-10 cursor-pointer"
+            // onClick={() => navigate(`/user/${users?.id || 1}`)}
+          >
+            <AvatarImage
+              className="w-10 h-10 rounded-full object-cover"
+              src={
+                comment?.users?.avatar ||
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s"
+              }
+            />
+          </Avatar>
+          <div className="flex flex-col">
+            <span className="font-semibold text-gray-900 dark:text-gray-100">
+              {comment?.users?.name ?? "User"}
+            </span>
+            <span className="text-xs text-gray-500">
+              {format(comment?.created_at)}
+            </span>
+          </div>
         </div>
         {showEdit ? (
           <CommentEditor
             blogId={blogId}
             parentId={comment?.parent_id}
             initial={comment?.content}
-            onSubmit={async (newContent) => {
-              await api.put(`/comments/${comment.id}`, { content: newContent });
-              setShowEdit(false);
-              refresh();
-            }}
+            onSubmit={handleEdit}
             onCancel={() => setShowEdit(false)}
           />
         ) : (
-          <div className="prose">
+          <div className="mt-4 prose prose-sm dark:prose-invert">
             <ReactMarkdown>{comment?.content}</ReactMarkdown>
           </div>
         )}
-        <div className="flex gap-2 mt-1">
+        <div className="flex gap-2 mt-2">
           <Button
-            size="small"
-            variant="outline"
+            size="sm"
+            variant="ghostButton"
             onClick={() => setShowReply((v) => !v)}
           >
             Reply
           </Button>
-          <Button
-            size="small"
-            variant="outline"
-            onClick={() => setShowEdit((v) => !v)}
-          >
-            Edit
-          </Button>
-          <Button size="small" variant="outline" onClick={handleDelete}>
-            Delete
-          </Button>
-          <Button size="small" variant="outline" onClick={fetchReplies}>
+
+          {userId === comment?.user_id && (
+            <>
+              <Button
+                size="sm"
+                variant="ghostButton"
+                onClick={() => setShowEdit((v) => !v)}
+              >
+                Edit
+              </Button>
+              <Button size="sm" variant="ghostButton" onClick={handleDelete}>
+                Delete
+              </Button>
+            </>
+          )}
+          <Button size="sm" variant="ghostButton" onClick={fetchReplies}>
             {repliesLoaded ? "Hide Replies" : "Show Replies"}
           </Button>
         </div>
         {showReply && (
-          <div className="ml-4 mt-2">
+          <div className="ml-6 mt-3">
             <CommentEditor
               blogId={blogId}
               parentId={comment?.id}
@@ -149,11 +180,10 @@ const CommentItem = ({ comment, blogId, refresh }) => {
             />
           </div>
         )}
-        {/* Nested Replies */}
         {repliesLoaded &&
           replies?.map((reply) => (
             <div
-              className="ml-6 border-l-2 border-gray-200 pl-2"
+              className="ml-8 mt-4 border-l-2 border-gray-200 dark:border-gray-700 pl-4"
               key={reply?.id}
             >
               <CommentItem
@@ -177,7 +207,7 @@ const BlogComments = ({ blogId }) => {
       const fetchComments = async () => {
         const res = await api.get(`/comments/${blogId}`);
 
-        console.log("Response from comments..", res);
+        // console.log("Response from comments..", res);
         setComments(res?.data?.comments || []);
       };
       fetchComments();
@@ -191,7 +221,7 @@ const BlogComments = ({ blogId }) => {
   return (
     <div className="mt-8">
       <h3 className="font-bold text-lg mb-2">Comments</h3>
-      <CommentEditor blogId={blogId} onSubmit={refresh} />
+      <CommentEditor blogId={blogId} onSubmit={() => refresh()} />
       <div className="mt-4 space-y-4">
         {comments?.map((comment) => (
           <CommentItem
@@ -201,6 +231,10 @@ const BlogComments = ({ blogId }) => {
             refresh={refresh}
           />
         ))}
+
+        <Button className="mt-4 mx-auto block w-1/2 max-w-xs">
+          See all comments
+        </Button>
       </div>
     </div>
   );

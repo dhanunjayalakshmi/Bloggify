@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@tiptap/extension-placeholder": "^2.25.0",
-    "react-markdown": "^10.1.0"
+    "react-markdown": "^10.1.0",
+    "timeago.js": "^4.0.2"
   }
 }
