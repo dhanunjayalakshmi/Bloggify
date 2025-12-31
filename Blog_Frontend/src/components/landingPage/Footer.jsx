@@ -4,7 +4,7 @@ const Footer = () => {
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
         {/* Left: Logo or Copyright */}
         <div className="text-center md:text-left">
-          © {new Date().getFullYear()} MediumClone. All rights reserved.
+          © {new Date().getFullYear()} Bloggify. All rights reserved.
         </div>
 
         {/* Right: Links */}
