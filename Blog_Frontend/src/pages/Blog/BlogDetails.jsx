@@ -11,7 +11,7 @@ import {
   ThumbsUp,
 } from "lucide-react";
 import BlogContentRenderer from "@/components/blogEditor/BlogContentRenderer";
-// import BlogVotes from "@/components/blogs/BlogVotes";
+import ContentVotes from "@/components/blogs/ContentVotes";
 import BlogComments from "@/components/blogs/BlogComments";
 
 const BlogDetails = () => {
@@ -85,10 +85,12 @@ const BlogDetails = () => {
       </div>
 
       <div className="flex items-center gap-4 mt-4">
-        <Button variant="ghostButton" aria-label="Like">
+        {/* <Button variant="ghostButton" aria-label="Like">
           <ThumbsUp className="h-5 w-5" />
           <span>120</span>
-        </Button>
+        </Button> */}
+        <ContentVotes contentId={blog.id} contentType="blog" className="ml-2" />
+
         <Button variant="ghostButton" aria-label="Comment">
           <MessageCircle className="h-5 w-5" />
           <span>56</span>
@@ -164,7 +166,7 @@ const BlogDetails = () => {
         </div>
 
         {/* Add your other comments here */}
-      
+
       {/* </div> */}
       <BlogComments blogId={blogId} />
 

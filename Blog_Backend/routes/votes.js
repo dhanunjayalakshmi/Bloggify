@@ -5,13 +5,13 @@ const { verifyToken } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
-// Votin API
+// Votes API
 router.post("/", verifyToken, async (req, res) => {
   try {
     const { content_id, content_type, vote_type } = req?.body;
     const userId = req?.user?.id;
 
-    const { data: existingVote, error: fetchError } = await supabase
+    const { data: existingVote, error: fetchError } = await req?.supabase
       .from("votes")
       .select("id, vote_type")
       .eq("user_id", userId)
@@ -23,7 +23,7 @@ router.post("/", verifyToken, async (req, res) => {
 
     if (existingVote) {
       if (existingVote?.vote_type === vote_type) {
-        const { error: deleteError } = await supabase
+        const { error: deleteError } = await req?.supabase
           .from("votes")
           .delete()
           .eq("id", existingVote.id);
@@ -31,7 +31,7 @@ router.post("/", verifyToken, async (req, res) => {
         if (deleteError) throw deleteError;
         return res.status(200).json({ message: "Vote has been removed" });
       } else {
-        const { error: updateError } = await supabase
+        const { error: updateError } = await req?.supabase
           .from("votes")
           .update({ vote_type })
           .eq("id", existingVote.id);
@@ -43,7 +43,7 @@ router.post("/", verifyToken, async (req, res) => {
       }
     }
 
-    const { error: insertError } = await supabase
+    const { error: insertError } = await req?.supabase
       .from("votes")
       .insert({ user_id: userId, content_id, content_type, vote_type });
 
@@ -66,7 +66,7 @@ router.get("/count", verifyToken, async (req, res) => {
         .json({ error: "Missing content_id or content_type" });
     }
 
-    const { data: votesData, error: fetchError } = await supabase
+    const { data: votesData, error: fetchError } = await req?.supabase
       .from("votes")
       .select("vote_type", { count: "exact" })
       .eq("content_id", content_id)
@@ -85,7 +85,7 @@ router.get("/count", verifyToken, async (req, res) => {
 
     let user_vote = null;
     if (userId) {
-      const { data: userVoteData, error: userVoteError } = await supabase
+      const { data: userVoteData, error: userVoteError } = await req?.supabase
         .from("votes")
         .select("vote_type")
         .eq("content_id", content_id)

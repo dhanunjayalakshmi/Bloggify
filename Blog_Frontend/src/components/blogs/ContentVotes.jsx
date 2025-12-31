@@ -3,7 +3,7 @@ import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import api from "@/lib/api";
 
-const BlogVotes = ({ blogId }) => {
+const ContentVotes = ({ contentId, contentType, className = "" }) => {
   const [votes, setVotes] = useState({
     total_upvotes: 0,
     total_downvotes: 0,
@@ -15,7 +15,7 @@ const BlogVotes = ({ blogId }) => {
     try {
       setLoading(true);
       const res = await api.get(
-        `/votes/count?content_id=${blogId}&content_type=blog`
+        `/votes/count?content_id=${contentId}&content_type=${contentType}`
       );
       setVotes(res?.data);
     } finally {
@@ -26,13 +26,13 @@ const BlogVotes = ({ blogId }) => {
   useEffect(() => {
     fetchVotes();
     // Optionally: Add websocket or polling for live updates
-  }, [blogId]);
+  }, [contentId, contentType]);
 
   const handleVote = async (voteType) => {
     setLoading(true);
     await api.post("/votes", {
-      content_id: blogId,
-      content_type: "blog",
+      content_id: contentId,
+      content_type: contentType,
       vote_type: voteType,
     });
     await fetchVotes();
@@ -40,7 +40,7 @@ const BlogVotes = ({ blogId }) => {
   };
 
   return (
-    <div className="flex items-center gap-4 mt-4">
+    <div className={`flex items-center gap-4 ${className}`}>
       <Button
         disabled={loading}
         variant={votes?.user_vote === "upvote" ? "solid" : "ghostButton"}
@@ -52,7 +52,7 @@ const BlogVotes = ({ blogId }) => {
       </Button>
       <Button
         disabled={loading}
-        variant={votes.user_vote === "downvote" ? "solid" : "ghostButton"}
+        variant={votes?.user_vote === "downvote" ? "solid" : "ghostButton"}
         aria-label="Downvote"
         onClick={() => handleVote("downvote")}
       >
@@ -63,4 +63,4 @@ const BlogVotes = ({ blogId }) => {
   );
 };
 
-export default BlogVotes;
+export default ContentVotes;

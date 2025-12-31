@@ -3,7 +3,7 @@ import { useAuthStore } from "@/stores/authStore";
 import api from "@/lib/api";
 import { supabase } from "@/lib/supabaseClient";
 import useThemeStore from "@/stores/themeStore";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import { useNavigate } from "react-router";
 
 const useAuthInit = () => {
@@ -38,9 +38,9 @@ const useAuthInit = () => {
       (event, session) => {
         if (!session?.user) {
           setUser(null, null);
-          if (!isManualLogout) {
-            toast.success("You are logged out. Please log in again.");
-          }
+          // if (!isManualLogout) {
+          //   toast.success("You are logged out. Please log in again.");
+          // }
           setManualLogout(false);
           navigate("/", { replace: true });
         } else {

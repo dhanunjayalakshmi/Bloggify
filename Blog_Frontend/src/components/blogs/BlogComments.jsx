@@ -3,10 +3,10 @@ import api from "@/lib/api";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { format } from "timeago.js";
-
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { Textarea } from "../ui/textarea";
 import { useAuthStore } from "@/stores/authStore";
+import ContentVotes from "./ContentVotes";
 
 const CommentEditor = ({
   blogId,
@@ -140,6 +140,12 @@ const CommentItem = ({ comment, blogId, refresh }) => {
           </div>
         )}
         <div className="flex gap-2 mt-2">
+          <ContentVotes
+            contentId={comment.id}
+            contentType="comment"
+            className="ml-2"
+          />
+
           <Button
             size="sm"
             variant="ghostButton"
