@@ -1,4 +1,4 @@
-import api from "@/lib/api";
+import api from "@/lib/apiClient";
 import { useState } from "react";
 
 export const useEditorImageUpload = (editor, draftId) => {

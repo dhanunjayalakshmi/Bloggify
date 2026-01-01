@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 export default function KpiCard({ icon: Icon, label, value, className }) {
   return (

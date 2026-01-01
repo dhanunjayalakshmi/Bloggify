@@ -13,7 +13,7 @@ import Posts from "@/pages/User/PostsTab";
 import Bookmarks from "@/pages/User/BookmarksTab";
 import Settings from "@/pages/User/SettingsTab";
 import EditProfilePage from "@/pages/User/EditProfilePage";
-import PrivateRoute from "@/components/PrivateRoute";
+import PrivateRoute from "@/routes/PrivateRoute";
 import LandingPage from "@/pages/LandingPage/LandingPage";
 import AboutPage from "@/pages/LandingPage/AboutPage";
 import ContactPage from "@/pages/LandingPage/ContactPage";

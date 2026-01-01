@@ -1,4 +1,4 @@
-import api from "@/lib/api";
+import api from "@/lib/apiClient";
 
 export const fetchBlogs = async ({
   page = 1,

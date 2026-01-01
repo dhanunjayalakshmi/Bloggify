@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useAuthStore } from "@/stores/authStore";
-import api from "@/lib/api";
+import api from "@/lib/apiClient";
 import { supabase } from "@/lib/supabaseClient";
 import useThemeStore from "@/stores/themeStore";
 // import { toast } from "sonner";

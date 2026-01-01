@@ -4,7 +4,7 @@ import { ReactNodeViewRenderer, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Button } from "@/components/ui/button";
-import api from "@/lib/api";
+import api from "@/lib/apiClient";
 import { toast } from "sonner";
 import BlogEditor from "@/components/blogEditor/BlogEditor";
 import TagInput from "@/components/blogEditor/TagInput";

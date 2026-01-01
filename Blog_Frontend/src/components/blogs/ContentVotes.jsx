@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import api from "@/lib/api";
+import api from "@/lib/apiClient";
 
 const ContentVotes = ({ contentId, contentType, className = "" }) => {
   const [votes, setVotes] = useState({

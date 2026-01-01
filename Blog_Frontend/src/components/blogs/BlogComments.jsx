@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import api from "@/lib/api";
+import api from "@/lib/apiClient";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { format } from "timeago.js";
