@@ -8,9 +8,12 @@ export const useAuthStore = create(
       token: null,
       profile: null,
       isManualLogout: false,
-      setUser: (user, token) => set({ user: user, token }),
+      isInitialized: false,
+
+      setUser: (user, token) => set({ user, token, isInitialized: true }),
       setProfile: (profile) => set({ profile }),
-      clearAuth: () => set({ user: null, token: null, profile: null }),
+      clearAuth: () =>
+        set({ user: null, token: null, profile: null, isInitialized: true }),
       setManualLogout: (val) => set({ isManualLogout: val }),
     }),
     {

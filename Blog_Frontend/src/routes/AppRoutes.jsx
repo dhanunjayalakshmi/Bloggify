@@ -5,7 +5,7 @@ import CreateEditBlog from "@/pages/Blog/CreateEditBlog";
 import PreviewPage from "@/pages/Blog/PreviewPage";
 import Home from "@/pages/Home/Home";
 import AuthorProfilePage from "@/pages/Author/AuthorProfilePage";
-import { Routes, Route } from "react-router";
+import { Routes, Route } from "react-router-dom";
 import UserAccountLayout from "@/layouts/UserAccountLayout";
 import UserAccountPage from "@/pages/User/UserProfilePage";
 import Stats from "@/pages/User/StatsTab";
