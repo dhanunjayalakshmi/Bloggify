@@ -1,9 +1,10 @@
-import { Navigate, Outlet } from "react-router";
+import { Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
 
 const PrivateRoute = () => {
-  const user = useAuthStore((state) => state?.user);
-  const token = useAuthStore((state) => state?.token);
+  const { user, token, isInitialized } = useAuthStore();
+
+  if (!isInitialized) return null;
 
   if (!user || !token) {
     return <Navigate to="/" replace />;

@@ -3,7 +3,7 @@ import FeaturesSection from "@/components/landingPage/FeaturesSection";
 import HeroSection from "@/components/landingPage/HeroSection";
 import { useAuthStore } from "@/stores/authStore";
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
   const user = useAuthStore((state) => state?.user);

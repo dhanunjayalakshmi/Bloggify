@@ -1,8 +1,13 @@
 import Footer from "@/components/landingPage/Footer";
 import Navbar from "@/components/Navbar";
-import { Outlet } from "react-router";
+import useAuthRedirect from "@/hooks/useAuthRedirect";
+import useUserProfile from "@/hooks/useUserProfile";
+import { Outlet } from "react-router-dom";
 
 const MainLayout = () => {
+  useAuthRedirect();
+  useUserProfile();
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-200 dark:bg-gray-900">
       <Navbar />

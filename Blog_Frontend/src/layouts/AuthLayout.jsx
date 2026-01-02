@@ -1,6 +1,6 @@
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
-import { Outlet } from "react-router";
+import { Outlet } from "react-router-dom";
 
 const AuthLayout = () => {
   return (

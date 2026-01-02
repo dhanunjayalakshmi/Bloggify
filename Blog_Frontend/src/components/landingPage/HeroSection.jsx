@@ -1,6 +1,6 @@
 import { useModalStore } from "@/stores/modalStore";
 import { Button } from "../ui/button";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
   const { openModal } = useModalStore();

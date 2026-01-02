@@ -1,5 +1,5 @@
 import { useAuthStore } from "@/stores/authStore";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
