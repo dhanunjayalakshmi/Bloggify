@@ -82,9 +82,6 @@ const BlogList = ({
           <p className="text-center text-muted-foreground">No blogs found.</p>
         )}
         {blogs?.map((blog) => (
-          // <Link key={blog?.id} to={`/blogs/${blog?.id}`}>
-          //   <BlogCard blog={blog} footerVariant={mode} status={status} />
-          // </Link>
           <BlogCard
             key={blog?.id}
             blog={blog}
