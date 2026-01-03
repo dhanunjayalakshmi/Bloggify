@@ -12,6 +12,7 @@ import { toast } from "sonner";
 
 const BlogCardFooter = ({ blog, variant = "home", status }) => {
   const [isBookmarked, setIsBookmarked] = useState(true);
+  const stop = (e) => e.stopPropagation();
 
   const toggleBookmark = async () => {
     setIsBookmarked(!isBookmarked);
@@ -22,7 +23,7 @@ const BlogCardFooter = ({ blog, variant = "home", status }) => {
 
   if (variant === "dashboard") {
     return (
-      <div className="flex justify-between w-full items-center">
+      <div onClick={stop} className="flex justify-between w-full items-center">
         <span className="text-sm text-muted-foreground">
           {blog.tags.join(", ")}
         </span>
@@ -53,7 +54,10 @@ const BlogCardFooter = ({ blog, variant = "home", status }) => {
 
   if (variant === "bookmarks") {
     return (
-      <div className="flex justify-between items-center text-sm text-muted-foreground mt-2">
+      <div
+        onClick={stop}
+        className="flex justify-between items-center text-sm text-muted-foreground mt-2"
+      >
         <span>By {blog.author}</span>
         <span>{blog.tags.join(", ")}</span>
         <span>⭐ {blog.rating}</span>
@@ -74,12 +78,15 @@ const BlogCardFooter = ({ blog, variant = "home", status }) => {
             } stroke-current`}
           />
         </Button>
-      </div>    
+      </div>
     );
   }
 
   return (
-    <div className="flex justify-between items-center text-sm text-muted-foreground mt-2">
+    <div
+      onClick={stop}
+      className="flex justify-between items-center text-sm text-muted-foreground mt-2"
+    >
       <span>By {blog.author}</span>
       <span>{blog.tags.join(", ")}</span>
       <span>⭐ {blog.rating}</span>

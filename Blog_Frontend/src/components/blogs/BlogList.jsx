@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import BlogCard from "./BlogCard";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { fetchBlogs } from "@/services/blogService";
@@ -19,6 +19,7 @@ const BlogList = ({
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const loaderRef = useRef();
+  const navigate = useNavigate();
 
   const seenIds = useRef(new Set());
 
@@ -81,9 +82,16 @@ const BlogList = ({
           <p className="text-center text-muted-foreground">No blogs found.</p>
         )}
         {blogs?.map((blog) => (
-          <Link key={blog?.id} to={`/blogs/${blog?.id}`}>
-            <BlogCard blog={blog} footerVariant={mode} status={status} />
-          </Link>
+          // <Link key={blog?.id} to={`/blogs/${blog?.id}`}>
+          //   <BlogCard blog={blog} footerVariant={mode} status={status} />
+          // </Link>
+          <BlogCard
+            key={blog?.id}
+            blog={blog}
+            footerVariant={mode}
+            status={status}
+            onOpen={() => navigate(`/blogs/${blog?.id}`)}
+          />
         ))}
       </div>
 

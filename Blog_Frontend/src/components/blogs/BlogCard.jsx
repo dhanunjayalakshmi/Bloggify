@@ -1,7 +1,7 @@
 import { Card, CardContent } from "../ui/card";
 import BlogCardFooter from "./BlogCardFooter";
 
-const BlogCard = ({ blog, footerVariant = "home", status }) => {
+const BlogCard = ({ blog, footerVariant = "home", status, onOpen }) => {
   const {
     cover_image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s",
     title = "My first blog",
@@ -9,7 +9,10 @@ const BlogCard = ({ blog, footerVariant = "home", status }) => {
   } = blog;
 
   return (
-    <Card className="rounded-2xl my-3 shadow-sm hover:shadow-md transition dark:bg-gray-800 dark:text-gray-200">
+    <Card
+      onClick={onOpen}
+      className="cursor-pointer rounded-2xl my-3 shadow-sm hover:shadow-md transition dark:bg-gray-800 dark:text-gray-200"
+    >
       <CardContent className="px-4 py-4 flex flex-col sm:flex-row gap-4">
         <img
           src={cover_image}
@@ -27,7 +30,12 @@ const BlogCard = ({ blog, footerVariant = "home", status }) => {
           </div>
 
           {/* Footer Section */}
-          <BlogCardFooter blog={blog} variant={footerVariant} status={status} />
+          <BlogCardFooter
+            blog={blog}
+            variant={footerVariant}
+            status={status}
+            onStopPropagation
+          />
         </div>
       </CardContent>
     </Card>
