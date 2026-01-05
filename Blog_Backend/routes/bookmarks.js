@@ -15,7 +15,7 @@ router.post("/", verifyToken, async (req, res) => {
       return res.status(400).json({ error: "Missing blog id" });
     }
 
-    const { data: existingBookmark, error: fetchError } = await supabase
+    const { data: existingBookmark, error: fetchError } = await req?.supabase
       .from("bookmarks")
       .select("id")
       .eq("blog_id", blog_id)
@@ -27,7 +27,7 @@ router.post("/", verifyToken, async (req, res) => {
     }
 
     if (existingBookmark) {
-      const { error: deleteError } = await supabase
+      const { error: deleteError } = await req?.supabase
         .from("bookmarks")
         .delete()
         .eq("id", existingBookmark.id);
@@ -36,7 +36,7 @@ router.post("/", verifyToken, async (req, res) => {
       return res.status(200).json({ message: "Bookmark removed" });
     }
 
-    const { error: insertError } = await supabase
+    const { error: insertError } = await req?.supabase
       .from("bookmarks")
       .insert([{ user_id: userId, blog_id }]);
 
@@ -53,7 +53,7 @@ router.get("/", verifyToken, async (req, res) => {
   try {
     const userId = req?.user?.id;
 
-    const { data, error } = await supabase
+    const { data, error } = await req?.supabase
       .from("bookmarks")
       .select("blog_id, created_at")
       .eq("user_id", userId);

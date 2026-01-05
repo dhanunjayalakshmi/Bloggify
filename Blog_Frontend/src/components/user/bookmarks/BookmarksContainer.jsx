@@ -100,7 +100,7 @@ const BookmarksContainer = () => {
         )}
       </div>
 
-      {filteredBookmarks.length > 0 ? (
+      {filteredBookmarks?.length > 0 ? (
         <div className="space-y-4">
           {filteredBookmarks.map((blog) => (
             <BlogCard key={blog?.id} blog={blog} footerVariant="bookmarks" />

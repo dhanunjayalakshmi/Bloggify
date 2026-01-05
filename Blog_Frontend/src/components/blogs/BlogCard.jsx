@@ -1,7 +1,13 @@
 import { Card, CardContent } from "../ui/card";
 import BlogCardFooter from "./BlogCardFooter";
+import useBookmark from "@/hooks/useBookmark";
 
 const BlogCard = ({ blog, footerVariant = "home", status, onOpen }) => {
+  const { isBookmarked, toggleBookmark } = useBookmark({
+    blogId: blog?.id,
+    initialBookmarked: blog?.isBookmarked,
+  });
+
   const {
     cover_image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s",
     title = "My first blog",
@@ -34,7 +40,8 @@ const BlogCard = ({ blog, footerVariant = "home", status, onOpen }) => {
             blog={blog}
             variant={footerVariant}
             status={status}
-            onStopPropagation
+            isBookmarked={isBookmarked}
+            toggleBookmark={toggleBookmark}
           />
         </div>
       </CardContent>

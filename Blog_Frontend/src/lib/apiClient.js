@@ -2,8 +2,8 @@ import axios from "axios";
 import { getAuthToken } from "@/utils/authToken";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
-  // baseURL: "/api",
+  // baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
+  baseURL: "/api",
   headers: {
     "Content-Type": "application/json",
   },

@@ -13,12 +13,16 @@ import {
 import BlogContentRenderer from "@/components/blogEditor/BlogContentRenderer";
 import ContentVotes from "@/components/blogs/ContentVotes";
 import BlogComments from "@/components/blogs/BlogComments";
+import useBookmark from "@/hooks/useBookmark";
 
 const BlogDetails = () => {
   const { blogId } = useParams();
   const navigate = useNavigate();
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { isBookmarked, toggleBookmark } = useBookmark({
+    blogId,
+  });
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -95,9 +99,22 @@ const BlogDetails = () => {
           <MessageCircle className="h-5 w-5" />
           <span>56</span>
         </Button>
-        <Button size="icon" variant="ghostButton" aria-label="Bookmark">
-          <Bookmark className="h-5 w-5" />
+
+        <Button
+          size="icon"
+          variant="ghostButton"
+          aria-label="Bookmark"
+          onClick={toggleBookmark}
+          className="transition-transform transform hover:scale-110 active:scale-90"
+        >
+          <Bookmark
+            size={18}
+            className={`${
+              isBookmarked ? "fill-black dark:fill-white" : "fill-none"
+            } stroke-current`}
+          />
         </Button>
+
         <Button size="icon" variant="ghostButton" aria-label="Share">
           <Share2 className="h-5 w-5" />
         </Button>
@@ -130,44 +147,6 @@ const BlogDetails = () => {
         </div>
       )}
 
-      {/* <BlogVotes blogId={blogId} /> */}
-
-      {/* Comments Section */}
-      {/* <div className="mt-10 space-y-4">
-        <h3 className="text-lg font-semibold">Comments (23)</h3>
-
-        <div className="flex gap-3 items-start">
-          <Avatar>
-            <AvatarImage
-              className="w-8 h-8 rounded-full object-cover"
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s"
-            />
-          </Avatar>
-          <div className="space-y-1">
-            <p className="font-medium">
-              John Doe{" "}
-              <span className="text-sm text-muted-foreground">
-                • October 12, 2023
-              </span>
-            </p>
-            <p>This article is very insightful and well-written!</p>
-            <div className="flex gap-4 mt-2">
-              <Button variant="outline" size="icon">
-                <ThumbsUp size={16} />
-              </Button>
-              <Button variant="outline" size="icon">
-                <ThumbsDown size={16} />
-              </Button>
-              <Button variant="outline" className="text-blue-600">
-                Reply
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Add your other comments here */}
-
-      {/* </div> */}
       <BlogComments blogId={blogId} />
 
       {/* Other Articles from Author */}
