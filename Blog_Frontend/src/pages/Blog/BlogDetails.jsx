@@ -20,9 +20,7 @@ const BlogDetails = () => {
   const navigate = useNavigate();
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { isBookmarked, toggleBookmark } = useBookmark({
-    blogId,
-  });
+  const { isBookmarked, toggle } = useBookmark(blogId);
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -104,7 +102,7 @@ const BlogDetails = () => {
           size="icon"
           variant="ghostButton"
           aria-label="Bookmark"
-          onClick={toggleBookmark}
+          onClick={toggle}
           className="transition-transform transform hover:scale-110 active:scale-90"
         >
           <Bookmark

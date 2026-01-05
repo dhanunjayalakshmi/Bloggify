@@ -13,7 +13,7 @@ const BlogCardFooter = ({
   variant = "home",
   status,
   isBookmarked,
-  toggleBookmark,
+  onBookmarkToggle,
 }) => {
   const stop = (e) => e.stopPropagation();
 
@@ -75,7 +75,7 @@ const BlogCardFooter = ({
           size="icon"
           variant="ghostButton"
           aria-label="Bookmark"
-          onClick={toggleBookmark}
+          onClick={onBookmarkToggle}
           className="transition-transform transform hover:scale-110 active:scale-90"
         >
           <Bookmark

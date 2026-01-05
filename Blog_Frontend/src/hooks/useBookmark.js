@@ -1,39 +1,29 @@
-import { useState } from "react";
-import { addBookmark, removeBookmark } from "@/services/bookmarkService";
+import { toggleBookmark } from "@/services/bookmarkService";
+import { useBookmarkStore } from "@/stores/bookmarksStore";
 import { toast } from "sonner";
 
-const useBookmark = ({ blogId, initialBookmarked = false }) => {
-  const [isBookmarked, setIsBookmarked] = useState(initialBookmarked);
-  const [loading, setLoading] = useState(false);
+const useBookmark = (blogId) => {
+  const isBookmarked = useBookmarkStore((store) => store?.isBookmarked(blogId));
+  const add = useBookmarkStore((store) => store?.add);
+  const remove = useBookmarkStore((store) => store?.remove);
 
-  const toggleBookmark = async (e) => {
-    e.stopPropagation();
-    if (loading) return;
-
+  const toggle = async () => {
     try {
-      setLoading(true);
-      setIsBookmarked((prev) => !prev);
+      await toggleBookmark(blogId);
 
-      if (!isBookmarked) {
-        await addBookmark(blogId);
-        toast.success("Bookmark added");
-      } else {
-        await removeBookmark(blogId);
+      if (isBookmarked) {
+        remove(blogId);
         toast.success("Bookmark removed");
+      } else {
+        add(blogId);
+        toast.success("Bookmark added");
       }
     } catch {
-      setIsBookmarked((prev) => !prev);
-      toast.error("Failed to update bookmark");
-    } finally {
-      setLoading(false);
+      toast.error("Bookmark failed");
     }
   };
 
-  return {
-    isBookmarked,
-    toggleBookmark,
-    loading,
-  };
+  return { isBookmarked, toggle };
 };
 
 export default useBookmark;

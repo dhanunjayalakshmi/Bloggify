@@ -8,6 +8,19 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import useBookmark from "@/hooks/useBookmark";
+
+const BookmarkCardItem = ({ blog }) => {
+  const { isBookmarked, toggle } = useBookmark(blog?.id);
+
+  return (
+    <BlogCard
+      blog={{ ...blog, isBookmarked }}
+      footerVariant="bookmarks"
+      onBookmarkToggle={toggle}
+    />
+  );
+};
 
 const BookmarksContainer = () => {
   const [bookmarks] = useState([
@@ -102,8 +115,8 @@ const BookmarksContainer = () => {
 
       {filteredBookmarks?.length > 0 ? (
         <div className="space-y-4">
-          {filteredBookmarks.map((blog) => (
-            <BlogCard key={blog?.id} blog={blog} footerVariant="bookmarks" />
+          {filteredBookmarks?.map((blog) => (
+            <BookmarkCardItem key={blog?.id} blog={blog} />
           ))}
         </div>
       ) : (
