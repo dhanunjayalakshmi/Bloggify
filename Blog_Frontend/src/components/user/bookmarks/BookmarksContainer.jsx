@@ -34,7 +34,6 @@ const BookmarksContainer = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const availableTags = [...new Set(bookmarkList?.flatMap((b) => b.tags))];
-  console.log(availableTags);
 
   const filteredBookmarks = bookmarkList
     ?.filter(
@@ -89,14 +88,16 @@ const BookmarksContainer = () => {
 
         {availableTags?.length > 0 && (
           <Select
-            value={selectedTag}
-            onValueChange={(val) => setSelectedTag(val)}
+            value={selectedTag || "__all__"}
+            onValueChange={(val) =>
+              setSelectedTag(val === "__all__" ? "" : val)
+            }
           >
             <SelectTrigger className="w-full sm:w-40">
               <SelectValue placeholder="Filter by Tag" />
             </SelectTrigger>
             <SelectContent className="dark:bg-gray-700">
-              <SelectItem value="allTags">All Tags</SelectItem>
+              <SelectItem value="__all__">All Tags</SelectItem>
               {availableTags?.map((tag) => (
                 <SelectItem
                   key={tag}
