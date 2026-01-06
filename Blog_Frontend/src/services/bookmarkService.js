@@ -23,3 +23,15 @@ export async function getBookmarks() {
     throw error;
   }
 }
+
+export async function getBookmarkedBlogs() {
+  try {
+    const res = await api.get("/bookmarks/blogs");
+
+    if (!res?.data) throw new Error("Failed to fetch bookmarked blog details");
+    return res?.data?.blogs;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}

@@ -65,4 +65,45 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
+// Get all bookmarked blogs with details
+router.get("/blogs", verifyToken, async (req, res) => {
+  try {
+    const userId = req?.user?.id;
+
+    const { data, error } = await req?.supabase
+      .from("bookmarks")
+      .select(
+        `
+        created_at,
+        blogs (
+          id,
+          title,
+          content,
+          cover_image,
+          tags,
+          rating,
+          author:users (
+            name,
+            avatar
+          )
+        )
+      `
+      )
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    const blogs = data?.map((row) => ({
+      ...row?.blogs,
+      bookmarked_at: row?.created_at,
+      isBookmarked: true,
+    }));
+
+    res.status(200).json({ blogs });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

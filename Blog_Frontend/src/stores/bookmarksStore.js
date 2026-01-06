@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getBookmarks } from "@/services/bookmarkService";
+import { getBookmarkedBlogs, getBookmarks } from "@/services/bookmarkService";
 
 export const useBookmarkStore = create((set, get) => ({
   bookmarks: new Set(),
@@ -11,8 +11,19 @@ export const useBookmarkStore = create((set, get) => ({
     const data = await getBookmarks();
 
     set({
-      bookmarks: new Set(data?.bookmarks?.map((b) => b?.blog_id)),
-      bookmarkList: data?.blogs ?? [],
+      bookmarks: new Set(data?.bookmarks?.map((blog) => blog?.blog_id)),
+      loading: false,
+    });
+  },
+
+  fetchBookmarkedBlogs: async () => {
+    set({ loading: true });
+
+    const blogs = await getBookmarkedBlogs();
+
+    set({
+      bookmarkList: blogs,
+      bookmarks: new Set(blogs?.map((blog) => blog?.id)),
       loading: false,
     });
   },
