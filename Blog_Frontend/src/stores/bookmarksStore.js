@@ -39,6 +39,12 @@ export const useBookmarkStore = create((set, get) => ({
     set((state) => {
       const next = new Set(state?.bookmarks);
       next?.delete(blogId);
-      return { bookmarks: next };
+
+      return {
+        bookmarks: next,
+        bookmarkList: state?.bookmarkList?.filter(
+          (blog) => blog?.id !== blogId
+        ),
+      };
     }),
 }));

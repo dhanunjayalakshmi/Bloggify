@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BlogCard from "@/components/blogs/BlogCard";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,62 +9,62 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import useBookmark from "@/hooks/useBookmark";
+import { useBookmarkStore } from "@/stores/bookmarksStore";
+import { useNavigate } from "react-router";
 
 const BookmarkCardItem = ({ blog }) => {
   const { isBookmarked, toggle } = useBookmark(blog?.id);
+  const navigate = useNavigate();
 
   return (
     <BlogCard
       blog={{ ...blog, isBookmarked }}
       footerVariant="bookmarks"
       onBookmarkToggle={toggle}
+      onOpen={() => navigate(`/blogs/${blog?.id}`)}
     />
   );
 };
 
 const BookmarksContainer = () => {
-  const [bookmarks] = useState([
-    {
-      id: 1,
-      title: "Learn React",
-      description: "An introduction to React.js",
-      author: "John Doe",
-      tags: ["react", "frontend"],
-      rating: 10,
-      cover_image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s",
-    },
-    {
-      id: 2,
-      title: "Advanced JS",
-      description: "Deep dive into JavaScript",
-      author: "Jane Smith",
-      tags: ["javascript"],
-      rating: 15,
-      cover_image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s",
-    },
-  ]);
+  const { bookmarkList, loading, fetchBookmarkedBlogs } = useBookmarkStore();
 
   const [sortBy, setSortBy] = useState("recent");
   const [selectedTag, setSelectedTag] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const availableTags = [...new Set(bookmarks.flatMap((b) => b.tags))];
+  const availableTags = [...new Set(bookmarkList?.flatMap((b) => b.tags))];
+  console.log(availableTags);
 
-  const filteredBookmarks = bookmarks
-    .filter(
+  const filteredBookmarks = bookmarkList
+    ?.filter(
       (b) =>
-        (selectedTag ? b.tags.includes(selectedTag) : true) &&
+        (selectedTag ? b?.tags?.includes(selectedTag) : true) &&
         (searchTerm
-          ? b.title.toLowerCase().includes(searchTerm.toLowerCase())
+          ? b?.title?.toLowerCase()?.includes(searchTerm?.toLowerCase())
           : true)
     )
-    .sort((a, b) => {
-      if (sortBy === "author") return a.author.localeCompare(b.author);
-      if (sortBy === "alphabetical") return a.title.localeCompare(b.title);
+    ?.sort((a, b) => {
+      if (sortBy === "author") return a?.author?.localeCompare(b?.author);
+      if (sortBy === "alphabetical") return a?.title?.localeCompare(b?.title);
       return 0;
     });
+
+  useEffect(() => {
+    fetchBookmarkedBlogs();
+  }, [fetchBookmarkedBlogs]);
+
+  if (loading) {
+    return <div className="py-20 text-center">Loading bookmarks...</div>;
+  }
+
+  if (!bookmarkList?.length) {
+    return (
+      <div className="text-center text-muted-foreground py-20">
+        You haven’t bookmarked anything yet.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -87,7 +87,7 @@ const BookmarksContainer = () => {
           </SelectContent>
         </Select>
 
-        {availableTags.length > 0 && (
+        {availableTags?.length > 0 && (
           <Select
             value={selectedTag}
             onValueChange={(val) => setSelectedTag(val)}
@@ -97,7 +97,7 @@ const BookmarksContainer = () => {
             </SelectTrigger>
             <SelectContent className="dark:bg-gray-700">
               <SelectItem value="allTags">All Tags</SelectItem>
-              {availableTags.map((tag) => (
+              {availableTags?.map((tag) => (
                 <SelectItem
                   key={tag}
                   value={tag}
@@ -113,17 +113,9 @@ const BookmarksContainer = () => {
         )}
       </div>
 
-      {filteredBookmarks?.length > 0 ? (
-        <div className="space-y-4">
-          {filteredBookmarks?.map((blog) => (
-            <BookmarkCardItem key={blog?.id} blog={blog} />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center text-muted-foreground py-20">
-          You haven’t bookmarked anything yet.
-        </div>
-      )}
+      {filteredBookmarks?.map((blog) => (
+        <BookmarkCardItem key={blog?.id} blog={blog} />
+      ))}
     </div>
   );
 };

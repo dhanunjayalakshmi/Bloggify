@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import BlogCard from "./BlogCard";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { fetchBlogs } from "@/services/blogService";

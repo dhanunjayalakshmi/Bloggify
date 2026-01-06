@@ -78,14 +78,11 @@ router.get("/blogs", verifyToken, async (req, res) => {
         blogs (
           id,
           title,
+          read_time,
           content,
           cover_image,
           tags,
-          rating,
-          author:users (
-            name,
-            avatar
-          )
+          users (name, avatar)
         )
       `
       )
