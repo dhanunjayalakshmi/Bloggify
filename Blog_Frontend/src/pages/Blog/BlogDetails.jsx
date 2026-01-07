@@ -87,11 +87,11 @@ const BlogDetails = () => {
       </div>
 
       <div className="flex items-center gap-4 mt-4">
-        {/* <Button variant="ghostButton" aria-label="Like">
-          <ThumbsUp className="h-5 w-5" />
-          <span>120</span>
-        </Button> */}
-        <ContentVotes contentId={blog.id} contentType="blog" className="ml-2" />
+        <ContentVotes
+          contentId={blog?.id}
+          contentType="blog"
+          className="ml-2"
+        />
 
         <Button variant="ghostButton" aria-label="Comment">
           <MessageCircle className="h-5 w-5" />

@@ -7,6 +7,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { Button } from "../ui/button";
+import ContentVotes from "./ContentVotes";
 
 const BlogCardFooter = ({
   blog,
@@ -60,13 +61,8 @@ const BlogCardFooter = ({
         <span>{blog?.tags?.join(", ")}</span>
 
         <div className="flex items-center gap-4">
-          <div className="flex gap-1">
-            <ThumbsUp size={16} />
-            10
-          </div>
-          <div className="flex gap-1">
-            <ThumbsDown size={16} />2
-          </div>
+          <ContentVotes contentId={blog?.id} contentType="blog" disabled />
+
           <div className="flex gap-1">
             <MessageCircle size={16} />8
           </div>
