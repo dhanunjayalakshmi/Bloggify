@@ -14,7 +14,7 @@ function App() {
 
   useEffect(() => {
     fetchBookmarks();
-  }, []);
+  }, [fetchBookmarks]);
 
   return (
     <>
@@ -22,7 +22,7 @@ function App() {
         <AppRoutes />
         <AuthModal />
       </BrowserRouter>
-      <Toaster richColors position="top-right" closeButton theme="system" />
+      <Toaster richColors position="bottom-right" closeButton theme="system" />
     </>
   );
 }

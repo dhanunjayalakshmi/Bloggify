@@ -106,4 +106,30 @@ router.get("/count", verifyToken, async (req, res) => {
   }
 });
 
+// Bulk vote counts
+router.get("/counts", verifyToken, async (req, res) => {
+  try {
+    const { content_type, ids } = req?.query;
+    const userId = req?.user?.id;
+
+    if (!content_type || !ids) {
+      return res.status(400).json({ error: "Missing content_type or ids" });
+    }
+
+    const contentIds = ids?.split(",");
+
+    const { data, error } = await req?.supabase?.rpc("get_vote_counts", {
+      content_type_param: content_type,
+      content_ids_param: contentIds,
+      user_id_param: userId,
+    });
+
+    if (error) throw error;
+
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
