@@ -4,6 +4,8 @@ import BlogCard from "./BlogCard";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { fetchBlogs } from "@/services/blogService";
 import BlogSkeleton from "./BlogSkeleton";
+import { useVoteStore } from "@/stores/votesStore";
+import { voteService } from "@/services/voteService";
 
 const BlogList = ({
   status = "published",
@@ -22,6 +24,21 @@ const BlogList = ({
   const navigate = useNavigate();
 
   const seenIds = useRef(new Set());
+
+  // const hydrateVotesForBlogs = async (blogsToHydrate) => {
+  //   try {
+  //     const blogIds = blogsToHydrate?.map((blog) => blog?.id);
+
+  //     const res = await voteService.getVoteCounts({
+  //       contentType: "blog",
+  //       ids: blogIds,
+  //     });
+
+  //     useVoteStore.getState().setVoteCounts("blog", res?.data);
+  //   } catch (err) {
+  //     console.error("Vote hydration failed", err);
+  //   }
+  // };
 
   useInfiniteScroll(loaderRef, () => {
     if (!loading && hasMore) {
@@ -42,7 +59,7 @@ const BlogList = ({
 
       setLoading(true);
       try {
-        const res = await fetchBlogs({
+        const blogsRes = await fetchBlogs({
           page,
           limit,
           search,
@@ -51,21 +68,32 @@ const BlogList = ({
           authorId,
         });
 
-        const newBlogs = res?.blogs || [];
+        const newBlogs = blogsRes?.blogs || [];
 
         const uniqueBlogs = newBlogs?.filter((blog) => {
-          if (seenIds?.current?.has(blog.id)) return false;
-          seenIds?.current?.add(blog.id);
+          if (seenIds?.current?.has(blog?.id)) return false;
+          seenIds?.current?.add(blog?.id);
           return true;
         });
 
+        if (uniqueBlogs?.length > 0) {
+          const blogIds = uniqueBlogs?.map((blog) => blog?.id);
+
+          const votesRes = await voteService?.getVoteCounts({
+            contentType: "blog",
+            ids: blogIds,
+          });
+
+          useVoteStore?.getState()?.setVoteCounts("blog", votesRes?.data);
+        }
+
         setBlogs((prev) => [...prev, ...uniqueBlogs]);
 
-        if (res?.totalPages && page >= res?.totalPages) {
+        if (blogsRes?.totalPages && page >= blogsRes?.totalPages) {
           setHasMore(false);
         }
       } catch (err) {
-        console.error("Blog fetch failed:", err);
+        console.error("Blog fetch failed:", err?.response?.data);
         setHasMore(false);
       } finally {
         setLoading(false);

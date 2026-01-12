@@ -109,16 +109,14 @@ router.get("/count", verifyToken, async (req, res) => {
 // Bulk vote counts
 router.get("/counts", verifyToken, async (req, res) => {
   try {
-    const { content_type, ids: contentIds } = req?.query;
+    const { content_type, ids } = req?.query;
     const userId = req?.user?.id;
 
-    if (!content_type || !contentIds) {
+    if (!content_type || !ids) {
       return res.status(400).json({ error: "Missing content_type or ids" });
     }
 
-    if (typeof contentIds === "string") {
-      contentIds = contentIds?.split(",");
-    }
+    const contentIds = typeof ids === "string" ? ids?.split(",") : ids;
 
     if (!Array.isArray(contentIds)) {
       return res.status(400).json({ error: "Invalid ids format" });
