@@ -1,7 +1,9 @@
 import { useVoteStore } from "@/stores/votesStore";
 import { voteService } from "@/services/voteService";
+import { useAuthStore } from "@/stores/authStore";
 
 const useVote = (contentId, contentType) => {
+  const user = useAuthStore((s) => s.user);
   const key = `${contentType}:${contentId}`;
 
   const vote = useVoteStore((store) => store?.votesByContent[key]);
@@ -9,6 +11,8 @@ const useVote = (contentId, contentType) => {
   const rollbackVote = useVoteStore((store) => store?.rollbackVote);
 
   const upvote = async () => {
+    if (!user) return;
+
     const prev = optimisticVote({
       contentId,
       contentType,
@@ -27,6 +31,8 @@ const useVote = (contentId, contentType) => {
   };
 
   const downvote = async () => {
+    if (!user) return;
+
     const prev = optimisticVote({
       contentId,
       contentType,
