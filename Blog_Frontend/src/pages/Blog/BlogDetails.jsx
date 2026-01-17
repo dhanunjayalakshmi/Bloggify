@@ -8,8 +8,7 @@ import BlogContentRenderer from "@/components/blogEditor/BlogContentRenderer";
 import ContentVotes from "@/components/blogs/ContentVotes";
 import BlogComments from "@/components/blogs/BlogComments";
 import useBookmark from "@/hooks/useBookmark";
-import { useVoteStore } from "@/stores/votesStore";
-import { voteService } from "@/services/voteService";
+import { hydrateVotesForContent } from "@/utils/hydrateVotesForContent";
 
 const BlogDetails = () => {
   const { blogId } = useParams();
@@ -39,21 +38,7 @@ const BlogDetails = () => {
   useEffect(() => {
     if (!blogId) return;
 
-    const hydrate = async () => {
-      const key = `blog:${blogId}`;
-      const existing = useVoteStore.getState().votesByContent[key];
-
-      if (existing) return;
-
-      const res = await voteService.getVoteCounts({
-        contentType: "blog",
-        ids: [blogId],
-      });
-
-      useVoteStore.getState().setVoteCounts("blog", res?.data);
-    };
-
-    hydrate();
+    hydrateVotesForContent({ items: [blog] });
   }, [blogId]);
 
   if (loading) return <div className="p-4">Loading...</div>;

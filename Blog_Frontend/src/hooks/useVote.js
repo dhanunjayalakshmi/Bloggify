@@ -3,7 +3,7 @@ import { voteService } from "@/services/voteService";
 import { useAuthStore } from "@/stores/authStore";
 
 const useVote = (contentId, contentType) => {
-  const user = useAuthStore((s) => s.user);
+  const user = useAuthStore((store) => store?.user);
   const key = `${contentType}:${contentId}`;
 
   const vote = useVoteStore((store) => store?.votesByContent[key]);
