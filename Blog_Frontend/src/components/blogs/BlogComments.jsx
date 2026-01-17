@@ -37,8 +37,11 @@ const CommentEditor = ({
       setContent("");
       setLoading(false);
       onCancel?.();
-    } catch (error) {
-      console.log("Unable to submit comment ...", error?.message);
+    } catch (err) {
+      console.error("BlogComments error:", {
+        message: err?.message,
+        response: err?.response?.data,
+      });
       setLoading(false);
     }
   };
@@ -95,7 +98,6 @@ const CommentItem = ({ comment, blogId, refresh }) => {
   };
 
   const handleEdit = async (newContent) => {
-    console.log("Came here for update", newContent);
     await api.put(`/comments/${comment.id}`, { content: newContent });
     setShowEdit(false);
     refresh();
@@ -223,7 +225,7 @@ const BlogComments = ({ blogId }) => {
   const loadMoreComments = async () => {
     const res = await api.get(`/comments/${blogId}?page=${page}&limit=1`);
     const newComments = (res?.data?.comments || []).filter(
-      (newC) => !comments.some((oldC) => oldC.id === newC.id)
+      (newC) => !comments.some((oldC) => oldC.id === newC.id),
     );
     setComments((comments) => [...comments, ...newComments]);
     setPage((page) => page + 1);

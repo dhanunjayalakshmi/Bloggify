@@ -26,8 +26,11 @@ const Navbar = () => {
       if (error) throw error;
       logout();
       navigate("/");
-    } catch (error) {
-      console.log(error?.message);
+    } catch (err) {
+      console.error("Navbar error:", {
+        message: err?.message,
+        response: err?.response?.data,
+      });
     }
   };
 

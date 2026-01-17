@@ -23,8 +23,10 @@ export const fetchBlogs = async ({
     if (error) throw error;
 
     return data;
-  } catch (error) {
-    console.log(error?.message);
-    throw error;
+  } catch (err) {
+    console.error("blogService error:", {
+      message: err?.message,
+      response: err?.response?.data,
+    });
   }
 };

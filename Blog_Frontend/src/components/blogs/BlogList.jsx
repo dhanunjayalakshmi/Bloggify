@@ -25,21 +25,6 @@ const BlogList = ({
 
   const seenIds = useRef(new Set());
 
-  // const hydrateVotesForBlogs = async (blogsToHydrate) => {
-  //   try {
-  //     const blogIds = blogsToHydrate?.map((blog) => blog?.id);
-
-  //     const res = await voteService.getVoteCounts({
-  //       contentType: "blog",
-  //       ids: blogIds,
-  //     });
-
-  //     useVoteStore.getState().setVoteCounts("blog", res?.data);
-  //   } catch (err) {
-  //     console.error("Vote hydration failed", err);
-  //   }
-  // };
-
   useInfiniteScroll(loaderRef, () => {
     if (!loading && hasMore) {
       setPage((prev) => prev + 1);
@@ -93,7 +78,10 @@ const BlogList = ({
           setHasMore(false);
         }
       } catch (err) {
-        console.error("Blog fetch failed:", err?.response?.data);
+        console.error("BlogList error:", {
+          message: err?.message,
+          response: err?.response?.data,
+        });
         setHasMore(false);
       } finally {
         setLoading(false);

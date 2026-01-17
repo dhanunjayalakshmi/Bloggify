@@ -31,9 +31,12 @@ const FloatingPlusMenu = ({ editor, onPlusClick }) => {
         });
         setVisible(true);
         return;
-      } catch (e) {
+      } catch (err) {
         setVisible(false);
-        console.log(e);
+        console.error("FloatingPlusMenu error:", {
+          message: err?.message,
+          response: err?.response?.data,
+        });
         return;
       }
     }
@@ -85,7 +88,7 @@ const FloatingPlusMenu = ({ editor, onPlusClick }) => {
     >
       <Plus size={20} className="text-primary" />
     </button>,
-    document.body
+    document.body,
   );
 };
 

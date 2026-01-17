@@ -24,7 +24,10 @@ const BlogDetails = () => {
         const res = await api.get(`/blogs/${blogId}`);
         setBlog(res?.data);
       } catch (err) {
-        console.error("Failed to fetch blog", err);
+        console.error("BlogDetails error:", {
+          message: err?.message,
+          response: err?.response?.data,
+        });
       } finally {
         setLoading(false);
       }
