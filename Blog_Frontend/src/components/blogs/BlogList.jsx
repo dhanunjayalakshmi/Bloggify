@@ -4,8 +4,7 @@ import BlogCard from "./BlogCard";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { fetchBlogs } from "@/services/blogService";
 import BlogSkeleton from "./BlogSkeleton";
-import { useVoteStore } from "@/stores/votesStore";
-import { voteService } from "@/services/voteService";
+import { hydrateVotesForContent } from "@/utils/hydrateVotesForContent";
 
 const BlogList = ({
   status = "published",
@@ -62,14 +61,10 @@ const BlogList = ({
         });
 
         if (uniqueBlogs?.length > 0) {
-          const blogIds = uniqueBlogs?.map((blog) => blog?.id);
-
-          const votesRes = await voteService?.getVoteCounts({
+          await hydrateVotesForContent({
             contentType: "blog",
-            ids: blogIds,
+            items: uniqueBlogs,
           });
-
-          useVoteStore?.getState()?.setVoteCounts("blog", votesRes?.data);
         }
 
         setBlogs((prev) => [...prev, ...uniqueBlogs]);
