@@ -7,6 +7,7 @@ import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { Textarea } from "../ui/textarea";
 import { useAuthStore } from "@/stores/authStore";
 import ContentVotes from "./ContentVotes";
+import { hydrateVotesForContent } from "@/utils/hydrateVotesForContent";
 
 const CommentEditor = ({
   blogId,
@@ -145,7 +146,7 @@ const CommentItem = ({ comment, blogId, refresh }) => {
           <ContentVotes
             contentId={comment.id}
             contentType="comment"
-            className="ml-2"
+            mode="upvote-only"
           />
 
           <Button
@@ -221,6 +222,15 @@ const BlogComments = ({ blogId }) => {
     };
     fetchComments();
   }, [blogId, forceReload]);
+
+  useEffect(() => {
+    if (!comments?.length) return;
+
+    hydrateVotesForContent({
+      contentType: "comment",
+      items: comments,
+    });
+  }, [comments]);
 
   const loadMoreComments = async () => {
     const res = await api.get(`/comments/${blogId}?page=${page}&limit=1`);

@@ -7,11 +7,29 @@ const ContentVotes = ({
   contentType,
   className = "",
   disabled = false,
+  mode = "full",
 }) => {
   const { upvotes, downvotes, userVote, upvote, downvote } = useVote(
     contentId,
-    contentType
+    contentType,
   );
+
+  if (mode === "upvote-only") {
+    return (
+      <div className={`flex items-center gap-2 ${className}`}>
+        <Button
+          disabled={disabled}
+          variant={userVote === "upvote" ? "solid" : "ghostButton"}
+          aria-label="Upvote"
+          onClick={upvote}
+          className="gap-1"
+        >
+          <ThumbsUp className="h-4 w-4" />
+          <span>{upvotes}</span>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex items-center gap-4 ${className}`}>
