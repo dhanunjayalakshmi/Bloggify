@@ -25,6 +25,37 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
+// Getting comments counts of blogs in bulk
+router.get("/counts", verifyToken, async (req, res) => {
+  try {
+    const { blogIds } = req?.query;
+    if (!blogIds) return res.status(400).json({ error: "Missing blogIds" });
+
+    const ids = typeof blogIds === "string" ? blogIds?.split(",") : blogIds;
+
+    const { data, error } = await req?.supabase
+      .from("comments")
+      .select("blog_id", { count: "exact" })
+      .in("blog_id", ids);
+
+    if (error) throw error;
+
+    const countsMap = {};
+    data?.forEach((comment) => {
+      countsMap[comment?.blog_id] = (countsMap[comment?.blog_id] || 0) + 1;
+    });
+
+    const result = ids?.map((id) => ({
+      blog_id: id,
+      count: countsMap[id] || 0,
+    }));
+
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Get comments for a blog
 router.get("/:blogId", verifyToken, async (req, res) => {
   try {

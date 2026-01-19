@@ -5,6 +5,8 @@ import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { fetchBlogs } from "@/services/blogService";
 import BlogSkeleton from "./BlogSkeleton";
 import { hydrateVotesForContent } from "@/utils/hydrateVotesForContent";
+import { useCommentCountStore } from "@/stores/commentCountStore";
+import api from "@/lib/apiClient";
 
 const BlogList = ({
   status = "published",
@@ -61,6 +63,14 @@ const BlogList = ({
         });
 
         if (uniqueBlogs?.length > 0) {
+          const blogIds = uniqueBlogs?.map((blog) => blog?.id)?.join(",");
+
+          const res = await api?.get("/comments/counts", {
+            params: { blogIds },
+          });
+
+          useCommentCountStore.getState().setCounts(res.data);
+
           await hydrateVotesForContent({
             contentType: "blog",
             items: uniqueBlogs,
@@ -89,7 +99,7 @@ const BlogList = ({
   return (
     <>
       <div className="space-y-4">
-        {blogs.length === 0 && !loading && (
+        {blogs?.length === 0 && !loading && (
           <p className="text-center text-muted-foreground">No blogs found.</p>
         )}
         {blogs?.map((blog) => (

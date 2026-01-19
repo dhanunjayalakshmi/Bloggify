@@ -1,13 +1,7 @@
-import {
-  Bookmark,
-  MessageCircle,
-  ThumbsDown,
-  ThumbsUp,
-  Edit,
-  Trash2,
-} from "lucide-react";
+import { Bookmark, MessageCircle, Edit, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import ContentVotes from "./ContentVotes";
+import { useCommentCountStore } from "@/stores/commentCountStore";
 
 const BlogCardFooter = ({
   blog,
@@ -17,6 +11,9 @@ const BlogCardFooter = ({
   onBookmarkToggle,
 }) => {
   const stop = (e) => e.stopPropagation();
+  const count = useCommentCountStore(
+    (store) => store?.countsByBlogId[blog?.id] ?? 0,
+  );
 
   if (variant === "dashboard") {
     return (
@@ -64,7 +61,7 @@ const BlogCardFooter = ({
           <ContentVotes contentId={blog?.id} contentType="blog" disabled />
 
           <div className="flex gap-1">
-            <MessageCircle size={16} />8
+            <MessageCircle size={16} /> {count}
           </div>
         </div>
         <Button
