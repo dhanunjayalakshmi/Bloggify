@@ -54,7 +54,7 @@ const PostFilters = ({
           onSortChange(val);
         }}
       >
-        <SelectTrigger className="w-full sm:w-40">
+        <SelectTrigger className="w-full sm:w-40 cursor-pointer">
           <SelectValue placeholder="Sort by" />
         </SelectTrigger>
         <SelectContent className="dark:bg-gray-700">
@@ -62,7 +62,7 @@ const PostFilters = ({
             <SelectItem
               key={sortOption?.value}
               value={sortOption?.value}
-              className={`hover:dark:bg-gray-800 ${
+              className={`hover:dark:bg-gray-800 cursor-pointer ${
                 sortOption?.value === sort ? "dark:bg-gray-800" : ""
               }`}
             >
@@ -73,7 +73,7 @@ const PostFilters = ({
       </Select>
 
       <Select value={selectedTag} onValueChange={(val) => setSelectedTag(val)}>
-        <SelectTrigger className="w-full sm:w-40">
+        <SelectTrigger className="w-full sm:w-40 cursor-pointer">
           <SelectValue placeholder="Filter By Tag" />
         </SelectTrigger>
         <SelectContent className="dark:bg-gray-700">
@@ -81,7 +81,7 @@ const PostFilters = ({
             <SelectItem
               key={tag}
               value={tag}
-              className={`hover:dark:bg-gray-800 ${
+              className={`hover:dark:bg-gray-800 cursor-pointer ${
                 tag === selectedTag ? "dark:bg-gray-800" : ""
               }`}
             >

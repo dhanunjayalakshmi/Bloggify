@@ -33,13 +33,13 @@ const PostsContainer = () => {
     <div className="space-y-4">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="w-full dark:bg-gray-800">
-          <TabsTrigger value="published" className="flex-1">
+          <TabsTrigger value="published" className="flex-1 cursor-pointer">
             Published
           </TabsTrigger>
-          <TabsTrigger value="draft" className="flex-1">
+          <TabsTrigger value="draft" className="flex-1 cursor-pointer">
             Drafts
           </TabsTrigger>
-          <TabsTrigger value="scheduled" className="flex-1">
+          <TabsTrigger value="scheduled" className="flex-1 cursor-pointer">
             Scheduled
           </TabsTrigger>
         </TabsList>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { fetchMyBlogs } from "@/services/blogService";
 import DashboardPostCard from "./DashboardPostCard";
+import { fetchMyBlogs } from "@/services/dashboardService";
 
 const DashboardPostsList = ({ status, filters }) => {
   const [posts, setPosts] = useState([]);
@@ -35,7 +35,9 @@ const DashboardPostsList = ({ status, filters }) => {
 
   if (!posts?.length)
     return (
-      <p className="text-muted-foreground">Not found any {status} posts.</p>
+      <div className="dark:text-white text-lg">
+        Not found any {status} posts.
+      </div>
     );
 
   return (
