@@ -34,12 +34,14 @@ const DashboardPostsList = ({ status, filters }) => {
   if (error) return <p className="text-red-500 text-sm">{error}</p>;
 
   if (!posts?.length)
-    return <p className="text-muted-foreground">Start posting</p>;
+    return (
+      <p className="text-muted-foreground">Not found any {status} posts.</p>
+    );
 
   return (
     <div className="space-y-4">
       {posts.map((post) => (
-        <DashboardPostCard key={post.id} post={post} />
+        <DashboardPostCard key={post?.id} post={post} />
       ))}
     </div>
   );
