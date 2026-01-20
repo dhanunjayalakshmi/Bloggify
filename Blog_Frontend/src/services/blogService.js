@@ -30,3 +30,18 @@ export const fetchBlogs = async ({
     });
   }
 };
+
+export const fetchMyBlogs = ({ status, search, sort, tags, dateRange }) => {
+  const params = new URLSearchParams();
+
+  params?.append("status", status);
+
+  if (search) params?.append("search", search);
+  if (sort) params?.append("sort", sort);
+  if (tags && tags !== "All Tags") params?.append("tags", tags);
+
+  if (dateRange?.from) params?.append("from", dateRange.from.toISOString());
+  if (dateRange?.to) params?.append("to", dateRange.to.toISOString());
+
+  return api.get(`/blogs/dashboard?${params}`);
+};
