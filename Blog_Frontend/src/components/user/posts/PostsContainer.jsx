@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import BlogList from "../../blogs/BlogList";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import PostFilters from "./PostsFilters";
+import DashboardPostsList from "./DashboardPostsList";
 
 const PostsContainer = () => {
   const [activeTab, setActiveTab] = useState("published");
@@ -9,6 +9,8 @@ const PostsContainer = () => {
   const [sort, setSort] = useState("recent");
   const [tag, setTag] = useState("All Tags");
   const [date, setDate] = useState({ from: null, to: null });
+
+  const filters = { search, sort, tag, date };
 
   useEffect(() => {
     setSearch("");
@@ -52,36 +54,15 @@ const PostsContainer = () => {
         />
 
         <TabsContent value="published">
-          <BlogList
-            status="published"
-            mode="dashboard"
-            search={search}
-            sort={sort}
-            tag={tag}
-            date={date}
-          />
+          <DashboardPostsList status="published" filters={filters} />
         </TabsContent>
 
         <TabsContent value="draft">
-          <BlogList
-            status="draft"
-            mode="dashboard"
-            search={search}
-            sort={sort}
-            tag={tag}
-            date={date}
-          />
+          <DashboardPostsList status="draft" filters={filters} />
         </TabsContent>
 
         <TabsContent value="scheduled">
-          <BlogList
-            status="scheduled"
-            mode="dashboard"
-            search={search}
-            sort={sort}
-            tag={tag}
-            date={date}
-          />
+          <DashboardPostsList status="scheduled" filters={filters} />
         </TabsContent>
       </Tabs>
     </div>
