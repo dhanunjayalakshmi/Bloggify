@@ -7,8 +7,26 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { fetchBlogStats } from "@/services/dashboardService";
 
 const BlogTable = ({ blogs }) => {
+  const [statRows, setStatRows] = useState([]);
+
+  useEffect(() => {
+    const loadBlogStats = async () => {
+      try {
+        const res = await fetchBlogStats();
+        setStatRows(res?.data);
+        console.log(statRows);
+      } catch (err) {
+        console.error("Blog stats failed", err);
+      }
+    };
+
+    loadBlogStats();
+  }, []);
+
   return (
     <Table className="w-full text-left table-auto border-collapse">
       <TableHeader>

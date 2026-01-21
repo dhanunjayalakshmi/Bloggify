@@ -146,7 +146,18 @@ router.get("/:blogId", verifyToken, async (req, res) => {
       return res.status(403).json({ error: "Authentication required" });
     }
 
-    res.status(200).json(blog);
+    const { data: viewsUpdate, error: updateError } = await req?.supabase
+      .from("blogs")
+      .update({ views: blog?.views + 1 })
+      .eq("id", blogId)
+      .select();
+
+    if (updateError) throw updateError;
+
+    res.status(200).json({
+      ...blog,
+      views: viewsUpdate?.views,
+    });
   } catch (error) {
     res.status(500).json({ error: error?.message });
   }
@@ -275,7 +286,7 @@ router.put("/:blogId", verifyToken, async (req, res) => {
       return res.status(403).json({ error: "Unauthorized" });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await req?.supabase
       .from("blogs")
       .update({
         title,

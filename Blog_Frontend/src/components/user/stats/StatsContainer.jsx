@@ -4,6 +4,8 @@ import KpiCard from "./KpiCard";
 import StatsChart from "./StatsChart";
 import BlogAnalytics from "./BlogAnalytics";
 import BlogStatsTable from "./BlogStatsTable";
+import { useEffect, useState } from "react";
+import { fetchDashboardStats } from "@/services/dashboardService";
 
 const dummyEngagement = [
   { date: "Apr 1", engagement: 10 },
@@ -34,6 +36,22 @@ const dummyAnalytics = [
 ];
 
 const StatsContainer = () => {
+  const [stats, setStats] = useState({});
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const res = await fetchDashboardStats();
+        setStats(res?.data);
+        console.log(stats);
+      } catch (err) {
+        console.error("Stats load failed", err);
+      }
+    };
+
+    loadStats();
+  }, []);
+
   return (
     <div className="p-4 space-y-6">
       <Tabs defaultValue="overview" className="space-y-4">
