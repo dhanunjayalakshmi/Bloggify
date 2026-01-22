@@ -38,12 +38,6 @@ router.get("/posts", verifyToken, async (req, res) => {
       query = query?.eq("is_published", false);
     }
 
-    if (status === "scheduled") {
-      query = query
-        ?.eq("is_published", true)
-        ?.gt("published_at", new Date().toISOString());
-    }
-
     if (search) {
       query = query?.ilike("title", `%${search}%`);
     }

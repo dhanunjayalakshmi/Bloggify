@@ -1,15 +1,25 @@
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Eye } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
-const DashboardPostCard = ({ post, status, stats }) => {
+const DashboardPostCard = ({ post, stats }) => {
   const navigate = useNavigate();
 
   const preview = useMemo(() => {
     if (!post?.content) return "Welcome to my blog";
     return post.content.replace(/<[^>]*>/g, "").substring(0, 100) + "...";
   }, [post?.content]);
+
+  const status = useMemo(() => {
+    if (!post?.is_published) {
+      if (post?.published_at && new Date(post?.published_at) > new Date()) {
+        return "scheduled";
+      }
+      return "draft";
+    }
+    return "published";
+  }, [post]);
 
   return (
     <div className="rounded-xl border bg-white dark:bg-gray-900 dark:border-gray-700 p-5 shadow-sm hover:shadow-md transition">
@@ -54,7 +64,9 @@ const DashboardPostCard = ({ post, status, stats }) => {
       )}
 
       {status === "scheduled" && (
-        <span>Scheduled for: {post?.scheduledFor}</span>
+        <span className="inline-block rounded bg-orange-400 px-2 py-0.5 text-xs dark:text-black">
+          Scheduled for: {new Date(post.published_at).toLocaleString()}
+        </span>
       )}
     </div>
   );

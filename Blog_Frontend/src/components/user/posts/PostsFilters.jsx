@@ -6,83 +6,64 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import DateRangePicker from "@/components/ui/date-range-picker";
-import { Tag } from "lucide-react";
 
-const PostFilters = ({
-  onSearchChange,
-  onSortChange,
-  onTagChange,
-  onDateChange,
-  tags = [],
-  sortOptions = [],
-}) => {
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("recent");
-  const [selectedTag, setSelectedTag] = useState("All Tags");
-  const [dateRange, setDateRange] = useState({ from: null, to: null });
+const PostsFilters = ({ filters, onChange, sortOptions, tags }) => {
+  const [localSearch, setLocalSearch] = useState(filters?.search);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      onSearchChange(search);
+    const id = setTimeout(() => {
+      onChange({ search: localSearch });
     }, 300);
-    return () => clearTimeout(timeout);
-  }, [search]);
-
-  useEffect(() => {
-    onTagChange(selectedTag);
-  }, [selectedTag]);
-
-  useEffect(() => {
-    onDateChange(dateRange);
-  }, [dateRange]);
+    return () => clearTimeout(id);
+  }, [localSearch]);
 
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between py-2">
+    <div className="flex flex-col sm:flex-row gap-4">
       <Input
         placeholder="Search by title..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="sm:max-w-sm w-full"
+        value={localSearch}
+        onChange={(e) => setLocalSearch(e.target.value)}
+        className="sm:max-w-sm"
       />
 
       <Select
-        value={sort}
-        onValueChange={(val) => {
-          setSort(val);
-          onSortChange(val);
-        }}
+        value={filters?.sort}
+        onValueChange={(val) => onChange({ sort: val })}
       >
-        <SelectTrigger className="w-full sm:w-40 cursor-pointer">
+        <SelectTrigger className="sm:w-40 cursor-pointer">
           <SelectValue placeholder="Sort by" />
         </SelectTrigger>
-        <SelectContent className="dark:bg-gray-700">
-          {sortOptions?.map((sortOption) => (
+        <SelectContent className="dark:bg-gray-700 cursor-pointer">
+          {sortOptions?.map((opt) => (
             <SelectItem
-              key={sortOption?.value}
-              value={sortOption?.value}
+              key={opt?.value}
+              value={opt?.value}
               className={`hover:dark:bg-gray-800 cursor-pointer ${
-                sortOption?.value === sort ? "dark:bg-gray-800" : ""
+                opt?.value === filters?.sort ? "dark:bg-gray-800" : ""
               }`}
             >
-              {sortOption?.label}
+              {opt?.label}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      <Select value={selectedTag} onValueChange={(val) => setSelectedTag(val)}>
-        <SelectTrigger className="w-full sm:w-40 cursor-pointer">
-          <SelectValue placeholder="Filter By Tag" />
+      <Select
+        value={filters.tag}
+        onValueChange={(val) => onChange({ tag: val })}
+      >
+        <SelectTrigger className="sm:w-40 cursor-pointer">
+          <SelectValue placeholder="Filter by tag" />
         </SelectTrigger>
-        <SelectContent className="dark:bg-gray-700">
-          {tags.map((tag) => (
+        <SelectContent className="dark:bg-gray-700 cursor-pointer">
+          {tags?.map((tag) => (
             <SelectItem
               key={tag}
               value={tag}
               className={`hover:dark:bg-gray-800 cursor-pointer ${
-                tag === selectedTag ? "dark:bg-gray-800" : ""
+                tag === filters?.tag ? "dark:bg-gray-800" : ""
               }`}
             >
               {tag}
@@ -92,12 +73,11 @@ const PostFilters = ({
       </Select>
 
       <DateRangePicker
-        value={dateRange}
-        onChange={setDateRange}
-        placeholder="Filter by date"
+        value={filters?.dateRange}
+        onChange={(range) => onChange({ dateRange: range })}
       />
     </div>
   );
 };
 
-export default PostFilters;
+export default PostsFilters;

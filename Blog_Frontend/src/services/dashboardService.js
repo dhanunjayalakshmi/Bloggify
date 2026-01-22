@@ -12,7 +12,7 @@ export const fetchMyBlogs = ({ status, search, sort, tags, dateRange }) => {
   if (dateRange?.from) params?.append("from", dateRange.from.toISOString());
   if (dateRange?.to) params?.append("to", dateRange.to.toISOString());
 
-  return api.get(`/dashboard?${params}`);
+  return api.get(`/dashboard/posts?${params}`);
 };
 
 export const fetchDashboardStats = () => {
