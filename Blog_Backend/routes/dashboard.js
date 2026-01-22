@@ -3,10 +3,10 @@ const { verifyToken } = require("../middlewares/authMiddleware");
 const router = express.Router();
 
 // Get all the logged-in user owned posts for dashboard
-router.get("/", verifyToken, async (req, res) => {
+router.get("/posts", verifyToken, async (req, res) => {
   try {
-    const userId = req?.user?.id;
     const supabase = req?.supabase;
+    const userId = req?.user?.id;
 
     let {
       status = "published",
@@ -15,51 +15,77 @@ router.get("/", verifyToken, async (req, res) => {
       tags,
       from,
       to,
+      page = 1,
+      limit = 10,
     } = req?.query;
+
+    page = Number(page);
+    limit = Number(limit);
+
+    const fromRange = (page - 1) * limit;
+    const toRange = fromRange + limit - 1;
 
     let query = supabase?.from("blogs")?.select("*")?.eq("user_id", userId);
 
-    // status
+    // Status
     if (status === "published") {
-      query = query?.eq("is_published", true);
-    } else if (status === "draft") {
-      query = query?.eq("is_published", false);
-    } else if (status === "scheduled") {
       query = query
-        .eq("is_published", true)
-        .gt("published_at", new Date().toISOString());
+        ?.eq("is_published", true)
+        ?.lte("published_at", new Date().toISOString());
     }
 
-    // search
+    if (status === "draft") {
+      query = query?.eq("is_published", false);
+    }
+
+    if (status === "scheduled") {
+      query = query
+        ?.eq("is_published", true)
+        ?.gt("published_at", new Date().toISOString());
+    }
+
     if (search) {
       query = query?.ilike("title", `%${search}%`);
     }
 
-    // tags
     if (tags) {
-      const tagList = tags?.split(",")?.map((t) => t.toLowerCase());
+      const tagList = tags?.split(",")?.map((t) => t.trim().toLowerCase());
       query = query?.contains("tags", tagList);
     }
 
-    // date range
     if (from) query = query?.gte("created_at", from);
     if (to) query = query?.lte("created_at", to);
 
-    // sorting
-    if (sort === "recent")
-      query = query?.order("updated_at", { ascending: false });
-    if (sort === "oldest")
-      query = query?.order("updated_at", { ascending: true });
-    // if (sort === "views") query = query?.order("views", { ascending: false });
+    // sort
+    switch (sort) {
+      case "oldest":
+        query = query?.order("updated_at", { ascending: true });
+        break;
+
+      case "views":
+        query = query?.order("views", { ascending: false });
+        break;
+
+      case "recent":
+      default:
+        query = query?.order("updated_at", { ascending: false });
+    }
+
+    // pagination
+    query = query?.range(fromRange, toRange);
 
     const { data, error } = await query;
-
     if (error) throw error;
 
-    res.json({ blogs: data });
+    res.status(200).json({
+      blogs: data,
+      page,
+      limit,
+      hasMore: data.length === limit,
+    });
   } catch (err) {
-    console.error("Dashboard blogs error:", err);
-    res.status(500).json({ error: err?.message });
+    console.error("Dashboard posts error:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -91,7 +117,7 @@ router.get("/stats", verifyToken, async (req, res) => {
     ]);
 
     // const totalViews =
-    //   viewsData?.reduce((sum, blog) => sum + (blog.views || 0), 0) || 0;
+    //   viewsData?.reduce((sum, blog) => sum + (blog?.views || 0), 0) || 0;
 
     res.json({
       totalBlogs: blogs || 0,
