@@ -110,38 +110,60 @@ router.get("/blog-stats", verifyToken, async (req, res) => {
   try {
     const supabase = req?.supabase;
     const userId = req?.user?.id;
+    const { blogIds } = req?.query;
 
-    const { data: blogs, error } = await supabase
-      ?.from("blogs")
-      ?.select(
-        `
-        id,
-        title,
-        views,
-        is_published,
-        published_at,
-        comments:comments(count),
-        upvotes:votes(count)
-      `,
-      )
-      ?.eq("user_id", userId);
+    if (!blogIds) {
+      return res.status(400).json({ error: "blogIds required" });
+    }
 
-    if (error) throw error;
+    const ids = typeof blogIds === "String" ? blogIds?.split(",") : blogIds;
 
-    const result = blogs?.map((blog) => ({
-      id: blog?.id,
-      title: blog?.title,
-      views: blog?.views || 0,
-      comments: blog?.comments?.[0]?.count || 0,
-      upvotes: blog?.upvotes?.[0]?.count || 0,
-      status: blog?.is_published
-        ? blog?.published_at
-          ? "Published"
-          : "Scheduled"
-        : "Draft",
-    }));
+    const { data: comments, error: commentsError } = await supabase
+      .from("comments")
+      .select("blog_id", { count: "exact" })
+      .in("blog_id", ids);
 
-    res?.json(result);
+    if (commentsError) throw commentsError;
+
+    const { data: votes, error: votesError } = await supabase
+      .from("votes")
+      .select("content_id, vote_type")
+      .eq("content_type", "blog")
+      .eq("vote_type", "upvote")
+      .in("content_id", ids);
+
+    if (votesError) throw votesError;
+
+    const result = {};
+
+    ids?.forEach((id) => {
+      result[id] = { comments: 0, upvotes: 0 };
+    });
+
+    comments?.forEach((comment) => {
+      result[comment?.blog_id].comments += 1;
+    });
+
+    votes?.forEach((vote) => {
+      result[vote?.content_id].upvotes += 1;
+    });
+
+    res.status(200).json(result);
+
+    // const result = blogs?.map((blog) => ({
+    //   id: blog?.id,
+    //   title: blog?.title,
+    //   views: blog?.views || 0,
+    //   comments: blog?.comments?.[0]?.count || 0,
+    //   upvotes: blog?.upvotes?.[0]?.count || 0,
+    //   status: blog?.is_published
+    //     ? blog?.published_at
+    //       ? "Published"
+    //       : "Scheduled"
+    //     : "Draft",
+    // }));
+
+    // res?.json(result);
   } catch (err) {
     res?.status(500)?.json({ error: err?.message });
   }

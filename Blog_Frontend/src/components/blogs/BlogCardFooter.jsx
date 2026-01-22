@@ -56,6 +56,7 @@ const BlogCardFooter = ({
       >
         <span>By {blog?.author}</span>
         <span>{blog?.tags?.join(", ")}</span>
+        <span>🔥 {blog?.views} views</span>
 
         <div className="flex items-center gap-4">
           <ContentVotes contentId={blog?.id} contentType="blog" disabled />

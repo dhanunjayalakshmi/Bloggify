@@ -156,7 +156,7 @@ router.get("/:blogId", verifyToken, async (req, res) => {
 
     res.status(200).json({
       ...blog,
-      views: viewsUpdate?.views,
+      views: viewsUpdate[0]?.views,
     });
   } catch (error) {
     res.status(500).json({ error: error?.message });

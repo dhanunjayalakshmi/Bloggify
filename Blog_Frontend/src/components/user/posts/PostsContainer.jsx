@@ -25,8 +25,8 @@ const PostsContainer = () => {
     { label: "Recent", value: "recent" },
     { label: "Oldest", value: "oldest" },
     { label: "Most Viewed", value: "views" },
-    { label: "Title A–Z", value: "title-asc" },
-    { label: "Title Z–A", value: "title-desc" },
+    // { label: "Title A–Z", value: "title-asc" },
+    // { label: "Title Z–A", value: "title-desc" },
   ];
 
   return (

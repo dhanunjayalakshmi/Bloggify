@@ -1,36 +1,61 @@
 import { Button } from "@/components/ui/button";
+import { Edit, Trash2, Eye } from "lucide-react";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
-const DashboardPostCard = ({ post }) => {
+const DashboardPostCard = ({ post, status, stats }) => {
   const navigate = useNavigate();
 
+  const preview = useMemo(() => {
+    if (!post?.content) return "Welcome to my blog";
+    return post.content.replace(/<[^>]*>/g, "").substring(0, 100) + "...";
+  }, [post?.content]);
+
   return (
-    <div className="p-4 rounded-lg border dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-      <h3 className="font-semibold">{post?.title}</h3>
+    <div className="rounded-xl border bg-white dark:bg-gray-900 dark:border-gray-700 p-5 shadow-sm hover:shadow-md transition">
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            {post?.title}
+          </h3>
 
-      <p className="text-sm text-muted-foreground line-clamp-2">
-        {post?.content?.slice(0, 120)}...
-      </p>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>
+              Last updated: {new Date(post?.updated_at).toLocaleDateString()}
+            </span>
+          </div>
 
-      <div className="flex items-center justify-between mt-3">
-        <span className="text-xs text-muted-foreground">
-          Updated: {new Date(post?.updated_at).toLocaleDateString()}
-        </span>
+          <p className="text-muted-foreground text-md">{preview}</p>
+        </div>
 
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <Button
             size="sm"
             variant="outline"
             onClick={() => navigate(`/edit/${post?.id}`)}
           >
+            <Edit className="w-4 h-4 mr-1" />
             Edit
           </Button>
 
           <Button size="sm" variant="destructive">
+            <Trash2 className="w-4 h-4 mr-1" />
             Delete
           </Button>
         </div>
       </div>
+
+      {status === "published" && (
+        <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
+          <span>👀 {post?.views ?? 0}</span>
+          <span>💬 {stats?.comments ?? 0}</span>
+          <span>👍 {stats?.upvotes ?? 0}</span>
+        </div>
+      )}
+
+      {status === "scheduled" && (
+        <span>Scheduled for: {post?.scheduledFor}</span>
+      )}
     </div>
   );
 };

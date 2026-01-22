@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "@/lib/apiClient";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
-import { Bookmark, MessageCircle, Share2 } from "lucide-react";
+import { Bookmark, MessageCircle, Share2, Flame } from "lucide-react";
 import BlogContentRenderer from "@/components/blogEditor/BlogContentRenderer";
 import ContentVotes from "@/components/blogs/ContentVotes";
 import BlogComments from "@/components/blogs/BlogComments";
@@ -100,6 +100,11 @@ const BlogDetails = () => {
         <Button variant="ghostButton" aria-label="Comment">
           <MessageCircle className="h-5 w-5" />
           <span>56</span>
+        </Button>
+
+        <Button variant="ghostButton" aria-label="Views">
+          {/* <Flame className="h-5 w-5" /> */}
+          <span>🔥 {blog?.views} views</span>
         </Button>
 
         <Button

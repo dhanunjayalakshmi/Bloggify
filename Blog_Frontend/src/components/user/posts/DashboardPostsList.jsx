@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import DashboardPostCard from "./DashboardPostCard";
-import { fetchMyBlogs } from "@/services/dashboardService";
+import { fetchBlogStats, fetchMyBlogs } from "@/services/dashboardService";
 
 const DashboardPostsList = ({ status, filters }) => {
   const [posts, setPosts] = useState([]);
+  const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -29,6 +30,23 @@ const DashboardPostsList = ({ status, filters }) => {
     loadPosts();
   }, [status, filters]);
 
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (!posts?.length) return;
+
+      const blogIds = posts?.map((post) => post?.id);
+
+      try {
+        const res = await fetchBlogStats({ blogIds });
+        setStats(res?.data);
+      } catch (err) {
+        console.error("Dashboard stats error", err);
+      }
+    };
+
+    fetchStats();
+  }, [posts]);
+
   if (loading) return <p>Loading posts...</p>;
 
   if (error) return <p className="text-red-500 text-sm">{error}</p>;
@@ -42,8 +60,13 @@ const DashboardPostsList = ({ status, filters }) => {
 
   return (
     <div className="space-y-4">
-      {posts.map((post) => (
-        <DashboardPostCard key={post?.id} post={post} />
+      {posts?.map((post) => (
+        <DashboardPostCard
+          key={post?.id}
+          post={post}
+          status={status}
+          stats={stats[post?.id]}
+        />
       ))}
     </div>
   );

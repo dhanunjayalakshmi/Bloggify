@@ -19,6 +19,8 @@ export const fetchDashboardStats = () => {
   return api.get("/dashboard/stats");
 };
 
-export const fetchBlogStats = () => {
-  return api.get("/dashboard/blog-stats");
+export const fetchBlogStats = ({ blogIds }) => {
+  return api.get("/dashboard/blog-stats", {
+    params: { blogIds: blogIds },
+  });
 };
