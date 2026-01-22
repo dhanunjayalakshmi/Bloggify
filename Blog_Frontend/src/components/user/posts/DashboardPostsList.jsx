@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import DashboardPostCard from "./DashboardPostCard";
 import { fetchBlogStats } from "@/services/dashboardService";
+import { useNavigate } from "react-router";
 
 const DashboardPostsList = ({ posts, loading, error }) => {
   const [stats, setStats] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -32,7 +34,12 @@ const DashboardPostsList = ({ posts, loading, error }) => {
   return (
     <div className="space-y-4">
       {posts?.map((post) => (
-        <DashboardPostCard key={post?.id} post={post} stats={stats[post?.id]} />
+        <DashboardPostCard
+          key={post?.id}
+          post={post}
+          stats={stats[post?.id]}
+          onOpen={() => navigate(`/blogs/${post?.id}`)}
+        />
       ))}
     </div>
   );

@@ -3,7 +3,7 @@ import { Edit, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
-const DashboardPostCard = ({ post, stats }) => {
+const DashboardPostCard = ({ post, stats, onOpen }) => {
   const navigate = useNavigate();
 
   const preview = useMemo(() => {
@@ -22,7 +22,10 @@ const DashboardPostCard = ({ post, stats }) => {
   }, [post]);
 
   return (
-    <div className="rounded-xl border bg-white dark:bg-gray-900 dark:border-gray-700 p-5 shadow-sm hover:shadow-md transition">
+    <div
+      onClick={onOpen}
+      className="cursor-pointer rounded-xl border bg-white dark:bg-gray-900 dark:border-gray-700 p-5 shadow-sm hover:shadow-md transition"
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">

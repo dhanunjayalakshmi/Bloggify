@@ -2,7 +2,7 @@ import { Card, CardContent } from "../ui/card";
 import BlogCardFooter from "./BlogCardFooter";
 import useBookmark from "@/hooks/useBookmark";
 
-const BlogCard = ({ blog, footerVariant = "home", status, onOpen }) => {
+const BlogCard = ({ blog, onOpen }) => {
   const { isBookmarked, toggle } = useBookmark(blog?.id);
 
   const {
@@ -35,8 +35,6 @@ const BlogCard = ({ blog, footerVariant = "home", status, onOpen }) => {
           {/* Footer Section */}
           <BlogCardFooter
             blog={blog}
-            variant={footerVariant}
-            status={status}
             isBookmarked={isBookmarked}
             onBookmarkToggle={toggle}
           />

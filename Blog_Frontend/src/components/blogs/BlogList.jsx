@@ -9,8 +9,6 @@ import { useCommentCountStore } from "@/stores/commentCountStore";
 import api from "@/lib/apiClient";
 
 const BlogList = ({
-  status = "published",
-  mode = "home",
   search = "",
   limit = 5,
   sort = "newest",
@@ -106,8 +104,6 @@ const BlogList = ({
           <BlogCard
             key={blog?.id}
             blog={blog}
-            footerVariant={mode}
-            status={status}
             onOpen={() => navigate(`/blogs/${blog?.id}`)}
           />
         ))}

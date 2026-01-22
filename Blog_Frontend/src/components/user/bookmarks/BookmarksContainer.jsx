@@ -19,7 +19,6 @@ const BookmarkCardItem = ({ blog }) => {
   return (
     <BlogCard
       blog={{ ...blog, isBookmarked }}
-      footerVariant="bookmarks"
       onBookmarkToggle={toggle}
       onOpen={() => navigate(`/blogs/${blog?.id}`)}
     />
@@ -41,7 +40,7 @@ const BookmarksContainer = () => {
         (selectedTag ? b?.tags?.includes(selectedTag) : true) &&
         (searchTerm
           ? b?.title?.toLowerCase()?.includes(searchTerm?.toLowerCase())
-          : true)
+          : true),
     )
     ?.sort((a, b) => {
       if (sortBy === "author") return a?.author?.localeCompare(b?.author);
