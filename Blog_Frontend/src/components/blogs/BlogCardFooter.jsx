@@ -1,4 +1,4 @@
-import { Bookmark, MessageCircle, Edit, Trash2 } from "lucide-react";
+import { Bookmark, MessageCircle } from "lucide-react";
 import { Button } from "../ui/button";
 import ContentVotes from "./ContentVotes";
 import { useCommentCountStore } from "@/stores/commentCountStore";

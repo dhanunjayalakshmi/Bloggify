@@ -7,7 +7,7 @@ const PublicNavbar = () => {
   const { openModal } = useModalStore();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow px-4 py-4 flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow px-4 py-4 flex items-center justify-around">
       <Logo />
 
       <div className="flex items-center gap-3">

@@ -1,9 +1,9 @@
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 text-sm py-8 px-4">
+    <footer className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-md  font-bold py-8 px-4">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
         {/* Left: Logo or Copyright */}
-        <div className="text-center md:text-left">
+        <div className="text-centermd:text-left">
           © {new Date().getFullYear()} Bloggify. All rights reserved.
         </div>
 

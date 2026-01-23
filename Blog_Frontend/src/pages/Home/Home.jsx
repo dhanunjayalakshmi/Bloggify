@@ -15,7 +15,7 @@ const Home = () => {
         <BlogList sort={sort} />
       </div>
 
-      <aside className="hidden lg:block sticky top-12 self-start space-y-4 pt-4">
+      <aside className="hidden lg:block sticky top-12 self-start space-y-4 my-4">
         <Suggestions />
         <BookmarkedArticles />
         <ProfileSuggestions />

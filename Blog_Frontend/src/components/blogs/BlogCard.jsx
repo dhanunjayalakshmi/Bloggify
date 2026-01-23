@@ -4,12 +4,17 @@ import useBookmark from "@/hooks/useBookmark";
 
 const BlogCard = ({ blog, onOpen }) => {
   const { isBookmarked, toggle } = useBookmark(blog?.id);
+  console.log(blog?.cover_image);
 
   const {
-    cover_image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s",
+    cover_image = "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
     title = "My first blog",
     content,
   } = blog;
+
+  const coverImage = cover_image
+    ? cover_image
+    : "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg";
 
   return (
     <Card
@@ -18,7 +23,7 @@ const BlogCard = ({ blog, onOpen }) => {
     >
       <CardContent className="px-4 py-4 flex flex-col sm:flex-row gap-4">
         <img
-          src={cover_image}
+          src={coverImage}
           alt={title}
           className="w-full sm:w-40 h-32 object-cover rounded-md"
         />

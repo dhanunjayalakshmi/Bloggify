@@ -82,9 +82,10 @@ router.get("/blogs", verifyToken, async (req, res) => {
           content,
           cover_image,
           tags,
+          views,
           users (name, avatar)
         )
-      `
+      `,
       )
       .eq("user_id", userId)
       .order("created_at", { ascending: false });

@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
+// import { Edit, Trash2 } from "lucide-react";
 import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 const DashboardPostCard = ({ post, stats, onOpen }) => {
-  const navigate = useNavigate();
+  //   const navigate = useNavigate();
 
   const preview = useMemo(() => {
     if (!post?.content) return "Welcome to my blog";
@@ -41,7 +41,7 @@ const DashboardPostCard = ({ post, stats, onOpen }) => {
           <p className="text-muted-foreground text-md">{preview}</p>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        {/* <div className="flex items-center gap-2 shrink-0">
           <Button
             size="sm"
             variant="outline"
@@ -55,7 +55,7 @@ const DashboardPostCard = ({ post, stats, onOpen }) => {
             <Trash2 className="w-4 h-4 mr-1" />
             Delete
           </Button>
-        </div>
+        </div> */}
       </div>
 
       {status === "published" && (

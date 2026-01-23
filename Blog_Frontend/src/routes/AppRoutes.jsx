@@ -41,6 +41,7 @@ const AppRoutes = () => {
           <Route path="/create" element={<CreateEditBlog />} />
           <Route path="/blogs/:blogId" element={<BlogDetails />} />
           <Route path="/preview" element={<PreviewPage />} />
+          <Route path="/dashboard/posts/:id" element={<PreviewPage />} />
           <Route path="/user/:id" element={<AuthorProfilePage />} />
 
           <Route path="/account" element={<UserAccountLayout />}>

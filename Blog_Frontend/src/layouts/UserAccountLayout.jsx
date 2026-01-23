@@ -30,7 +30,7 @@ const UserAccountLayout = () => {
   }, [location.pathname]);
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] bg-gray-100 dark:bg-gray-800 mt-8 overflow-hidden relative">
+    <div className="flex min-h-[calc(100vh-4rem)] bg-gray-100 dark:bg-gray-800 my-8 overflow-hidden relative rounded-xl">
       <aside className="hidden md:block w-64 p-4 border-r dark:border-gray-700">
         <nav className="flex flex-col gap-2">
           {tabs.map((tab) => {

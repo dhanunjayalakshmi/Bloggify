@@ -38,7 +38,7 @@ const DashboardPostsList = ({ posts, loading, error }) => {
           key={post?.id}
           post={post}
           stats={stats[post?.id]}
-          onOpen={() => navigate(`/blogs/${post?.id}`)}
+          onOpen={() => navigate(`/dashboard/posts/${post?.id}`)}
         />
       ))}
     </div>
