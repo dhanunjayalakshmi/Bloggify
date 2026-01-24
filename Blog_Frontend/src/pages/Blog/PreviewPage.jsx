@@ -22,10 +22,11 @@ const PreviewPage = () => {
       const loadBlog = async () => {
         try {
           setLoading(true);
-          const res = await api.get(`/blogs/${id}`);
+          const res = await api.get(`/dashboard/posts/${id}`);
           setBlog(res?.data);
-        } catch {
+        } catch (err) {
           setError("Post not found or access denied");
+          console.log("Error...", err);
         } finally {
           setLoading(false);
         }

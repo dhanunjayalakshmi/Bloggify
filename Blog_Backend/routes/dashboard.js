@@ -83,6 +83,38 @@ router.get("/posts", verifyToken, async (req, res) => {
   }
 });
 
+// Get a single post of author
+router.get("/posts/:id", verifyToken, async (req, res) => {
+  try {
+    const { id } = req?.params;
+    const userId = req?.user?.id;
+
+    const { data: blog, error } = await req?.supabase
+      ?.from("blogs")
+      ?.select(
+        `
+        *,
+        users (
+          name,
+          avatar
+        )
+      `,
+      )
+      ?.eq("id", id)
+      ?.eq("user_id", userId)
+      ?.single();
+
+    if (error || !blog) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    res.status(200).json(blog);
+  } catch (err) {
+    conaole.log("Error...", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Get all stats details of user owned blogs
 router.get("/stats", verifyToken, async (req, res) => {
   try {
