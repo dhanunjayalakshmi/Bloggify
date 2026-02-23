@@ -190,7 +190,9 @@ router.post("/", verifyToken, async (req, res) => {
       title: title.trim(),
       content,
       cover_image: coverImageUrl,
-      tags: Array.isArray(tags) ? tags : tags?.split(",").map((t) => t.trim()),
+      tags: Array.isArray(tags)
+        ? tags?.map((tag) => tag?.trim().toLowerCase())
+        : tags?.split(",").map((tag) => tag?.trim().toLowerCase()),
       read_time: read_time || Math.ceil(content.split(" ").length / 200),
       user_id: user.id,
       is_published: Boolean(is_published),

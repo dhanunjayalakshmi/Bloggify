@@ -1,71 +1,3 @@
-// const PostsContainer = () => {
-//   const [activeTab, setActiveTab] = useState("published");
-//   const [search, setSearch] = useState("");
-//   const [sort, setSort] = useState("recent");
-//   const [tag, setTag] = useState("All Tags");
-//   const [date, setDate] = useState({ from: null, to: null });
-
-//   const filters = { search, sort, tag, date };
-
-//   useEffect(() => {
-//     setSearch("");
-//     setSort("recent");
-//     setTag("All Tags");
-//     setDate({ from: null, to: null });
-//   }, [activeTab]);
-
-//   const allTags = ["All Tags", "React", "Javascript", "Personal", "Tutorial"]; // Fetch dynamically in real case
-
-//   const sortOptions = [
-//     { label: "Recent", value: "recent" },
-//     { label: "Oldest", value: "oldest" },
-//     { label: "Most Viewed", value: "views" },
-//     // { label: "Title A–Z", value: "title-asc" },
-//     // { label: "Title Z–A", value: "title-desc" },
-//   ];
-
-//   return (
-//     <div className="space-y-4">
-//       <Tabs value={activeTab} onValueChange={setActiveTab}>
-//         <TabsList className="w-full dark:bg-gray-800">
-//           <TabsTrigger value="published" className="flex-1 cursor-pointer">
-//             Published
-//           </TabsTrigger>
-//           <TabsTrigger value="draft" className="flex-1 cursor-pointer">
-//             Drafts
-//           </TabsTrigger>
-//           <TabsTrigger value="scheduled" className="flex-1 cursor-pointer">
-//             Scheduled
-//           </TabsTrigger>
-//         </TabsList>
-
-//         <PostFilters
-//           onSearchChange={setSearch}
-//           onSortChange={setSort}
-//           onTagChange={setTag}
-//           onDateChange={setDate}
-//           tags={allTags}
-//           sortOptions={sortOptions}
-//         />
-
-//         <TabsContent value="published">
-//           <DashboardPostsList status="published" filters={filters} />
-//         </TabsContent>
-
-//         <TabsContent value="draft">
-//           <DashboardPostsList status="draft" filters={filters} />
-//         </TabsContent>
-
-//         <TabsContent value="scheduled">
-//           <DashboardPostsList status="scheduled" filters={filters} />
-//         </TabsContent>
-//       </Tabs>
-//     </div>
-//   );
-// };
-
-// export default PostsContainer;
-
 import { useEffect, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PostsFilters from "./PostsFilters";
@@ -77,12 +9,12 @@ const DEFAULT_FILTERS = {
   search: "",
   sort: "recent",
   tag: "All Tags",
-  dateRange: { from: null, to: null },
 };
 
 const PostsContainer = () => {
   const [activeTab, setActiveTab] = useState("published");
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const [debouncedSearch, setDebouncedSearch] = useState(filters?.search);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 5,
@@ -109,8 +41,15 @@ const PostsContainer = () => {
 
   useEffect(() => {
     setPagination((prev) => ({ ...prev, page: 1, hasMore: true }));
-    setDataState((prev) => ({ ...prev, posts: [] }));
-  }, [filters]);
+  }, [filters?.sort, filters?.tag]);
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setDebouncedSearch(filters?.search);
+    }, 300);
+
+    return () => clearTimeout(id);
+  }, [filters?.search]);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -119,10 +58,9 @@ const PostsContainer = () => {
       try {
         const res = await fetchMyBlogs({
           status: activeTab,
-          search: filters?.search,
+          search: debouncedSearch,
           sort: filters?.sort,
           tags: filters?.tag !== "All Tags" ? filters?.tag : undefined,
-          dateRange: filters?.dateRange,
           page: pagination?.page,
           limit: pagination?.limit,
         });
@@ -150,7 +88,13 @@ const PostsContainer = () => {
     };
 
     fetchPosts();
-  }, [activeTab, filters, pagination?.page]);
+  }, [
+    activeTab,
+    debouncedSearch,
+    filters?.sort,
+    filters?.tag,
+    pagination?.page,
+  ]);
 
   useEffect(() => {
     // placeholder — we will replace with shared tags API

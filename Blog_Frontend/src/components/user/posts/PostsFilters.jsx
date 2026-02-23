@@ -7,7 +7,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
-import DateRangePicker from "@/components/ui/date-range-picker";
 
 const PostsFilters = ({ filters, onChange, sortOptions, tags }) => {
   const [localSearch, setLocalSearch] = useState(filters?.search);
@@ -71,11 +70,6 @@ const PostsFilters = ({ filters, onChange, sortOptions, tags }) => {
           ))}
         </SelectContent>
       </Select>
-
-      <DateRangePicker
-        value={filters?.dateRange}
-        onChange={(range) => onChange({ dateRange: range })}
-      />
     </div>
   );
 };

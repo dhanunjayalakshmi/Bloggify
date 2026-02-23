@@ -32,14 +32,16 @@ const BookmarksContainer = () => {
   const [selectedTag, setSelectedTag] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const availableTags = [...new Set(bookmarkList?.flatMap((b) => b.tags))];
+  const availableTags = [
+    ...new Set(bookmarkList?.flatMap((blog) => blog?.tags)),
+  ];
 
   const filteredBookmarks = bookmarkList
     ?.filter(
-      (b) =>
-        (selectedTag ? b?.tags?.includes(selectedTag) : true) &&
+      (blog) =>
+        (selectedTag ? blog?.tags?.includes(selectedTag) : true) &&
         (searchTerm
-          ? b?.title?.toLowerCase()?.includes(searchTerm?.toLowerCase())
+          ? blog?.title?.toLowerCase()?.includes(searchTerm?.toLowerCase())
           : true),
     )
     ?.sort((a, b) => {
