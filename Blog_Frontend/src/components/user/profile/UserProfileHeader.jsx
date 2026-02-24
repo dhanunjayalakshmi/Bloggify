@@ -13,22 +13,25 @@ const UserProfileHeader = ({ user, isOwnProfile = false }) => {
             Edit Profile
           </Link>
         ) : (
-          <FollowButton isFollowing={user.isFollowing} userId={user.id} />
+          <FollowButton isFollowing={user?.isFollowing} userId={user?.id} />
         )}
       </div>
 
       <img
-        src={user.profile_image}
-        alt={user.full_name}
+        src={
+          user?.profile_image ||
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGEZghB-stFaphAohNqDAhEaXOWQJ9XvHKJw&s"
+        }
+        alt={user?.full_name}
         className="w-24 h-24 rounded-full object-cover border-4 border-orange-500"
       />
       <div>
-        <h2 className="text-2xl font-bold">{user.full_name}</h2>
-        <p className="text-muted-foreground">@{user.username}</p>
+        <h2 className="text-2xl font-bold">{user?.full_name}</h2>
+        <p className="text-muted-foreground">@{user?.username}</p>
       </div>
-      {user.bio && (
+      {user?.bio && (
         <p className="max-w-2xl text-sm text-gray-600 dark:text-gray-300">
-          {user.bio}
+          {user?.bio}
         </p>
       )}
 
@@ -41,7 +44,7 @@ const UserProfileHeader = ({ user, isOwnProfile = false }) => {
             Edit Profile
           </Link>
         ) : (
-          <FollowButton isFollowing={user.isFollowing} userId={user.id} />
+          <FollowButton isFollowing={user?.isFollowing} userId={user?.id} />
         )}
       </div>
     </div>

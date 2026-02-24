@@ -35,7 +35,7 @@ const ProfileSchema = z.object({
       z.object({
         label: z.string().min(1, "Label is required."),
         url: z.string().url("Invalid URL."),
-      })
+      }),
     )
     .optional(),
 });
@@ -49,17 +49,17 @@ const EditProfileForm = ({ initialData }) => {
   } = useForm({
     resolver: zodResolver(ProfileSchema),
     defaultValues: {
-      fullName: initialData.full_name || "",
-      username: initialData.username || "",
-      bio: initialData.bio || "",
-      location: initialData.location || "",
-      website: initialData.social_links?.website || "",
-      github: initialData.social_links?.github || "",
-      linkedin: initialData.social_links?.linkedin || "",
-      twitter: initialData.social_links?.twitter || "",
-      instagram: initialData.social_links?.instagram || "",
-      otherSocialLinks: initialData.social_links?.other?.length
-        ? initialData.social_links.other
+      fullName: initialData?.full_name || "",
+      username: initialData?.username || "",
+      bio: initialData?.bio || "",
+      location: initialData?.location || "",
+      website: initialData?.social_links?.website || "",
+      github: initialData?.social_links?.github || "",
+      linkedin: initialData?.social_links?.linkedin || "",
+      twitter: initialData?.social_links?.twitter || "",
+      instagram: initialData?.social_links?.instagram || "",
+      otherSocialLinks: initialData?.social_links?.other?.length
+        ? initialData?.social_links.other
         : [],
     },
   });

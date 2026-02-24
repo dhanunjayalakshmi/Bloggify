@@ -1,28 +1,43 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import api from "@/lib/apiClient";
 import { useAuthStore } from "@/stores/authStore";
 
-const useUserProfile = () => {
-  const { user, token, setProfile } = useAuthStore();
+const useUserProfile = ({ mode = "self", username } = {}) => {
+  const { token, setProfile } = useAuthStore();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        if (!user || !token) return;
+        if (!token) return;
 
-        const res = await api.get(`/users/${user?.id}`);
+        setLoading(true);
+        setError(null);
 
+        let endPoint = mode === "self" ? "/users/me" : `/users/${username}`;
+
+        const res = await api.get(endPoint);
         const profile = res?.data;
-        if (profile) {
+
+        if (mode === "self") {
           setProfile(profile);
         }
+
+        setData(profile);
       } catch (err) {
         console.error("Failed to fetch user profile:", err);
+        setError("Failed to load profile");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchProfile();
-  }, [user, token]);
+  }, [mode, username, token]);
+
+  return { data, loading, error };
 };
 
 export default useUserProfile;

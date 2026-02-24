@@ -3,29 +3,11 @@ const { verifyToken } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
-//Fetch User Profile
-// router.get("/:id", async (req, res) => {
-//   try {
-//     const { id } = req?.params;
-//     const { data, error } = await supabase
-//       .from("users")
-//       .select("*")
-//       .eq("auth_id", id)
-//       .single();
-
-//     if (error) throw error;
-
-//     res.json(data);
-//   } catch (error) {
-//     res.status(500).json({ error: error?.message });
-//   }
-// });
-
 // Get Self Profile
 router.get("/me", verifyToken, async (req, res) => {
   try {
     const supabase = req?.supabase;
-    const authId = req?.user?.id;
+    const authId = req?.user?.auth_id;
 
     const { data: user, error } = await supabase
       .from("users")
@@ -70,17 +52,11 @@ router.get("/me", verifyToken, async (req, res) => {
       avatar: user?.avatar,
       bio: user?.bio,
       location: user?.location,
-      social_links: {
-        website: user?.website,
-        github: user?.github,
-        linkedin: user?.linkedin,
-        twitter: user?.twitter,
-        instagram: user?.instagram,
-      },
+      social_links: user?.social_links || {},
       stats: {
         blogs_published: blogs_published || 0,
-        followers: 0, // future
-        following: 0, // future
+        followers: 0,
+        following: 0,
         total_upvotes: total_upvotes || 0,
         total_comments: total_comments || 0,
       },
@@ -139,13 +115,7 @@ router.get("/:username", async (req, res) => {
       avatar: user?.avatar,
       bio: user?.bio,
       location: user?.location,
-      social_links: {
-        website: user?.website,
-        github: user?.github,
-        linkedin: user?.linkedin,
-        twitter: user?.twitter,
-        instagram: user?.instagram,
-      },
+      social_links: user?.social_links || {},
       stats: {
         blogs_published: blogs_published || 0,
         followers: 0,
@@ -206,7 +176,7 @@ router.post("/", verifyToken, async (req, res) => {
 router.put("/me", verifyToken, async (req, res) => {
   try {
     const supabase = req?.supabase;
-    const authId = req?.user?.id;
+    const authId = req?.user?.auth_id;
 
     const {
       full_name,
@@ -219,7 +189,7 @@ router.put("/me", verifyToken, async (req, res) => {
       twitter,
       instagram,
       username,
-    } = req.body;
+    } = req?.body;
 
     // Check username uniqueness if provided
     if (username) {
@@ -242,11 +212,14 @@ router.put("/me", verifyToken, async (req, res) => {
         bio,
         avatar,
         location,
-        website,
-        github,
-        linkedin,
-        twitter,
-        instagram,
+        social_links: {
+          website,
+          github,
+          linkedin,
+          twitter,
+          instagram,
+          other: req.body.otherSocialLinks || [],
+        },
         username,
         last_active_at: new Date(),
       })

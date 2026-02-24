@@ -1,8 +1,9 @@
 import EditProfileForm from "@/components/user/profile/EditProfileForm";
+import { useAuthStore } from "@/stores/authStore";
 import { MOCKUSERDATA } from "@/utils/mockUserProfileJson";
 
 const EditProfilePage = () => {
-  const user = MOCKUSERDATA;
+  const user = useAuthStore((store) => store?.profile);
 
   return (
     <div className="max-w-xl mx-auto p-4">
