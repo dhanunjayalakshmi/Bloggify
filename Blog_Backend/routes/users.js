@@ -133,25 +133,84 @@ router.post("/", async (req, res) => {
 });
 
 //Update User Profile
-router.put("/:id", async (req, res) => {
+router.put("/me", verifyToken, async (req, res) => {
   try {
-    const { id } = req?.params;
-    const { name, bio, avatar } = req?.body;
+    const supabase = req?.supabase;
+    const authId = req?.user?.id;
 
-    console.log(id, name, bio, avatar);
+    const {
+      full_name,
+      bio,
+      avatar,
+      location,
+      website,
+      github,
+      linkedin,
+      twitter,
+      instagram,
+      username,
+    } = req.body;
+
+    // Check username uniqueness if provided
+    if (username) {
+      const { data: existing } = await supabase
+        .from("users")
+        .select("id")
+        .eq("username", username)
+        .neq("auth_id", authId)
+        .single();
+
+      if (existing) {
+        return res.status(400).json({ error: "Username already taken" });
+      }
+    }
 
     const { data, error } = await supabase
       .from("users")
-      .update({ name, bio, avatar })
-      .eq("auth_id", id)
-      .select();
+      .update({
+        name: full_name,
+        bio,
+        avatar,
+        location,
+        website,
+        github,
+        linkedin,
+        twitter,
+        instagram,
+        username,
+        last_active_at: new Date(),
+      })
+      .eq("auth_id", authId)
+      .select()
+      .single();
 
     if (error) throw error;
 
     res.json({ message: "Profile updated successfully", user: data });
-  } catch (error) {
-    res.status(500).json({ error: error?.message });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
+
+// router.put("/:id", async (req, res) => {
+//   try {
+//     const { id } = req?.params;
+//     const { name, bio, avatar } = req?.body;
+
+//     console.log(id, name, bio, avatar);
+
+//     const { data, error } = await supabase
+//       .from("users")
+//       .update({ name, bio, avatar })
+//       .eq("auth_id", id)
+//       .select();
+
+//     if (error) throw error;
+
+//     res.json({ message: "Profile updated successfully", user: data });
+//   } catch (error) {
+//     res.status(500).json({ error: error?.message });
+//   }
+// });
 
 module.exports = router;
