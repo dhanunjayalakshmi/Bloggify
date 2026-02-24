@@ -94,9 +94,79 @@ router.get("/me", verifyToken, async (req, res) => {
   }
 });
 
-//Save user details after Signup
-router.post("/", async (req, res) => {
+// Author Public Profile
+router.get("/:username", async (req, res) => {
   try {
+    const supabase = req?.supabase;
+    const { username } = req?.params;
+
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("username", username)
+      .single();
+
+    if (error || !user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const [
+      { count: blogs_published },
+      { count: total_comments },
+      { count: total_upvotes },
+    ] = await Promise?.all([
+      supabase
+        .from("blogs")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("is_published", true),
+
+      supabase
+        .from("comments")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id),
+
+      supabase
+        .from("votes")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("vote_type", "upvote"),
+    ]);
+
+    res.json({
+      username: user?.username,
+      full_name: user?.name,
+      avatar: user?.avatar,
+      bio: user?.bio,
+      location: user?.location,
+      social_links: {
+        website: user?.website,
+        github: user?.github,
+        linkedin: user?.linkedin,
+        twitter: user?.twitter,
+        instagram: user?.instagram,
+      },
+      stats: {
+        blogs_published: blogs_published || 0,
+        followers: 0,
+        following: 0,
+        total_upvotes: total_upvotes || 0,
+        total_comments: total_comments || 0,
+      },
+      account_metadata: {
+        join_date: user?.created_at,
+        last_active_at: user?.last_active_at,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+//Save user details after Signup
+router.post("/", verifyToken, async (req, res) => {
+  try {
+    const supabase = req?.supabase;
     const { id, email, name = "New User", bio = "", avatar = "" } = req?.body;
 
     const { data: existingUser, error: fetchError } = await supabase
