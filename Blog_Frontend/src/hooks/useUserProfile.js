@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/apiClient";
 import { useAuthStore } from "@/stores/authStore";
+import { useParams } from "react-router";
 
-const useUserProfile = ({ mode = "self", username } = {}) => {
+const useUserProfile = () => {
   const { token, setProfile } = useAuthStore();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { userId } = useParams();
+
+  console.log(userId);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -16,12 +20,12 @@ const useUserProfile = ({ mode = "self", username } = {}) => {
         setLoading(true);
         setError(null);
 
-        let endPoint = mode === "self" ? "/users/me" : `/users/${username}`;
+        let endPoint = userId ? `/users/${userId}` : "/users/me";
 
         const res = await api.get(endPoint);
         const profile = res?.data;
 
-        if (mode === "self") {
+        if (!userId) {
           setProfile(profile);
         }
 
@@ -35,7 +39,7 @@ const useUserProfile = ({ mode = "self", username } = {}) => {
     };
 
     fetchProfile();
-  }, [mode, username, token]);
+  }, [userId, token]);
 
   return { data, loading, error };
 };

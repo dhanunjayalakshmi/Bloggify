@@ -4,7 +4,6 @@ import useBookmark from "@/hooks/useBookmark";
 
 const BlogCard = ({ blog, onOpen }) => {
   const { isBookmarked, toggle } = useBookmark(blog?.id);
-  console.log(blog?.cover_image);
 
   const {
     cover_image = "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",

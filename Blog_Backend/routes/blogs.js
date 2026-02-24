@@ -126,6 +126,7 @@ router.get("/:blogId", verifyToken, async (req, res) => {
         `
         *,
         users (
+          id,
           name,
           avatar
         )

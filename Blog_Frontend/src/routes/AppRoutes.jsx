@@ -42,7 +42,7 @@ const AppRoutes = () => {
           <Route path="/blogs/:blogId" element={<BlogDetails />} />
           <Route path="/preview" element={<PreviewPage />} />
           <Route path="/dashboard/posts/:id" element={<PreviewPage />} />
-          <Route path="/user/:id" element={<AuthorProfilePage />} />
+          <Route path="/users/:userId" element={<AuthorProfilePage />} />
 
           <Route path="/account" element={<UserAccountLayout />}>
             <Route index element={<UserAccountPage />} />

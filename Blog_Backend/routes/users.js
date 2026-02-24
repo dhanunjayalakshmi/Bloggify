@@ -71,15 +71,15 @@ router.get("/me", verifyToken, async (req, res) => {
 });
 
 // Author Public Profile
-router.get("/:username", async (req, res) => {
+router.get("/:userId", verifyToken, async (req, res) => {
   try {
     const supabase = req?.supabase;
-    const { username } = req?.params;
+    const { userId } = req?.params;
 
     const { data: user, error } = await supabase
       .from("users")
       .select("*")
-      .eq("username", username)
+      .eq("id", userId)
       .single();
 
     if (error || !user) {
@@ -94,18 +94,18 @@ router.get("/:username", async (req, res) => {
       supabase
         .from("blogs")
         .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id)
+        .eq("user_id", user?.id)
         .eq("is_published", true),
 
       supabase
         .from("comments")
         .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id),
+        .eq("user_id", user?.id),
 
       supabase
         .from("votes")
         .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id)
+        .eq("user_id", user?.id)
         .eq("vote_type", "upvote"),
     ]);
 
