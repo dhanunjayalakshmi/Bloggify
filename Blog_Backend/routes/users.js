@@ -181,8 +181,6 @@ router.put("/me", verifyToken, async (req, res) => {
     const { full_name, bio, avatar, location, social_links, username } =
       req?.body;
 
-    console.log("Bio...", bio);
-
     // Check username uniqueness if provided
     if (username) {
       const { data: existing } = await supabase

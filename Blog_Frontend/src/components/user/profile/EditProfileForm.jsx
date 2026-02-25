@@ -73,7 +73,6 @@ const EditProfileForm = ({ initialData }) => {
     control,
     handleSubmit,
     reset,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(ProfileSchema),
@@ -90,10 +89,6 @@ const EditProfileForm = ({ initialData }) => {
       otherSocialLinks: [],
     },
   });
-
-  console.log("Current bio in form:", watch("bio"));
-
-  console.log("Bio....", initialData?.bio);
 
   const setProfile = useAuthStore((store) => store?.setProfile);
   const navigate = useNavigate();
@@ -121,7 +116,6 @@ const EditProfileForm = ({ initialData }) => {
   }, [initialData?.id]);
 
   const onSubmit = async (data) => {
-    console.log("Bio in edit form...", data?.bio);
     try {
       const payload = {
         full_name: data?.fullName,
