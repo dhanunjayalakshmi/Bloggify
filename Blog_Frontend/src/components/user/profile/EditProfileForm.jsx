@@ -10,6 +10,17 @@ import { useNavigate } from "react-router-dom";
 import api from "@/lib/apiClient";
 import { useAuthStore } from "@/stores/authStore";
 import { useEffect } from "react";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 const FormRow = ({ label, error, children }) => (
   <div className="flex flex-col md:flex-row md:items-center md:gap-4">
@@ -23,6 +34,13 @@ const FormRow = ({ label, error, children }) => (
   </div>
 );
 
+const optionalUrl = z
+  .string()
+  .trim()
+  .optional()
+  .transform((val) => (val === "" ? undefined : val))
+  .refine((val) => !val || /^https?:\/\/.+/.test(val), "Invalid URL format.");
+
 const ProfileSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters."),
   username: z
@@ -34,11 +52,11 @@ const ProfileSchema = z.object({
     ),
   bio: z.string().max(200, "Bio can't exceed 200 characters.").optional(),
   location: z.string().optional(),
-  website: z.string().url("Invalid URL format.").optional(),
-  github: z.string().url("Invalid GitHub URL.").optional(),
-  linkedin: z.string().url("Invalid LinkedIn URL.").optional(),
-  twitter: z.string().url("Invalid Twitter URL.").optional(),
-  instagram: z.string().url("Invalid Instagram URL.").optional(),
+  website: optionalUrl,
+  github: optionalUrl,
+  linkedin: optionalUrl,
+  twitter: optionalUrl,
+  instagram: optionalUrl,
   otherSocialLinks: z
     .array(
       z.object({
@@ -55,10 +73,25 @@ const EditProfileForm = ({ initialData }) => {
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(ProfileSchema),
+    defaultValues: {
+      fullName: "",
+      username: "",
+      bio: "",
+      location: "",
+      website: "",
+      github: "",
+      linkedin: "",
+      twitter: "",
+      instagram: "",
+      otherSocialLinks: [],
+    },
   });
+
+  console.log("Current bio in form:", watch("bio"));
 
   console.log("Bio....", initialData?.bio);
 
@@ -74,20 +107,18 @@ const EditProfileForm = ({ initialData }) => {
     if (!initialData) return;
 
     reset({
-      fullName: initialData?.full_name || "",
-      username: initialData?.username || "",
-      bio: initialData?.bio || "",
-      location: initialData?.location || "",
-      website: initialData?.social_links?.website || "",
-      github: initialData?.social_links?.github || "",
-      linkedin: initialData?.social_links?.linkedin || "",
-      twitter: initialData?.social_links?.twitter || "",
-      instagram: initialData?.social_links?.instagram || "",
-      otherSocialLinks: initialData?.social_links?.other?.length
-        ? initialData.social_links.other
-        : [],
+      fullName: initialData.full_name ?? "",
+      username: initialData.username ?? "",
+      bio: initialData.bio ?? "",
+      location: initialData.location ?? "",
+      website: initialData.social_links?.website ?? "",
+      github: initialData.social_links?.github ?? "",
+      linkedin: initialData.social_links?.linkedin ?? "",
+      twitter: initialData.social_links?.twitter ?? "",
+      instagram: initialData.social_links?.instagram ?? "",
+      otherSocialLinks: initialData.social_links?.other ?? [],
     });
-  }, [initialData, reset]);
+  }, [initialData?.id]);
 
   const onSubmit = async (data) => {
     console.log("Bio in edit form...", data?.bio);
@@ -108,6 +139,8 @@ const EditProfileForm = ({ initialData }) => {
       };
 
       const res = await api.put("/users/me", payload);
+
+      console.log("Response...", res?.data);
 
       // Update global profile store immediately
       if (res?.data?.user) {
@@ -134,10 +167,10 @@ const EditProfileForm = ({ initialData }) => {
     }
   };
 
-  const handleCancel = () => {
-    const confirmLeave = window.confirm("Discard unsaved changes?");
-    if (confirmLeave) navigate(-1);
-  };
+  // const handleCancel = () => {
+  //   const confirmLeave = window.confirm("Discard unsaved changes?");
+  //   if (confirmLeave) navigate(-1);
+  // };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
@@ -273,9 +306,32 @@ const EditProfileForm = ({ initialData }) => {
       </div>
 
       <div className="flex justify-end gap-4 border-t pt-6">
-        <Button type="button" variant="outline" onClick={handleCancel}>
+        {/* <Button type="button" variant="outline" onClick={handleCancel}>
           Cancel
-        </Button>
+        </Button> */}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button type="button" variant="outline">
+              Cancel
+            </Button>
+          </AlertDialogTrigger>
+
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Discard changes?</AlertDialogTitle>
+              <AlertDialogDescription>
+                You have unsaved changes. Are you sure you want to leave?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <AlertDialogFooter>
+              <AlertDialogCancel>Stay</AlertDialogCancel>
+              <AlertDialogAction onClick={() => navigate(-1)}>
+                Discard
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Saving..." : "Save Changes"}
         </Button>

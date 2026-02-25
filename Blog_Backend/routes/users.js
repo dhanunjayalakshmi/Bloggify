@@ -181,6 +181,8 @@ router.put("/me", verifyToken, async (req, res) => {
     const { full_name, bio, avatar, location, social_links, username } =
       req?.body;
 
+    console.log("Bio...", bio);
+
     // Check username uniqueness if provided
     if (username) {
       const { data: existing } = await supabase
@@ -216,26 +218,5 @@ router.put("/me", verifyToken, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-// router.put("/:id", async (req, res) => {
-//   try {
-//     const { id } = req?.params;
-//     const { name, bio, avatar } = req?.body;
-
-//     console.log(id, name, bio, avatar);
-
-//     const { data, error } = await supabase
-//       .from("users")
-//       .update({ name, bio, avatar })
-//       .eq("auth_id", id)
-//       .select();
-
-//     if (error) throw error;
-
-//     res.json({ message: "Profile updated successfully", user: data });
-//   } catch (error) {
-//     res.status(500).json({ error: error?.message });
-//   }
-// });
 
 module.exports = router;
