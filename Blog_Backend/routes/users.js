@@ -178,18 +178,8 @@ router.put("/me", verifyToken, async (req, res) => {
     const supabase = req?.supabase;
     const authId = req?.user?.auth_id;
 
-    const {
-      full_name,
-      bio,
-      avatar,
-      location,
-      website,
-      github,
-      linkedin,
-      twitter,
-      instagram,
-      username,
-    } = req?.body;
+    const { full_name, bio, avatar, location, social_links, username } =
+      req?.body;
 
     // Check username uniqueness if provided
     if (username) {
@@ -210,17 +200,9 @@ router.put("/me", verifyToken, async (req, res) => {
       .update({
         name: full_name,
         bio,
-        avatar,
         location,
-        social_links: {
-          website,
-          github,
-          linkedin,
-          twitter,
-          instagram,
-          other: req.body.otherSocialLinks || [],
-        },
         username,
+        social_links,
         last_active_at: new Date(),
       })
       .eq("auth_id", authId)

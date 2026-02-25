@@ -1,6 +1,5 @@
 import EditProfileForm from "@/components/user/profile/EditProfileForm";
 import { useAuthStore } from "@/stores/authStore";
-import { MOCKUSERDATA } from "@/utils/mockUserProfileJson";
 
 const EditProfilePage = () => {
   const user = useAuthStore((store) => store?.profile);

@@ -10,8 +10,6 @@ const useUserProfile = () => {
   const [error, setError] = useState(null);
   const { userId } = useParams();
 
-  console.log(userId);
-
   useEffect(() => {
     const fetchProfile = async () => {
       try {

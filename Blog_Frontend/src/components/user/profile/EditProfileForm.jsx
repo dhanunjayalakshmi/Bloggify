@@ -7,22 +7,31 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import api from "@/lib/apiClient";
+import { useAuthStore } from "@/stores/authStore";
+import { useEffect } from "react";
 
 const FormRow = ({ label, error, children }) => (
   <div className="flex flex-col md:flex-row md:items-center md:gap-4">
     <Label className="text-sm md:text-base mb-1 md:mb-0 md:w-1/4">
       {label}
     </Label>
-    <div className="flex-1">{children}</div>
-    {error && (
-      <p className="text-xs text-red-500 mt-1 md:mt-0 md:ml-4">{error}</p>
-    )}
+    <div className="flex-1 flex-col">
+      <div className="">{children}</div>
+      {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
+    </div>
   </div>
 );
 
 const ProfileSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters."),
-  username: z.string().min(2, "Username must be at least 2 characters."),
+  username: z
+    .string()
+    .min(2)
+    .regex(
+      /^[a-zA-Z0-9_]+$/,
+      "Username can only contain letters, numbers and underscores",
+    ),
   bio: z.string().max(200, "Bio can't exceed 200 characters.").optional(),
   location: z.string().optional(),
   website: z.string().url("Invalid URL format.").optional(),
@@ -45,10 +54,26 @@ const EditProfileForm = ({ initialData }) => {
     register,
     control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(ProfileSchema),
-    defaultValues: {
+  });
+
+  console.log("Bio....", initialData?.bio);
+
+  const setProfile = useAuthStore((store) => store?.setProfile);
+  const navigate = useNavigate();
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "otherSocialLinks",
+  });
+
+  useEffect(() => {
+    if (!initialData) return;
+
+    reset({
       fullName: initialData?.full_name || "",
       username: initialData?.username || "",
       bio: initialData?.bio || "",
@@ -59,22 +84,54 @@ const EditProfileForm = ({ initialData }) => {
       twitter: initialData?.social_links?.twitter || "",
       instagram: initialData?.social_links?.instagram || "",
       otherSocialLinks: initialData?.social_links?.other?.length
-        ? initialData?.social_links.other
+        ? initialData.social_links.other
         : [],
-    },
-  });
-
-  const navigate = useNavigate();
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "otherSocialLinks",
-  });
+    });
+  }, [initialData, reset]);
 
   const onSubmit = async (data) => {
-    console.log("Submitted Data:", data);
-    toast.success("Profile updated!");
-    navigate(-1);
+    console.log("Bio in edit form...", data?.bio);
+    try {
+      const payload = {
+        full_name: data?.fullName,
+        username: data?.username.trim(),
+        bio: data?.bio,
+        location: data?.location,
+        social_links: {
+          website: data?.website || null,
+          github: data?.github || null,
+          linkedin: data?.linkedin || null,
+          twitter: data?.twitter || null,
+          instagram: data?.instagram || null,
+          other: data?.otherSocialLinks || [],
+        },
+      };
+
+      const res = await api.put("/users/me", payload);
+
+      // Update global profile store immediately
+      if (res?.data?.user) {
+        setProfile((prev) => ({
+          ...prev,
+          full_name: res.data.user.name,
+          username: res.data.user.username,
+          bio: res.data.user.bio,
+          location: res.data.user.location,
+          social_links: res.data.user.social_links || {},
+        }));
+      }
+
+      toast.success("Profile updated successfully!");
+      navigate(-1);
+    } catch (err) {
+      const message = err.response?.data?.error || "Failed to update profile";
+
+      if (message.toLowerCase().includes("username")) {
+        toast.error("Username already taken.");
+      } else {
+        toast.error(message);
+      }
+    }
   };
 
   const handleCancel = () => {
