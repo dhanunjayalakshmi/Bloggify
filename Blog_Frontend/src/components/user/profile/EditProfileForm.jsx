@@ -312,10 +312,10 @@ const EditProfileForm = ({ initialData }) => {
 
             <AlertDialogFooter>
               <AlertDialogCancel className="bg-white dark:bg-gray-700 hover:dark:bg-gray-800">
-                Yes
+                Stay
               </AlertDialogCancel>
               <AlertDialogAction onClick={() => navigate(-1)}>
-                No
+                Leave
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
