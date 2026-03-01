@@ -161,11 +161,6 @@ const EditProfileForm = ({ initialData }) => {
     }
   };
 
-  // const handleCancel = () => {
-  //   const confirmLeave = window.confirm("Discard unsaved changes?");
-  //   if (confirmLeave) navigate(-1);
-  // };
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
       <div>
@@ -300,9 +295,6 @@ const EditProfileForm = ({ initialData }) => {
       </div>
 
       <div className="flex justify-end gap-4 border-t pt-6">
-        {/* <Button type="button" variant="outline" onClick={handleCancel}>
-          Cancel
-        </Button> */}
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button type="button" variant="outline">
@@ -310,7 +302,7 @@ const EditProfileForm = ({ initialData }) => {
             </Button>
           </AlertDialogTrigger>
 
-          <AlertDialogContent>
+          <AlertDialogContent className="bg-white dark:bg-gray-800">
             <AlertDialogHeader>
               <AlertDialogTitle>Discard changes?</AlertDialogTitle>
               <AlertDialogDescription>
@@ -319,9 +311,11 @@ const EditProfileForm = ({ initialData }) => {
             </AlertDialogHeader>
 
             <AlertDialogFooter>
-              <AlertDialogCancel>Stay</AlertDialogCancel>
+              <AlertDialogCancel className="bg-white dark:bg-gray-700 hover:dark:bg-gray-800">
+                Yes
+              </AlertDialogCancel>
               <AlertDialogAction onClick={() => navigate(-1)}>
-                Discard
+                No
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
