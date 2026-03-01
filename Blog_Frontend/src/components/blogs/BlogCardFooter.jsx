@@ -12,10 +12,10 @@ const BlogCardFooter = ({ blog, isBookmarked, onBookmarkToggle }) => {
   return (
     <div
       onClick={stop}
-      className="flex justify-between items-center text-sm text-muted-foreground mt-2"
+      className="flex justify-between items-center text-sm text-muted-foreground mt-2 gap-2"
     >
-      <span>By {blog?.author}</span>
-      <span>{blog?.tags?.join(", ")}</span>
+      <span>@{blog?.users?.username}</span>
+      {/* <span># {blog?.tags?.join(", ")}</span> */}
       <span>🔥 {blog?.views} views</span>
 
       <div className="flex items-center gap-4">

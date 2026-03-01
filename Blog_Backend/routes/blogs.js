@@ -68,7 +68,7 @@ router.get("/", async (req, res) => {
     // Build query
     let query = supabase
       .from("blogs")
-      .select("*", { count: "exact" })
+      .select(`*, users ( id, name, username ) `, { count: "exact" })
       .eq("is_published", true);
 
     if (authorId) query = query?.eq("user_id", authorId);
@@ -100,6 +100,7 @@ router.get("/", async (req, res) => {
 
     const { data: blogs, error } = await query;
     if (error) throw error;
+    console.log(blogs);
 
     res.status(200).json({
       blogs,
