@@ -24,7 +24,7 @@ const AuthorProfilePage = () => {
           lastActive={user?.account_metadata.last_active_at}
         />
       </div>
-      <BlogListSection />
+      <BlogListSection username={user?.username} />
     </div>
   );
 };

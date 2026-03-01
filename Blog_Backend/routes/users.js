@@ -133,6 +133,50 @@ router.get("/:userId", verifyToken, async (req, res) => {
   }
 });
 
+// GET public blogs of an author (paginated)
+router.get("/:username/blogs", verifyToken, async (req, res) => {
+  try {
+    const supabase = req?.supabase;
+    const { username } = req?.params;
+    let { page = 1, limit = 5 } = req.query;
+
+    page = Number(page);
+    limit = Number(limit);
+
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    // Find user by username
+    const { data: user, error: userError } = await supabase
+      .from("users")
+      .select("id")
+      .eq("username", username)
+      .single();
+
+    if (userError || !user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const { data: blogs, error } = await supabase
+      .from("blogs")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("is_published", true)
+      .lte("published_at", new Date().toISOString())
+      .order("published_at", { ascending: false })
+      .range(from, to);
+
+    if (error) throw error;
+
+    res.json({
+      blogs,
+      page,
+      hasMore: blogs.length === limit,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 //Save user details after Signup
 router.post("/", verifyToken, async (req, res) => {

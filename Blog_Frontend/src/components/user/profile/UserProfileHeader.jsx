@@ -30,7 +30,7 @@ const UserProfileHeader = ({ user, isOwnProfile = false }) => {
         <p className="text-muted-foreground">@{user?.username}</p>
       </div>
       {user?.bio && (
-        <p className="max-w-2xl text-sm text-gray-600 dark:text-gray-300">
+        <p className="max-w-2xl text-md text-gray-600 dark:text-gray-300">
           {user?.bio}
         </p>
       )}
