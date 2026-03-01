@@ -133,6 +133,7 @@ router.get("/:userId", verifyToken, async (req, res) => {
   }
 });
 
+
 //Save user details after Signup
 router.post("/", verifyToken, async (req, res) => {
   try {
