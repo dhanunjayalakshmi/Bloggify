@@ -8,7 +8,7 @@ const Suggestions = () => {
     date: "Date",
     altName: "Suggestions",
   };
-  return <MiniBlogCard blog={blog} />;
+  return <MiniBlogCard blog={blog} path="/explore" />;
 };
 
 export default Suggestions;

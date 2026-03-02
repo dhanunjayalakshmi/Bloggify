@@ -1,8 +1,11 @@
+import { useNavigate } from "react-router";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 
-const MiniBlogCard = ({ blog }) => {
+const MiniBlogCard = ({ blog, path }) => {
   const { sideHeading, title, author, date, altName } = blog;
+  const navigate = useNavigate();
+
   return (
     <Card className="w-full dark:bg-gray-800 dark:text-gray-200">
       <CardContent className="px-4">
@@ -25,7 +28,9 @@ const MiniBlogCard = ({ blog }) => {
             </div>
           </div>
         ))}
-        <Button className="w-full mt-2 text-sm">See More</Button>
+        <Button className="w-full mt-2 text-sm" onClick={() => navigate(path)}>
+          See More
+        </Button>
       </CardContent>
     </Card>
   );

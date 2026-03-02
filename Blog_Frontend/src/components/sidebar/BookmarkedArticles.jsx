@@ -8,7 +8,7 @@ const BookmarkedArticles = () => {
     date: "Date",
     altName: "bookmarks",
   };
-  return <MiniBlogCard blog={blog} />;
+  return <MiniBlogCard blog={blog} path="/profile/bookmarks" />;
 };
 
 export default BookmarkedArticles;

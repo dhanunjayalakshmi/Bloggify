@@ -182,12 +182,12 @@ const BlogDetails = () => {
       </div>
 
       {/* Other Platform Suggestions */}
-      {/* <div className="mt-10">
+      <div className="mt-10">
         <h3 className="text-xl font-semibold">
           Other Suggestions from Platform
         </h3>
         <div className="grid gap-4 mt-4">
-          {[1, 2].map((_, idx) => (
+          {/* {[1, 2].map((_, idx) => (
             <div
               key={idx}
               className="border p-4 rounded-xl shadow-sm transition hover:shadow-md hover:bg-muted dark:hover:bg-gray-800 cursor-pointer"
@@ -197,15 +197,15 @@ const BlogDetails = () => {
                 A brief description of the blog post content goes here.
               </p>
             </div>
-          ))}
+          ))} */}
+          <MiniBlogList
+            title="Related Articles"
+            blogs={relatedBlogs}
+            seeMorePath={`/tags/${tags?.[0]}`}
+          />
         </div>
         <Button className="mt-4">See More</Button>
-      </div> */}
-      <MiniBlogList
-        title="Related Articles"
-        blogs={relatedBlogs}
-        seeMorePath={`/tags/${tags?.[0]}`}
-      />
+      </div>
     </div>
   );
 };

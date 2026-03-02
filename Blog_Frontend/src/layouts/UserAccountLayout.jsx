@@ -11,11 +11,11 @@ import { Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const tabs = [
-  { name: "Profile", path: "/account" },
-  { name: "Posts", path: "/account/posts" },
-  { name: "Bookmarks", path: "/account/bookmarks" },
-  { name: "Stats & Activity", path: "/account/stats" },
-  { name: "Settings", path: "/account/settings" },
+  { name: "Profile", path: "/profile" },
+  { name: "Posts", path: "/profile/posts" },
+  { name: "Bookmarks", path: "/profile/bookmarks" },
+  { name: "Stats & Activity", path: "/profile/stats" },
+  { name: "Settings", path: "/profile/settings" },
 ];
 
 const UserAccountLayout = () => {
@@ -23,7 +23,7 @@ const UserAccountLayout = () => {
   const location = useLocation();
 
   const shouldHighlightProfile =
-    location.pathname === "/account" || location.pathname === "/account/edit";
+    location.pathname === "/profile" || location.pathname === "/profile/edit";
 
   useEffect(() => {
     setIsOpen(false);
@@ -35,7 +35,7 @@ const UserAccountLayout = () => {
         <nav className="flex flex-col gap-2">
           {tabs.map((tab) => {
             const isCurrentProfileTab =
-              tab.path === "/account" && shouldHighlightProfile;
+              tab.path === "/profile" && shouldHighlightProfile;
 
             return (
               <NavLink
@@ -80,7 +80,7 @@ const UserAccountLayout = () => {
             <nav className="flex flex-col gap-2 mt-4">
               {tabs.map((tab) => {
                 const isCurrentProfileTab =
-                  tab.path === "/account" && shouldHighlightProfile;
+                  tab.path === "/profile" && shouldHighlightProfile;
                 return (
                   <NavLink
                     key={tab.path}

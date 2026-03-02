@@ -20,6 +20,7 @@ import ContactPage from "@/pages/LandingPage/ContactPage";
 import TermsPage from "@/pages/LandingPage/TermsPage";
 import PublicLayout from "@/layouts/PublicLayout";
 import useAuthInit from "@/hooks/useAuthInit";
+import Explore from "@/pages/Explore";
 
 const AppRoutes = () => {
   useAuthInit();
@@ -38,15 +39,15 @@ const AppRoutes = () => {
         <Route path="/update-password" element={<UpdatePassword />} />
         <Route element={<MainLayout />}>
           <Route path="/home" element={<Home />} />
-          {/* <Route path="/explore" element={<Explore />} />
-          <Route path="/tags/:tag" element={<Explore />} /> */}
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/tags/:tag" element={<Explore />} />
           <Route path="/create" element={<CreateEditBlog />} />
           <Route path="/blogs/:blogId" element={<BlogDetails />} />
           <Route path="/preview" element={<PreviewPage />} />
           <Route path="/dashboard/posts/:id" element={<PreviewPage />} />
           <Route path="/users/:userId" element={<AuthorProfilePage />} />
 
-          <Route path="/account" element={<UserAccountLayout />}>
+          <Route path="/profile" element={<UserAccountLayout />}>
             <Route index element={<UserAccountPage />} />
             <Route path="edit" element={<EditProfilePage />} />
             <Route path="stats" element={<Stats />} />

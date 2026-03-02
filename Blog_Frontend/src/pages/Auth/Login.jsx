@@ -38,7 +38,7 @@ const Login = () => {
 
     closeModal();
 
-    navigate(isProfileIncomplete ? "/account/edit" : "/home");
+    navigate(isProfileIncomplete ? "/profile/edit" : "/home");
   }, [profile, user]);
 
   const onSubmit = async (formData) => {
