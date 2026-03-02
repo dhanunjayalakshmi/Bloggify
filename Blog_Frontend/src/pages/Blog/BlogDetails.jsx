@@ -11,6 +11,7 @@ import useBookmark from "@/hooks/useBookmark";
 import { hydrateVotesForContent } from "@/utils/hydrateVotesForContent";
 import useRelatedBlogs from "@/hooks/useRelatedBlogs";
 import MiniBlogList from "@/components/blogs/MiniBlogList";
+import useAuthorOtherBlogs from "@/hooks/useAuthorOtherBlogs";
 
 const BlogDetails = () => {
   const { blogId } = useParams();
@@ -20,6 +21,8 @@ const BlogDetails = () => {
   const { isBookmarked, toggle } = useBookmark(blogId);
 
   const { blogs: relatedBlogs } = useRelatedBlogs(blog?.tags, blogId);
+  const authorId = blog?.users?.id;
+  const { blogs: authorBlogs } = useAuthorOtherBlogs(authorId, blogId);
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -162,23 +165,11 @@ const BlogDetails = () => {
 
       {/* Other Articles from Author */}
       <div className="mt-10">
-        <h3 className="text-xl font-semibold">
-          Other Suggested Articles from Author
-        </h3>
-        <div className="grid gap-4 mt-4">
-          {[1, 2, 3].map((_, idx) => (
-            <div
-              key={idx}
-              className="border p-4 rounded-xl shadow-sm transition hover:shadow-md hover:bg-muted dark:hover:bg-gray-800 cursor-pointer"
-            >
-              <h4 className="font-semibold">Blog Title</h4>
-              <p className="text-sm text-muted-foreground">
-                A brief description of the blog post content goes here.
-              </p>
-            </div>
-          ))}
-        </div>
-        <Button className="mt-4">See More</Button>
+        <MiniBlogList
+          title="More from this Author"
+          blogs={authorBlogs}
+          seeMorePath={users?.username ? `/users/${users.username}` : null}
+        />
       </div>
 
       {/* Other Platform Suggestions */}
