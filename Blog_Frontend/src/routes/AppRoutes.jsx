@@ -38,8 +38,8 @@ const AppRoutes = () => {
         <Route path="/update-password" element={<UpdatePassword />} />
         <Route element={<MainLayout />}>
           <Route path="/home" element={<Home />} />
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/tags/:tag" element={<Explore />} />
+          {/* <Route path="/explore" element={<Explore />} />
+          <Route path="/tags/:tag" element={<Explore />} /> */}
           <Route path="/create" element={<CreateEditBlog />} />
           <Route path="/blogs/:blogId" element={<BlogDetails />} />
           <Route path="/preview" element={<PreviewPage />} />

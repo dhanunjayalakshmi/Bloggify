@@ -9,6 +9,8 @@ import ContentVotes from "@/components/blogs/ContentVotes";
 import BlogComments from "@/components/blogs/BlogComments";
 import useBookmark from "@/hooks/useBookmark";
 import { hydrateVotesForContent } from "@/utils/hydrateVotesForContent";
+import useRelatedBlogs from "@/hooks/useRelatedBlogs";
+import MiniBlogList from "@/components/blogs/MiniBlogList";
 
 const BlogDetails = () => {
   const { blogId } = useParams();
@@ -16,6 +18,8 @@ const BlogDetails = () => {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const { isBookmarked, toggle } = useBookmark(blogId);
+
+  const { blogs: relatedBlogs } = useRelatedBlogs(blog?.tags, blogId);
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -178,7 +182,7 @@ const BlogDetails = () => {
       </div>
 
       {/* Other Platform Suggestions */}
-      <div className="mt-10">
+      {/* <div className="mt-10">
         <h3 className="text-xl font-semibold">
           Other Suggestions from Platform
         </h3>
@@ -196,7 +200,12 @@ const BlogDetails = () => {
           ))}
         </div>
         <Button className="mt-4">See More</Button>
-      </div>
+      </div> */}
+      <MiniBlogList
+        title="Related Articles"
+        blogs={relatedBlogs}
+        seeMorePath={`/tags/${tags?.[0]}`}
+      />
     </div>
   );
 };
