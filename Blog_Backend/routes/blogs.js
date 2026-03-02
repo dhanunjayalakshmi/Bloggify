@@ -13,7 +13,8 @@ const upload = multer({ storage: multer.memoryStorage() });
 // Get all blogs
 router.get("/", async (req, res) => {
   try {
-    let { page, limit, search, sort, tags, authorId } = req?.query;
+    let { page, limit, search, sort, tags, authorId, exclude, overlapTags } =
+      req?.query;
 
     page = parseInt(page) || 1;
     limit = parseInt(limit) || 5;
@@ -48,6 +49,17 @@ router.get("/", async (req, res) => {
       const tagsArray = tags?.includes(",") ? tags?.split(",") : [tags];
       const tagsLowerCase = tagsArray.map((tag) => tag.toLowerCase());
       baseQuery = baseQuery?.contains("tags", tagsLowerCase);
+    }
+
+    if (exclude) {
+      query = query.neq("id", exclude);
+    }
+
+    if (overlapTags) {
+      const tagsArray = overlapTags
+        .split(",")
+        .map((t) => t.trim().toLowerCase());
+      query = query.overlaps("tags", tagsArray);
     }
 
     // Get total count of matching blogs
