@@ -40,7 +40,7 @@ const MiniBlogList = ({ title, blogs = [], seeMorePath }) => {
 
         {seeMorePath && (
           <Button
-            className="w-full text-sm"
+            className="w-full mx-auto text-sm"
             onClick={() => navigate(seeMorePath)}
           >
             See More

@@ -5,8 +5,11 @@ const useRelatedBlogs = (tags = [], blogId) => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(false);
 
+//   console.log(tags);
+
   useEffect(() => {
-    if (!tags.length || !blogId) return;
+    if (!blogId) return;
+    if (!tags.length) return;
 
     const fetchRelated = async () => {
       try {
@@ -25,7 +28,7 @@ const useRelatedBlogs = (tags = [], blogId) => {
     };
 
     fetchRelated();
-  }, [tags, blogId]);
+  }, [blogId, JSON.stringify(tags)]);
 
   return { blogs, loading };
 };

@@ -52,14 +52,14 @@ router.get("/", async (req, res) => {
     }
 
     if (exclude) {
-      query = query.neq("id", exclude);
+      baseQuery = baseQuery.neq("id", exclude);
     }
 
     if (overlapTags) {
       const tagsArray = overlapTags
         .split(",")
         .map((t) => t.trim().toLowerCase());
-      query = query.overlaps("tags", tagsArray);
+      baseQuery = baseQuery.overlaps("tags", tagsArray);
     }
 
     // Get total count of matching blogs
@@ -93,6 +93,17 @@ router.get("/", async (req, res) => {
     if (tags && tags !== "All Tags") {
       const tagsArray = tags?.split(",").map((tag) => tag.trim().toLowerCase());
       query = query?.contains("tags", tagsArray);
+    }
+
+    if (exclude) {
+      query = query.neq("id", exclude);
+    }
+
+    if (overlapTags) {
+      const tagsArray = overlapTags
+        .split(",")
+        .map((t) => t.trim().toLowerCase());
+      query = query.overlaps("tags", tagsArray);
     }
 
     if (sort === "newest")
