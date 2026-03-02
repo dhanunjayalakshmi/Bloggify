@@ -1,14 +1,12 @@
-import MiniBlogCard from "./MiniBlogCard";
+import MiniBlogList from "@/components/blogs/MiniBlogList";
+import useLatestBlogs from "@/hooks/useLatestBlogs";
 
 const Suggestions = () => {
-  const blog = {
-    sideHeading: "Suggestions",
-    title: "Mini Blog Title",
-    author: "Author",
-    date: "Date",
-    altName: "Suggestions",
-  };
-  return <MiniBlogCard blog={blog} path="/explore" />;
+  const { blogs } = useLatestBlogs(5);
+
+  return (
+    <MiniBlogList title="Suggestions" blogs={blogs} seeMorePath="/explore" />
+  );
 };
 
 export default Suggestions;

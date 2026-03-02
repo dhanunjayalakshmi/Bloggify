@@ -8,7 +8,7 @@ const MiniBlogList = ({ title, blogs = [], seeMorePath }) => {
   if (!blogs?.length) return null;
 
   return (
-    <Card className="dark:bg-gray-800">
+    <Card className="w-full dark:bg-gray-800 dark:text-gray-200">
       <CardContent className="p-4">
         <h2 className="font-semibold mb-4">{title}</h2>
 
@@ -16,14 +16,21 @@ const MiniBlogList = ({ title, blogs = [], seeMorePath }) => {
           <div
             key={blog?.id}
             onClick={() => navigate(`/blogs/${blog?.id}`)}
-            className="flex items-center gap-3 mb-4 cursor-pointer"
+            className="flex items-center gap-3 mb-4 p-2 cursor-pointer rounded-2xl shadow-sm hover:shadow-lg transition"
           >
             <img
-              src={blog?.cover_image || "/placeholder.png"}
-              className="w-10 h-10 rounded-full object-cover shrink-0"
+              src={
+                blog?.cover_image ||
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s"
+              }
+              className="w-12 h-12 rounded-full object-cover shrink-0"
             />
-            <div className="text-sm">
+            <div className="text-sm gap-2">
               <p className="font-medium line-clamp-1">{blog?.title}</p>
+              <p className="text-muted-foreground">
+                {blog?.content?.replace(/<[^>]*>/g, "").substring(0, 70) +
+                  "..." || "Welcome to my blog"}
+              </p>
               <p className="text-muted-foreground text-xs">
                 {blog?.users?.username}
               </p>
@@ -33,7 +40,6 @@ const MiniBlogList = ({ title, blogs = [], seeMorePath }) => {
 
         {seeMorePath && (
           <Button
-            variant="outline"
             className="w-full text-sm"
             onClick={() => navigate(seeMorePath)}
           >
