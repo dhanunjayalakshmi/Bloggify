@@ -1,9 +1,7 @@
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import FollowButton from "./FollowButton";
 
-const UserProfileHeader = ({ user, isOwnProfile = false }) => {
-  const { userId } = useParams();
-
+const UserProfileHeader = ({ user, isOwnProfile = false, userId }) => {
   return (
     <div className="flex flex-col items-center text-center space-y-4 relative">
       <div className="absolute top-0 right-0 hidden md:block">

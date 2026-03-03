@@ -5,9 +5,11 @@ import SocialLinks from "@/components/user/profile/SocialLinks";
 import Badges from "@/components/user/profile/Badges";
 import JoinedInfo from "@/components/user/profile/JoinedInfo";
 import useUserProfile from "@/hooks/useUserProfile";
+import { useParams } from "react-router";
 
 const AuthorProfilePage = () => {
   const { data: author, error, loading } = useUserProfile();
+  const { userId } = useParams();
 
   if (loading) return <div>Loading...</div>;
   if (error || !author) return <div>Error loading profile</div>;
@@ -15,8 +17,8 @@ const AuthorProfilePage = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 space-y-2 py-8">
       <div className="mx-auto px-4 space-y-6 py-8">
-        <UserProfileHeader user={author} />
-        <UserProfileStats stats={author?.stats} />
+        <UserProfileHeader user={author} userId={userId} />
+        <UserProfileStats stats={author?.stats} userId={userId} />
         <SocialLinks links={author?.social_links} />
         <Badges badges={author?.badges} />
         <JoinedInfo

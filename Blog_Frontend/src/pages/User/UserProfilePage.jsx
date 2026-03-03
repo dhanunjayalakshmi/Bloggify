@@ -17,7 +17,7 @@ const UserProfilePage = () => {
     <div className="max-w-4xl min-h-screen mx-auto my-8">
       <div className="mx-auto px-4 space-y-6 py-8">
         <UserProfileHeader user={user} isOwnProfile={true} />
-        <UserProfileStats stats={user?.stats} />
+        <UserProfileStats stats={user?.stats} userId={user?.id} />
         <SocialLinks links={user?.social_links} />
         {/* <Badges badges={user?.badges} /> */}
         <JoinedInfo

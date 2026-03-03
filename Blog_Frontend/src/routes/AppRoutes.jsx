@@ -21,6 +21,7 @@ import TermsPage from "@/pages/LandingPage/TermsPage";
 import PublicLayout from "@/layouts/PublicLayout";
 import useAuthInit from "@/hooks/useAuthInit";
 import Explore from "@/pages/Explore";
+import FollowListPage from "@/pages/User/FollowListPage";
 
 const AppRoutes = () => {
   useAuthInit();
@@ -46,6 +47,8 @@ const AppRoutes = () => {
           <Route path="/preview" element={<PreviewPage />} />
           <Route path="/dashboard/posts/:id" element={<PreviewPage />} />
           <Route path="/users/:userId" element={<AuthorProfilePage />} />
+          <Route path="/users/:userId/followers" element={<FollowListPage />} />
+          <Route path="/users/:userId/following" element={<FollowListPage />} />
 
           <Route path="/profile" element={<UserAccountLayout />}>
             <Route index element={<UserAccountPage />} />

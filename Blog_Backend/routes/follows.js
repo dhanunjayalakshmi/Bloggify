@@ -32,16 +32,27 @@ router.get("/is-following", verifyToken, async (req, res) => {
 // Get Followers of a User
 router.get("/followers/:userId", async (req, res) => {
   try {
-    const { userId } = req?.params;
+    const { userId } = req.params;
 
     const { data, error } = await supabase
       .from("follows")
-      .select("follower_id")
+      .select(
+        `
+        follower:users!follows_follower_id_fkey (
+          id,
+          username,
+          name,
+          avatar
+        )
+      `,
+      )
       .eq("following_id", userId);
 
     if (error) throw error;
 
-    res.status(200).json({ followers: data });
+    const followers = data.map((item) => item.follower);
+
+    res.status(200).json({ followers });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -50,16 +61,27 @@ router.get("/followers/:userId", async (req, res) => {
 // ✅ Get Following List of a User
 router.get("/following/:userId", async (req, res) => {
   try {
-    const { userId } = req?.params;
+    const { userId } = req.params;
 
     const { data, error } = await supabase
       .from("follows")
-      .select("following_id")
+      .select(
+        `
+        following:users!follows_following_id_fkey (
+          id,
+          username,
+          name,
+          avatar
+        )
+      `,
+      )
       .eq("follower_id", userId);
 
     if (error) throw error;
 
-    res.status(200).json({ following: data });
+    const following = data.map((item) => item.following);
+
+    res.status(200).json({ following });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
