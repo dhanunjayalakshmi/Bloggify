@@ -26,6 +26,8 @@ router.get("/me", verifyToken, async (req, res) => {
       { count: blogs_published },
       { count: total_comments },
       { count: total_upvotes },
+      { count: followers },
+      { count: following },
     ] = await Promise?.all([
       supabase
         .from("blogs")
@@ -43,6 +45,16 @@ router.get("/me", verifyToken, async (req, res) => {
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id)
         .eq("vote_type", "upvote"),
+
+      supabase
+        .from("follows")
+        .select("*", { count: "exact", head: true })
+        .eq("following_id", user.id),
+
+      supabase
+        .from("follows")
+        .select("*", { count: "exact", head: true })
+        .eq("follower_id", user.id),
     ]);
 
     res.json({
@@ -55,8 +67,8 @@ router.get("/me", verifyToken, async (req, res) => {
       social_links: user?.social_links || {},
       stats: {
         blogs_published: blogs_published || 0,
-        followers: 0,
-        following: 0,
+        followers: followers || 0,
+        following: following || 0,
         total_upvotes: total_upvotes || 0,
         total_comments: total_comments || 0,
       },
@@ -126,6 +138,8 @@ router.get("/:userId", verifyToken, async (req, res) => {
       { count: blogs_published },
       { count: total_comments },
       { count: total_upvotes },
+      { count: followers },
+      { count: following },
     ] = await Promise?.all([
       supabase
         .from("blogs")
@@ -143,6 +157,16 @@ router.get("/:userId", verifyToken, async (req, res) => {
         .select("*", { count: "exact", head: true })
         .eq("user_id", user?.id)
         .eq("vote_type", "upvote"),
+
+      supabase
+        .from("follows")
+        .select("*", { count: "exact", head: true })
+        .eq("following_id", user.id),
+
+      supabase
+        .from("follows")
+        .select("*", { count: "exact", head: true })
+        .eq("follower_id", user.id),
     ]);
 
     res.json({
@@ -154,8 +178,8 @@ router.get("/:userId", verifyToken, async (req, res) => {
       social_links: user?.social_links || {},
       stats: {
         blogs_published: blogs_published || 0,
-        followers: 0,
-        following: 0,
+        followers: followers || 0,
+        following: following || 0,
         total_upvotes: total_upvotes || 0,
         total_comments: total_comments || 0,
       },
