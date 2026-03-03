@@ -12,6 +12,7 @@ import { hydrateVotesForContent } from "@/utils/hydrateVotesForContent";
 import useRelatedBlogs from "@/hooks/useRelatedBlogs";
 import MiniBlogList from "@/components/blogs/MiniBlogList";
 import useAuthorOtherBlogs from "@/hooks/useAuthorOtherBlogs";
+import FollowButton from "@/components/user/profile/FollowButton";
 
 const BlogDetails = () => {
   const { blogId } = useParams();
@@ -94,7 +95,7 @@ const BlogDetails = () => {
             </span>
           </div>
         </div>
-        <Button size="sm">Follow</Button>
+        <FollowButton userId={users?.id} />
       </div>
 
       <div className="flex items-center gap-4 mt-4">

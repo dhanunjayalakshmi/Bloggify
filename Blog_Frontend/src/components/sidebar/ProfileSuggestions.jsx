@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import useProfileSuggestions from "@/hooks/useProfileSuggestions";
+import FollowButton from "../user/profile/FollowButton";
 
 const ProfileSuggestions = () => {
   const { users } = useProfileSuggestions(3);
@@ -31,9 +32,7 @@ const ProfileSuggestions = () => {
               <p className="font-medium text-sm">{user?.name}</p>
             </div>
 
-            <Button variant="outline" size="sm" className="text-xs">
-              Follow
-            </Button>
+            <FollowButton userId={user?.id} />
           </div>
         ))}
 

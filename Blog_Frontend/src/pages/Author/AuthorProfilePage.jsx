@@ -7,24 +7,24 @@ import JoinedInfo from "@/components/user/profile/JoinedInfo";
 import useUserProfile from "@/hooks/useUserProfile";
 
 const AuthorProfilePage = () => {
-  const { data: user, error, loading } = useUserProfile();
+  const { data: author, error, loading } = useUserProfile();
 
   if (loading) return <div>Loading...</div>;
-  if (error || !user) return <div>Error loading profile</div>;
+  if (error || !author) return <div>Error loading profile</div>;
 
   return (
     <div className="max-w-4xl mx-auto px-4 space-y-2 py-8">
       <div className="mx-auto px-4 space-y-6 py-8">
-        <UserProfileHeader user={user} />
-        <UserProfileStats stats={user?.stats} />
-        <SocialLinks links={user?.social_links} />
-        <Badges badges={user?.badges} />
+        <UserProfileHeader user={author} />
+        <UserProfileStats stats={author?.stats} />
+        <SocialLinks links={author?.social_links} />
+        <Badges badges={author?.badges} />
         <JoinedInfo
-          joinDate={user?.account_metadata.join_date}
-          lastActive={user?.account_metadata.last_active_at}
+          joinDate={author?.account_metadata.join_date}
+          lastActive={author?.account_metadata.last_active_at}
         />
       </div>
-      <BlogListSection username={user?.username} />
+      <BlogListSection authorUserName={author?.username} />
     </div>
   );
 };

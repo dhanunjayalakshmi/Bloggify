@@ -4,8 +4,9 @@ import BlogCard from "./BlogCard";
 import useAuthorBlogs from "@/hooks/useAuthorBlogs";
 import { useNavigate } from "react-router";
 
-const BlogListSection = ({ username }) => {
-  const { blogs, loading, hasMore, fetchBlogs } = useAuthorBlogs(username);
+const BlogListSection = ({ authorUserName }) => {
+  const { blogs, loading, hasMore, fetchBlogs } =
+    useAuthorBlogs(authorUserName);
 
   const observerRef = useRef();
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ const BlogListSection = ({ username }) => {
           <BlogCard
             key={blog?.id}
             blog={blog}
-            user={username}
+            user={authorUserName}
             onOpen={() => navigate(`/blogs/${blog?.id}`)}
           />
         ))}
