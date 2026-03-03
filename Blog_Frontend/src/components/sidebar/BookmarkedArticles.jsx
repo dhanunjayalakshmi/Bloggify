@@ -1,14 +1,18 @@
-import MiniBlogCard from "./MiniBlogCard";
+import MiniBlogList from "@/components/blogs/MiniBlogList";
+import useSidebarBookmarks from "@/hooks/useSidebarBookmarks";
 
 const BookmarkedArticles = () => {
-  const blog = {
-    sideHeading: "Bookmarks",
-    title: "Mini Blog Title",
-    author: "Author",
-    date: "Date",
-    altName: "bookmarks",
-  };
-  return <MiniBlogCard blog={blog} path="/profile/bookmarks" />;
+  const { blogs, hasBookmarks } = useSidebarBookmarks(5);
+
+  if (!hasBookmarks) return null;
+
+  return (
+    <MiniBlogList
+      title="Your Bookmarks"
+      blogs={blogs}
+      seeMorePath="/profile/bookmarks"
+    />
+  );
 };
 
 export default BookmarkedArticles;
