@@ -70,6 +70,42 @@ router.get("/me", verifyToken, async (req, res) => {
   }
 });
 
+// Get Profile Suggestions
+router.get("/suggestions", verifyToken, async (req, res) => {
+  try {
+    const supabase = req.supabase;
+    const currentUserId = req.user.id;
+    const limit = parseInt(req.query.limit) || 5;
+
+    // Get users with published blogs count
+    const { data, error } = await supabase
+      .from("users")
+      .select(
+        `
+        id,
+        username,
+        name,
+        avatar,
+        blogs:blogs(count)
+      `,
+      )
+      .neq("id", currentUserId)
+      .limit(limit);
+
+    if (error) throw error;
+
+    // Optional: sort by blog count descending
+    const sorted = data.sort(
+      (a, b) => (b.blogs?.length || 0) - (a.blogs?.length || 0),
+    );
+
+    res.json({ users: sorted });
+  } catch (err) {
+    console.error("Profile suggestions error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Author Public Profile
 router.get("/:userId", verifyToken, async (req, res) => {
   try {

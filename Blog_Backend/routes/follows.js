@@ -4,43 +4,26 @@ const { verifyToken } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
-// Follow/Unfollow a user
-router.post("/", verifyToken, async (req, res) => {
+// Check if User is Following Another User
+router.get("/is-following", verifyToken, async (req, res) => {
   try {
-    const { following_id } = req?.body;
+    const { following_id } = req?.query;
     const follower_id = req?.user?.id;
 
     if (!following_id) {
-      return res.status(400).json({ error: "Missing following id" });
+      return res.status(400).json({ error: "Missing following_id" });
     }
 
-    const { data: existingFollower, error: fetchError } = await supabase
+    const { data, error } = await req?.supabase
       .from("follows")
       .select("id")
       .eq("follower_id", follower_id)
       .eq("following_id", following_id)
       .single();
 
-    if (fetchError && fetchError.code !== "PGRST116") throw fetchError;
+    if (error && error.code !== "PGRST116") throw error;
 
-    if (existingFollower) {
-      const { error: deleteError } = await supabase
-        .from("follows")
-        .delete()
-        .eq("id", existingFollower.id);
-
-      if (deleteError) throw deleteError;
-
-      return res.status(200).json({ message: "Unfollowed successfully" });
-    }
-
-    const { error: insertError } = await supabase
-      .from("follows")
-      .insert([{ follower_id, following_id }]);
-
-    if (insertError) throw insertError;
-
-    res.status(201).json({ message: "Followed successfully" });
+    res.status(200).json({ is_following: !!data });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -82,26 +65,43 @@ router.get("/following/:userId", async (req, res) => {
   }
 });
 
-// Check if User is Following Another User
-router.get("/is-following", verifyToken, async (req, res) => {
+// Follow/Unfollow a user
+router.post("/", verifyToken, async (req, res) => {
   try {
-    const { following_id } = req?.query;
+    const { following_id } = req?.body;
     const follower_id = req?.user?.id;
 
     if (!following_id) {
-      return res.status(400).json({ error: "Missing following_id" });
+      return res.status(400).json({ error: "Missing following id" });
     }
 
-    const { data, error } = await supabase
+    const { data: existingFollower, error: fetchError } = await req?.supabase
       .from("follows")
       .select("id")
       .eq("follower_id", follower_id)
       .eq("following_id", following_id)
       .single();
 
-    if (error && error.code !== "PGRST116") throw error;
+    if (fetchError && fetchError.code !== "PGRST116") throw fetchError;
 
-    res.status(200).json({ is_following: !!data });
+    if (existingFollower) {
+      const { error: deleteError } = await req?.supabase
+        .from("follows")
+        .delete()
+        .eq("id", existingFollower.id);
+
+      if (deleteError) throw deleteError;
+
+      return res.status(200).json({ message: "Unfollowed successfully" });
+    }
+
+    const { error: insertError } = await req?.supabase
+      .from("follows")
+      .insert([{ follower_id, following_id }]);
+
+    if (insertError) throw insertError;
+
+    res.status(201).json({ message: "Followed successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
