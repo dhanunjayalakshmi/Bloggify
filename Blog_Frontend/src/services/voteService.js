@@ -2,6 +2,7 @@ import api from "@/lib/apiClient";
 
 export const voteService = {
   toggleVote: ({ contentId, contentType, voteType }) => {
+    console.log(contentId, contentType, voteType);
     return api?.post("/votes", {
       content_id: contentId,
       content_type: contentType,

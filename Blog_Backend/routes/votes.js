@@ -5,55 +5,6 @@ const { verifyToken } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
-// Votes API
-router.post("/", verifyToken, async (req, res) => {
-  try {
-    const { content_id, content_type, vote_type } = req?.body;
-    const userId = req?.user?.id;
-
-    const { data: existingVote, error: fetchError } = await req?.supabase
-      .from("votes")
-      .select("id, vote_type")
-      .eq("user_id", userId)
-      .eq("content_id", content_id)
-      .eq("content_type", content_type)
-      .single();
-
-    if (fetchError && fetchError.code !== "PGRST116") throw fetchError;
-
-    if (existingVote) {
-      if (existingVote?.vote_type === vote_type) {
-        const { error: deleteError } = await req?.supabase
-          .from("votes")
-          .delete()
-          .eq("id", existingVote.id);
-
-        if (deleteError) throw deleteError;
-        return res.status(200).json({ message: "Vote has been removed" });
-      } else {
-        const { error: updateError } = await req?.supabase
-          .from("votes")
-          .update({ vote_type })
-          .eq("id", existingVote.id);
-
-        if (updateError) throw updateError;
-        return res
-          .status(200)
-          .json({ message: `Vote has been updated to ${vote_type}` });
-      }
-    }
-
-    const { error: insertError } = await req?.supabase
-      .from("votes")
-      .insert({ user_id: userId, content_id, content_type, vote_type });
-
-    if (insertError) throw insertError;
-    res.status(200).json({ message: "Vote added successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error?.message });
-  }
-});
-
 // Votes count
 router.get("/count", verifyToken, async (req, res) => {
   try {
@@ -77,7 +28,7 @@ router.get("/count", verifyToken, async (req, res) => {
     const upvotes = votesData?.filter((vote) => vote?.vote_type === "upvote");
 
     const downvotes = votesData?.filter(
-      (vote) => vote?.vote_type === "downvote"
+      (vote) => vote?.vote_type === "downvote",
     );
 
     const total_upvotes = upvotes?.length;
@@ -133,6 +84,55 @@ router.get("/counts", verifyToken, async (req, res) => {
     res.status(200).json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Votes API
+router.post("/", verifyToken, async (req, res) => {
+  try {
+    const { content_id, content_type, vote_type } = req?.body;
+    const userId = req?.user?.id;
+
+    const { data: existingVote, error: fetchError } = await req?.supabase
+      .from("votes")
+      .select("id, vote_type")
+      .eq("user_id", userId)
+      .eq("content_id", content_id)
+      .eq("content_type", content_type)
+      .single();
+
+    if (fetchError && fetchError.code !== "PGRST116") throw fetchError;
+
+    if (existingVote) {
+      if (existingVote?.vote_type === vote_type) {
+        const { error: deleteError } = await req?.supabase
+          .from("votes")
+          .delete()
+          .eq("id", existingVote.id);
+
+        if (deleteError) throw deleteError;
+        return res.status(200).json({ message: "Vote has been removed" });
+      } else {
+        const { error: updateError } = await req?.supabase
+          .from("votes")
+          .update({ vote_type })
+          .eq("id", existingVote.id);
+
+        if (updateError) throw updateError;
+        return res
+          .status(200)
+          .json({ message: `Vote has been updated to ${vote_type}` });
+      }
+    }
+
+    const { error: insertError } = await req?.supabase
+      .from("votes")
+      .insert({ user_id: userId, content_id, content_type, vote_type });
+
+    if (insertError) throw insertError;
+    res.status(200).json({ message: "Vote added successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error?.message });
   }
 });
 

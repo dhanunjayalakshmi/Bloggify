@@ -5,7 +5,7 @@ const useRelatedBlogs = (tags = [], blogId) => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(false);
 
-//   console.log(tags);
+  //   console.log(tags);
 
   useEffect(() => {
     if (!blogId) return;
