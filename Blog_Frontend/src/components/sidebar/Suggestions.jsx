@@ -5,7 +5,12 @@ const Suggestions = () => {
   const { blogs } = useLatestBlogs(5);
 
   return (
-    <MiniBlogList title="Suggestions" blogs={blogs} seeMorePath="/explore" />
+    <MiniBlogList
+      title="Suggestions"
+      blogs={blogs}
+      seeMorePath="/explore"
+      fullWidth={true}
+    />
   );
 };
 

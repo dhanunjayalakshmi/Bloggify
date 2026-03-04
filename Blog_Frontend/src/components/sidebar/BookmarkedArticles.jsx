@@ -11,6 +11,7 @@ const BookmarkedArticles = () => {
       title="Your Bookmarks"
       blogs={blogs}
       seeMorePath="/profile/bookmarks"
+      fullWidth={true}
     />
   );
 };

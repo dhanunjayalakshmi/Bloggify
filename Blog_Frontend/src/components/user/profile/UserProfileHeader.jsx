@@ -19,7 +19,7 @@ const UserProfileHeader = ({ user, isOwnProfile = false, userId }) => {
 
       <img
         src={
-          user?.profile_image ||
+          user?.avatar ||
           "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGEZghB-stFaphAohNqDAhEaXOWQJ9XvHKJw&s"
         }
         alt={user?.full_name}

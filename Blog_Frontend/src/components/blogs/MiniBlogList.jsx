@@ -2,7 +2,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
-const MiniBlogList = ({ title, blogs = [], seeMorePath }) => {
+const MiniBlogList = ({
+  title,
+  blogs = [],
+  seeMorePath,
+  fullWidth = false,
+}) => {
   const navigate = useNavigate();
 
   if (!blogs?.length) return null;
@@ -40,7 +45,7 @@ const MiniBlogList = ({ title, blogs = [], seeMorePath }) => {
 
         {seeMorePath && (
           <Button
-            className="w-full mx-auto text-sm"
+            className={`${fullWidth ? "w-full" : "w-auto"} text-sm`}
             onClick={() => navigate(seeMorePath)}
           >
             See More
