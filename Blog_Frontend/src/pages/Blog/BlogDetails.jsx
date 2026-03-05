@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import api from "@/lib/apiClient";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
@@ -13,10 +13,10 @@ import useRelatedBlogs from "@/hooks/useRelatedBlogs";
 import MiniBlogList from "@/components/blogs/MiniBlogList";
 import useAuthorOtherBlogs from "@/hooks/useAuthorOtherBlogs";
 import FollowButton from "@/components/user/profile/FollowButton";
+import useProfileNavigation from "@/hooks/useProfileNavigation";
 
 const BlogDetails = () => {
   const { blogId } = useParams();
-  const navigate = useNavigate();
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const { isBookmarked, toggle } = useBookmark(blogId);
@@ -24,6 +24,8 @@ const BlogDetails = () => {
   const { blogs: relatedBlogs } = useRelatedBlogs(blog?.tags, blogId);
   const authorId = blog?.users?.id;
   const { blogs: authorBlogs } = useAuthorOtherBlogs(authorId, blogId);
+
+  const goToProfile = useProfileNavigation();
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -72,7 +74,7 @@ const BlogDetails = () => {
         <div className="flex items-center gap-3">
           <Avatar
             className="h-10 w-10 cursor-pointer"
-            onClick={() => navigate(`/users/${users?.id}`)}
+            onClick={() => goToProfile(users?.id)}
           >
             <AvatarImage
               className="w-10 h-10 rounded-full object-cover"
@@ -85,7 +87,7 @@ const BlogDetails = () => {
           <div className="flex flex-col">
             <span
               className="font-medium cursor-pointer"
-              onClick={() => navigate(`/users/${users?.id}`)}
+              onClick={() => goToProfile(users?.id)}
             >
               {users?.name || "Unknown Author"}
             </span>
@@ -111,7 +113,6 @@ const BlogDetails = () => {
         </Button>
 
         <Button variant="ghostButton" aria-label="Views">
-          {/* <Flame className="h-5 w-5" /> */}
           <span>🔥 {blog?.views} views</span>
         </Button>
 

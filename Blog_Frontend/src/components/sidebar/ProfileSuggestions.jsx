@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import useProfileSuggestions from "@/hooks/useProfileSuggestions";
 import FollowButton from "../user/profile/FollowButton";
+import useProfileNavigation from "@/hooks/useProfileNavigation";
 
 const ProfileSuggestions = () => {
   const { users } = useProfileSuggestions(3);
   const navigate = useNavigate();
+  const goToProfile = useProfileNavigation();
 
   if (!users.length) return null;
 
@@ -22,7 +24,7 @@ const ProfileSuggestions = () => {
           >
             <div
               className="flex items-center gap-3 cursor-pointer"
-              onClick={() => navigate(`/users/${user?.id}`)}
+              onClick={() => goToProfile(user?.id)}
             >
               <img
                 src={

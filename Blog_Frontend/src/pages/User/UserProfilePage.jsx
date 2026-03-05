@@ -3,15 +3,10 @@ import JoinedInfo from "@/components/user/profile/JoinedInfo";
 import SocialLinks from "@/components/user/profile/SocialLinks";
 import UserProfileHeader from "@/components/user/profile/UserProfileHeader";
 import UserProfileStats from "@/components/user/profile/UserProfileStats";
-import useUserProfile from "@/hooks/useUserProfile";
 import { useAuthStore } from "@/stores/authStore";
 
 const UserProfilePage = () => {
-  const { error, loading } = useUserProfile();
   const user = useAuthStore((store) => store?.profile);
-
-  if (loading) return <div>Loading...</div>;
-  if (error || !user) return <div>Error loading profile</div>;
 
   return (
     <div className="max-w-4xl min-h-screen mx-auto my-8">

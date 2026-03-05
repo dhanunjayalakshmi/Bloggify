@@ -1,11 +1,12 @@
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import useFollowList from "@/hooks/useFollowList";
 import FollowButton from "@/components/user/profile/FollowButton";
+import useProfileNavigation from "@/hooks/useProfileNavigation";
 
 const FollowListPage = () => {
   const { userId } = useParams();
   const location = useLocation();
-  const navigate = useNavigate();
+  const goToProfile = useProfileNavigation();
 
   const type = location.pathname.includes("followers")
     ? "followers"
@@ -19,7 +20,7 @@ const FollowListPage = () => {
     <div className="max-w-2xl mx-auto my-10">
       <h1 className="text-2xl font-bold mb-6 capitalize">{type}</h1>
 
-      {users.length === 0 && (
+      {users?.length === 0 && (
         <p className="text-muted-foreground">No {type} found.</p>
       )}
 
@@ -31,7 +32,7 @@ const FollowListPage = () => {
           >
             <div
               className="flex items-center gap-4 cursor-pointer"
-              onClick={() => navigate(`/users/${user.id}`)}
+              onClick={() => goToProfile(user?.id)}
             >
               <img
                 src={user.avatar || "/placeholder.png"}
