@@ -1,10 +1,13 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const BlogCard = ({ blog, user }) => {
+const BlogCard = ({ blog, user, onOpen }) => {
   const { title, content, cover_image, published_at } = blog;
   return (
-    <Card className="shadow-card dark:bg-gray-800 cursor-pointer">
+    <Card
+      className="shadow-card dark:bg-gray-800 cursor-pointer"
+      onClick={onOpen}
+    >
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
