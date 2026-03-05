@@ -10,12 +10,18 @@ const MiniBlogList = ({
 }) => {
   const navigate = useNavigate();
 
-  if (!blogs?.length) return null;
+  if (!blogs) return null;
 
   return (
     <Card className="w-full dark:bg-gray-800 dark:text-gray-200">
       <CardContent className="p-4">
         <h2 className="font-semibold mb-4">{title}</h2>
+
+        {blogs?.length === 0 && (
+          <p className="text-sm text-muted-foreground mb-4">
+            No articles found.
+          </p>
+        )}
 
         {blogs?.map((blog) => (
           <div
@@ -34,7 +40,7 @@ const MiniBlogList = ({
               <p className="font-medium line-clamp-1">{blog?.title}</p>
               <p className="text-muted-foreground">
                 {blog?.content?.replace(/<[^>]*>/g, "").substring(0, 70) +
-                  "..." || "Welcome to my blog"}
+                  "..."}
               </p>
               <p className="text-muted-foreground text-xs">
                 {blog?.users?.username}

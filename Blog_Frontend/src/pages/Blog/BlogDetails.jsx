@@ -72,7 +72,7 @@ const BlogDetails = () => {
         <div className="flex items-center gap-3">
           <Avatar
             className="h-10 w-10 cursor-pointer"
-            onClick={() => navigate(`/users/${users?.id || 1}`)}
+            onClick={() => navigate(`/users/${users?.id}`)}
           >
             <AvatarImage
               className="w-10 h-10 rounded-full object-cover"
@@ -85,7 +85,7 @@ const BlogDetails = () => {
           <div className="flex flex-col">
             <span
               className="font-medium cursor-pointer"
-              onClick={() => navigate(`/users/${users?.id || 1}`)}
+              onClick={() => navigate(`/users/${users?.id}`)}
             >
               {users?.name || "Unknown Author"}
             </span>
@@ -169,7 +169,7 @@ const BlogDetails = () => {
         <MiniBlogList
           title="More from this Author"
           blogs={authorBlogs}
-          seeMorePath={users?.username ? `/users/${users.username}` : null}
+          seeMorePath={users?.id ? `/users/${users?.id}` : null}
         />
       </div>
 

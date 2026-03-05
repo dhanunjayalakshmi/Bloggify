@@ -28,7 +28,7 @@ const useRelatedBlogs = (tags = [], blogId) => {
     };
 
     fetchRelated();
-  }, [blogId, JSON.stringify(tags)]);
+  }, [blogId, tags]);
 
   return { blogs, loading };
 };
