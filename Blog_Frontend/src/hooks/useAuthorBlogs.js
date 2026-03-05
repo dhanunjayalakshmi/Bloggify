@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import api from "@/lib/apiClient";
 
 const useAuthorBlogs = (username) => {
@@ -7,7 +7,7 @@ const useAuthorBlogs = (username) => {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const fetchBlogs = useCallback(async () => {
+  const fetchBlogs = async () => {
     if (!username || loading || !hasMore) return;
 
     try {
@@ -21,30 +21,29 @@ const useAuthorBlogs = (username) => {
 
       setBlogs((prev) => {
         const existingIds = new Set(prev.map((b) => b.id));
-        const filtered = newBlogs?.filter((b) => !existingIds.has(b.id));
+        const filtered = newBlogs.filter((b) => !existingIds.has(b.id));
         return [...prev, ...filtered];
       });
+
       setHasMore(res.data.hasMore);
-      setPage((prev) => prev + 1);
     } catch (err) {
       console.error("Failed to fetch author blogs:", err);
     } finally {
       setLoading(false);
     }
-  }, [username, page, hasMore, loading]);
+  };
 
   useEffect(() => {
-    // Reset when username changes
+    fetchBlogs();
+  }, [page, username]);
+
+  useEffect(() => {
     setBlogs([]);
     setPage(1);
     setHasMore(true);
   }, [username]);
 
-  useEffect(() => {
-    fetchBlogs();
-  }, [username]);
-
-  return { blogs, loading, hasMore, fetchBlogs };
+  return { blogs, loading, hasMore, setPage };
 };
 
 export default useAuthorBlogs;

@@ -234,7 +234,7 @@ router.get("/:username/blogs", verifyToken, async (req, res) => {
   try {
     const supabase = req?.supabase;
     const { username } = req?.params;
-    let { page = 1, limit = 5 } = req.query;
+    let { page = 1, limit = 5 } = req?.query;
 
     page = Number(page);
     limit = Number(limit);

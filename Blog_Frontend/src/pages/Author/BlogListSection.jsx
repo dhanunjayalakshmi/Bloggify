@@ -5,8 +5,7 @@ import useAuthorBlogs from "@/hooks/useAuthorBlogs";
 import { useNavigate } from "react-router";
 
 const BlogListSection = ({ authorUserName }) => {
-  const { blogs, loading, hasMore, fetchBlogs } =
-    useAuthorBlogs(authorUserName);
+  const { blogs, loading, hasMore, setPage } = useAuthorBlogs(authorUserName);
 
   const observerRef = useRef();
   const navigate = useNavigate();
@@ -16,8 +15,8 @@ const BlogListSection = ({ authorUserName }) => {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !loading) {
-          fetchBlogs();
+        if (entries[0].isIntersecting) {
+          setPage((prev) => prev + 1);
         }
       },
       { threshold: 1 },
@@ -32,9 +31,9 @@ const BlogListSection = ({ authorUserName }) => {
     return () => {
       if (currentRef) observer.unobserve(currentRef);
     };
-  }, [hasMore, loading, fetchBlogs]);
+  }, [hasMore, loading]);
 
-  if (blogs.length === 0) {
+  if (blogs.length === 0 && !loading) {
     return <EmptyStateFallback />;
   }
 
