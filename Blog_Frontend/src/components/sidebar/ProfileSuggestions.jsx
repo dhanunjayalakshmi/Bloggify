@@ -22,10 +22,13 @@ const ProfileSuggestions = () => {
           >
             <div
               className="flex items-center gap-3 cursor-pointer"
-              onClick={() => navigate(`/users/${user?.username}`)}
+              onClick={() => navigate(`/users/${user?.id}`)}
             >
               <img
-                src={user?.avatar || "/placeholder.png"}
+                src={
+                  user?.avatar ||
+                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGEZghB-stFaphAohNqDAhEaXOWQJ9XvHKJw&s"
+                }
                 alt={user?.username}
                 className="w-10 h-10 rounded-full object-cover"
               />
