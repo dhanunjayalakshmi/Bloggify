@@ -9,7 +9,7 @@ const useAuthRedirect = () => {
   useEffect(() => {
     if (!isInitialized) return;
 
-    if (!user || !token) {
+    if (!user) {
       navigate("/", { replace: true });
     }
   }, [user, token, isInitialized, navigate]);
