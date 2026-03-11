@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ReactNodeViewRenderer, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -76,7 +76,7 @@ const randomDraftId = () => {
     (
       c ^
       (crypto.getRandomValues(new Uint8Array(1)) & (15 >> (c / 4)))
-    ).toString(16)
+    ).toString(16),
   );
 };
 
@@ -91,6 +91,9 @@ const CreateEditBlog = () => {
   const [initialContent, setInitialContent] = useState("<p></p>");
   const [isDraftLoaded, setIsDraftLoaded] = useState(false);
   const draftWasReset = useRef(false);
+
+  const { blogId } = useParams();
+  const isEditMode = !!blogId;
 
   const [dirty, setDirty] = useState(false);
   const lastSavedDraft = useRef({
@@ -222,7 +225,7 @@ const CreateEditBlog = () => {
       },
       onUpdate,
     },
-    [initialContent, isDraftLoaded]
+    [initialContent, isDraftLoaded],
   );
 
   // --- Updated Auto-save logic including cleanup ---
@@ -282,6 +285,36 @@ const CreateEditBlog = () => {
     saveDraft,
   ]);
 
+  useEffect(() => {
+    if (!isEditMode) return;
+
+    const fetchBlog = async () => {
+      try {
+        const res = await api.get(`/blogs/${blogId}`);
+
+        const blog = res?.data;
+
+        setTitle(blog?.title);
+        setSelectedTags(blog?.tags || []);
+        setCoverImageUrl(blog?.cover_image || "");
+        setInitialContent(blog?.content);
+
+        lastSavedDraft.current = {
+          html: blog?.content,
+          title: blog?.title,
+          tags: blog?.tags,
+          coverImageUrl: blog?.cover_image || "",
+        };
+      } catch (err) {
+        console.error("Failed to load blog", err);
+        toast.error("Failed to load blog for editing");
+        navigate(-1);
+      }
+    };
+
+    fetchBlog();
+  }, [blogId, isEditMode]);
+
   // Cleanup draft and images on page/unload if draft empty
   useEffect(() => {
     const handleCleanup = async () => {
@@ -311,7 +344,7 @@ const CreateEditBlog = () => {
       tags: selectedTags,
       coverImageUrl,
       read_time: Math.ceil(
-        html.replace(/<[^>]*>/g, " ").split(/\s+/).length / 200
+        html.replace(/<[^>]*>/g, " ").split(/\s+/).length / 200,
       ),
     };
     navigate("/preview", { state: blog });
@@ -332,20 +365,36 @@ const CreateEditBlog = () => {
       tags: selectedTags,
       coverImageUrl,
       read_time: Math.ceil(
-        html.replace(/<[^>]*>/g, " ").split(/\s+/).length / 200
+        html.replace(/<[^>]*>/g, " ").split(/\s+/).length / 200,
       ),
       is_published: status === "published",
       is_public: true,
       draftId,
     };
+
     try {
-      const res = await api.post("/blogs/", payload);
-      if (res?.status === 201) {
+      // const res = await api.post("/blogs/", payload);
+      let res;
+
+      if (isEditMode) {
+        res = await api.put(`/blogs/${blogId}`, payload);
+      } else {
+        res = await api.post("/blogs/", payload);
+      }
+
+      if (res?.status === 201 || res?.status === 200) {
+        // toast.success(
+        //   status === "published" ? "Blog published!" : "Draft saved.",
+        // );
         toast.success(
-          status === "published" ? "Blog published!" : "Draft saved."
+          isEditMode
+            ? "Blog updated successfully"
+            : status === "published"
+              ? "Blog published!"
+              : "Draft saved.",
         );
-        localStorage.removeItem(DRAFT_KEY);
-        navigate("/");
+        localStorage?.removeItem(DRAFT_KEY);
+        isEditMode ? navigate(`/dashboard/posts/${blogId}`) : navigate("/");
       }
     } catch (err) {
       console.error("Save blog error:", err);
@@ -381,7 +430,9 @@ const CreateEditBlog = () => {
         <Button variant="outline" onClick={handlePreview}>
           Preview
         </Button>
-        <Button onClick={() => saveBlog("published")}>Save & Publish</Button>
+        <Button onClick={() => saveBlog("published")}>
+          {isEditMode ? "Update Blog" : "Save & Publish"}
+        </Button>
       </div>
     </div>
   );
