@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "@/lib/apiClient";
 import { Edit, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 const PreviewPage = () => {
   const location = useLocation();
@@ -35,6 +36,25 @@ const PreviewPage = () => {
       loadBlog();
     }
   }, [mode, id]);
+
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this blog?",
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      await api.delete(`/blogs/${blog.id}`);
+
+      toast.success("Blog deleted successfully");
+
+      navigate("/profile/posts"); // or dashboard posts page
+    } catch (err) {
+      console.error("Delete blog error:", err);
+      toast.error("Failed to delete blog");
+    }
+  };
 
   if (loading) {
     return <p className="text-center mt-20">Loading preview...</p>;
@@ -109,7 +129,7 @@ const PreviewPage = () => {
               Edit
             </Button>
 
-            <Button size="sm" variant="destructive">
+            <Button size="sm" variant="destructive" onClick={handleDelete}>
               <Trash2 className="w-4 h-4 mr-1" />
               Delete
             </Button>
