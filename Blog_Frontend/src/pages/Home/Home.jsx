@@ -3,16 +3,28 @@ import BookmarkedArticles from "@/components/sidebar/BookmarkedArticles";
 import ProfileSuggestions from "@/components/sidebar/ProfileSuggestions";
 import Suggestions from "@/components/sidebar/Suggestions";
 import SortOptions from "@/components/SortOptions";
-import { useState } from "react";
+import { useSearchStore } from "@/stores/searchStore";
+import { useEffect, useState } from "react";
 
 const Home = () => {
+  const globalSearch = useSearchStore((state) => state.search);
+
+  const [debouncedSearch, setDebouncedSearch] = useState(globalSearch);
   const [sort, setSort] = useState("Latest");
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setDebouncedSearch(globalSearch);
+    }, 300);
+
+    return () => clearTimeout(id);
+  }, [globalSearch]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-4 pt-4">
       <div className="lg:col-span-2 space-y-6">
         <SortOptions value={sort} onChange={setSort} />
-        <BlogList sort={sort} search="" tag="All Tags" />
+        <BlogList sort={sort} search={debouncedSearch} tag="All Tags" />
       </div>
 
       <aside className="hidden lg:block sticky top-12 self-start space-y-4 my-4">

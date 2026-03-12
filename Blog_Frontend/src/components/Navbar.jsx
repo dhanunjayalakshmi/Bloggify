@@ -12,11 +12,22 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/lib/supabaseClient";
+import { useState } from "react";
+import { useSearchStore } from "@/stores/searchStore";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const logout = useAuthStore((state) => state?.clearAuth);
   const setManualLogout = useAuthStore((state) => state?.setManualLogout);
+
+  const setSearch = useSearchStore((state) => state.setSearch);
+  const [query, setQuery] = useState("");
+
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setQuery(value);
+    setSearch(value);
+  };
 
   const handleLogout = async () => {
     try {
@@ -38,8 +49,16 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow px-4 py-4 flex items-center justify-around">
       <Logo />
       <div className="hidden md:block w-1/3">
-        <Input type="text" placeholder="Search" className="dark:bg-gray-700" />
+        {/* <Input type="text" placeholder="Search" className="dark:bg-gray-700" /> */}
+        <Input
+          type="text"
+          placeholder="Search blogs..."
+          value={query}
+          onChange={handleSearch}
+          className="dark:bg-gray-700"
+        />
       </div>
+
       <div className="flex items-center gap-3">
         <Button
           variant="outline"
