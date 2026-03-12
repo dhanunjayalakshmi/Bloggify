@@ -82,6 +82,7 @@ router.get("/me", verifyToken, async (req, res) => {
       avatar: user?.avatar,
       bio: user?.bio,
       location: user?.location,
+      is_profile_public: user?.is_profile_public,
       social_links: user?.social_links || {},
       stats: {
         blogs_published: blogs_published || 0,
@@ -141,6 +142,7 @@ router.get("/:userId", verifyToken, async (req, res) => {
   try {
     const supabase = req?.supabase;
     const { userId } = req?.params;
+    const viewerId = req?.user?.id;
 
     const { data: user, error } = await supabase
       .from("users")
@@ -150,6 +152,10 @@ router.get("/:userId", verifyToken, async (req, res) => {
 
     if (error || !user) {
       return res.status(404).json({ error: "User not found" });
+    }
+
+    if (!user.is_profile_public && viewerId !== user.id) {
+      return res.json({ message: "Profile is private" });
     }
 
     const [
@@ -319,8 +325,15 @@ router.put("/me", verifyToken, async (req, res) => {
     const supabase = req?.supabase;
     const authId = req?.user?.auth_id;
 
-    const { full_name, bio, avatar, location, social_links, username } =
-      req?.body;
+    const {
+      full_name,
+      bio,
+      avatar,
+      location,
+      social_links,
+      username,
+      is_profile_public,
+    } = req?.body;
 
     // Check username uniqueness if provided
     if (username) {
@@ -341,9 +354,11 @@ router.put("/me", verifyToken, async (req, res) => {
       .update({
         name: full_name,
         bio,
+        avatar,
         location,
         username,
         social_links,
+        is_profile_public,
         last_active_at: new Date(),
       })
       .eq("auth_id", authId)
@@ -353,6 +368,23 @@ router.put("/me", verifyToken, async (req, res) => {
     if (error) throw error;
 
     res.json({ message: "Profile updated successfully", user: data });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete("/me", verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const { error } = await req?.supabase
+      .from("users")
+      .delete()
+      .eq("id", userId);
+
+    if (error) throw error;
+
+    res.json({ message: "Account deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

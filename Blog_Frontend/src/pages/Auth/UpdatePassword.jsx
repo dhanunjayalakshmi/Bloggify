@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/lib/supabaseClient";
+import { useAuthStore } from "@/stores/authStore";
+import { toast } from "sonner";
 
 const updatePasswordSchema = z
   .object({
@@ -25,6 +27,7 @@ const UpdatePassword = () => {
     formState: { errors },
   } = useForm({ resolver: zodResolver(updatePasswordSchema) });
   const navigate = useNavigate();
+  const { user, logout } = useAuthStore();
 
   const onSubmit = async (formData) => {
     try {
@@ -33,6 +36,10 @@ const UpdatePassword = () => {
       });
 
       if (error) throw error;
+      if (user) {
+        logout();
+        toast.success("Please login again");
+      }
       navigate("/");
     } catch (error) {
       setError("root", { message: error?.message });

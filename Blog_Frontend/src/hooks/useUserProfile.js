@@ -16,7 +16,7 @@ const useUserProfile = () => {
       try {
         setLoading(true);
         const res = await api.get(`/users/${userId}`);
-        setData(res.data);
+        setData(res?.data);
       } catch (err) {
         console.error("Failed to fetch user profile", err);
       } finally {
