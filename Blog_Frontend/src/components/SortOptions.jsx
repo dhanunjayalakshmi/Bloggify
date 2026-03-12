@@ -1,6 +1,6 @@
 import { Button } from "./ui/button";
 
-const sortOptions = ["popular", "New", "Trending"];
+const sortOptions = ["Latest", "Popular", "Trending"];
 
 const SortOptions = ({ value, onChange }) => {
   return (
@@ -9,7 +9,7 @@ const SortOptions = ({ value, onChange }) => {
         <Button
           key={option}
           onClick={() => onChange(option)}
-          className={`tarnsition-all duration-200 ${
+          className={`transition-all duration-200 ${
             value === option
               ? "text-white"
               : "bg-muted text-muted-foreground hover:bg-accent hover:text-black dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-600"

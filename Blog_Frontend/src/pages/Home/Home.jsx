@@ -6,13 +6,13 @@ import SortOptions from "@/components/SortOptions";
 import { useState } from "react";
 
 const Home = () => {
-  const [sort, setSort] = useState("popular");
+  const [sort, setSort] = useState("Latest");
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-4 pt-4">
       <div className="lg:col-span-2 space-y-6">
         <SortOptions value={sort} onChange={setSort} />
-        <BlogList sort={sort} />
+        <BlogList sort={sort} search="" tag="All Tags" />
       </div>
 
       <aside className="hidden lg:block sticky top-12 self-start space-y-4 my-4">

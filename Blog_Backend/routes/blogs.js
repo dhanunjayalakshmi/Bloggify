@@ -112,6 +112,12 @@ router.get("/", async (req, res) => {
       query = query?.order("published_at", { ascending: true });
     else if (sort === "read_time")
       query = query?.order("read_time", { ascending: true });
+    else if (sort === "popular")
+      query = query?.order("views", { ascending: false });
+    else if (sort === "trending")
+      query = query
+        ?.order("views", { ascending: false })
+        ?.order("published_at", { ascending: false });
 
     // Exclude reported blogs
     if (reportedIds.length > 0) {
