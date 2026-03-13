@@ -52,6 +52,8 @@ const BlogList = ({
           authorId,
         });
 
+        if (!blogsRes) return;
+
         const newBlogs = blogsRes?.blogs || [];
 
         const uniqueBlogs = newBlogs?.filter((blog) => {
@@ -77,8 +79,12 @@ const BlogList = ({
 
         setBlogs((prev) => [...prev, ...uniqueBlogs]);
 
-        if (blogsRes?.totalPages && page >= blogsRes?.totalPages) {
+        const totalPages = blogsRes?.totalPages || 1;
+
+        if (page >= totalPages) {
           setHasMore(false);
+        } else {
+          setHasMore(true);
         }
       } catch (err) {
         console.error("BlogList error:", {
@@ -98,7 +104,9 @@ const BlogList = ({
     <>
       <div className="space-y-4">
         {blogs?.length === 0 && !loading && (
-          <p className="text-center text-muted-foreground">No blogs found.</p>
+          <p className="text-center text-muted-foreground py-6">
+            {search ? `No blogs found for "${search}"` : "No blogs found."}
+          </p>
         )}
         {blogs?.map((blog) => (
           <BlogCard

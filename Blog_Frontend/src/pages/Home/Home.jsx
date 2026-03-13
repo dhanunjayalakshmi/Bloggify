@@ -15,7 +15,7 @@ const Home = () => {
   useEffect(() => {
     const id = setTimeout(() => {
       setDebouncedSearch(globalSearch);
-    }, 300);
+    }, 600);
 
     return () => clearTimeout(id);
   }, [globalSearch]);
@@ -24,6 +24,11 @@ const Home = () => {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-4 pt-4">
       <div className="lg:col-span-2 space-y-6">
         <SortOptions value={sort} onChange={setSort} />
+        {debouncedSearch && (
+          <p className="text-sm text-muted-foreground">
+            Results for "{debouncedSearch}"
+          </p>
+        )}
         <BlogList sort={sort} search={debouncedSearch} tag="All Tags" />
       </div>
 
