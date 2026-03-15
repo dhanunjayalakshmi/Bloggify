@@ -24,3 +24,9 @@ export const fetchBlogStats = ({ blogIds }) => {
     params: { blogIds: blogIds },
   });
 };
+
+export const fetchDashboardPosts = ({ page = 1, limit = 10 } = {}) => {
+  return api.get("/dashboard/blog-post-stats", {
+    params: { page, limit },
+  });
+};

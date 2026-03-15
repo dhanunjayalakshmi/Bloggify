@@ -1,3 +1,115 @@
+// import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+// import { BarChart3, Eye, MessageCircle, ThumbsUp } from "lucide-react";
+// import KpiCard from "./KpiCard";
+// import StatsChart from "./StatsChart";
+// import BlogAnalytics from "./BlogAnalytics";
+// import BlogStatsTable from "./BlogStatsTable";
+// import { useEffect, useState } from "react";
+// import {
+//   fetchDashboardStats,
+//   fetchDashboardPosts,
+// } from "@/services/dashboardService";
+
+// // const dummyEngagement = [
+// //   { date: "Apr 1", engagement: 10 },
+// //   { date: "Apr 2", engagement: 40 },
+// //   { date: "Apr 3", engagement: 25 },
+// // ];
+
+// // const dummyBlogs = [
+// //   {
+// //     id: 1,
+// //     title: "React Hooks",
+// //     views: 120,
+// //     upvotes: 30,
+// //     comments: 5,
+// //     status: "Published",
+// //     updated: "2025-04-25",
+// //   },
+// //   // ...
+// // ];
+
+// const dummyAnalytics = [
+//   {
+//     id: 1,
+//     title: "React Basics",
+//     readTime: 5,
+//     traffic: { direct: 30, search: 40, social: 20 },
+//   },
+// ];
+
+// const StatsContainer = () => {
+//   const [stats, setStats] = useState({});
+//   const [blogs, setBlogs] = useState([]);
+
+//   useEffect(() => {
+//     const loadStats = async () => {
+//       try {
+//         const res = await fetchDashboardStats();
+//         setStats(res?.data);
+//       } catch (err) {
+//         console.error("Stats load failed", err);
+//       }
+//     };
+
+//     const loadBlogs = async () => {
+//       try {
+//         const res = await fetchDashboardPosts();
+//         setBlogs(res?.data?.blogs);
+//       } catch (err) {
+//         console.log("Blogs load failed", err);
+//       }
+//     };
+
+//     loadStats();
+//     loadBlogs();
+//   }, []);
+
+//   return (
+//     <div className="p-4 space-y-6">
+//       <Tabs defaultValue="overview" className="space-y-4">
+//         <TabsList className="flex gap-4 dark:bg-gray-800">
+//           <TabsTrigger value="overview">Overview</TabsTrigger>
+//           <TabsTrigger value="blog-stats">Blog Stats</TabsTrigger>
+//           <TabsTrigger value="analytics">Analytics</TabsTrigger>
+//         </TabsList>
+
+//         <TabsContent value="overview" className="space-y-4">
+//           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+//             <KpiCard
+//               icon={BarChart3}
+//               label="Total Blogs"
+//               value={stats?.totalBlogs}
+//             />
+//             <KpiCard icon={Eye} label="Total Views" value={stats?.totalViews} />
+//             <KpiCard
+//               icon={MessageCircle}
+//               label="Total Comments"
+//               value={stats?.totalComments}
+//             />
+//             <KpiCard
+//               icon={ThumbsUp}
+//               label="Total Upvotes"
+//               value={stats?.totalUpvotes}
+//             />
+//           </div>
+//           <StatsChart data={blogs} />
+//         </TabsContent>
+
+//         <TabsContent value="blog-stats">
+//           <BlogStatsTable blogs={blogs} />
+//         </TabsContent>
+
+//         <TabsContent value="analytics">
+//           <BlogAnalytics analytics={dummyAnalytics} />
+//         </TabsContent>
+//       </Tabs>
+//     </div>
+//   );
+// };
+
+// export default StatsContainer;
+
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BarChart3, Eye, MessageCircle, ThumbsUp } from "lucide-react";
 import KpiCard from "./KpiCard";
@@ -5,51 +117,36 @@ import StatsChart from "./StatsChart";
 import BlogAnalytics from "./BlogAnalytics";
 import BlogStatsTable from "./BlogStatsTable";
 import { useEffect, useState } from "react";
-import { fetchDashboardStats } from "@/services/dashboardService";
-
-const dummyEngagement = [
-  { date: "Apr 1", engagement: 10 },
-  { date: "Apr 2", engagement: 40 },
-  { date: "Apr 3", engagement: 25 },
-];
-
-const dummyBlogs = [
-  {
-    id: 1,
-    title: "React Hooks",
-    views: 120,
-    upvotes: 30,
-    comments: 5,
-    status: "Published",
-    updated: "2025-04-25",
-  },
-  // ...
-];
-
-const dummyAnalytics = [
-  {
-    id: 1,
-    title: "React Basics",
-    readTime: 5,
-    traffic: { direct: 30, search: 40, social: 20 },
-  },
-];
+import {
+  fetchDashboardStats,
+  fetchDashboardPosts,
+} from "@/services/dashboardService";
 
 const StatsContainer = () => {
   const [stats, setStats] = useState({});
+  const [blogs, setBlogs] = useState([]);
 
   useEffect(() => {
     const loadStats = async () => {
       try {
         const res = await fetchDashboardStats();
         setStats(res?.data);
-        console.log(stats);
       } catch (err) {
         console.error("Stats load failed", err);
       }
     };
 
+    const loadBlogs = async () => {
+      try {
+        const res = await fetchDashboardPosts();
+        setBlogs(res?.data?.blogs || []);
+      } catch (err) {
+        console.log("Blogs load failed", err);
+      }
+    };
+
     loadStats();
+    loadBlogs();
   }, []);
 
   return (
@@ -63,21 +160,35 @@ const StatsContainer = () => {
 
         <TabsContent value="overview" className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-            <KpiCard icon={BarChart3} label="Total Blogs" value="12" />
-            <KpiCard icon={Eye} label="Total Views" value="1,540" />
-            <KpiCard icon={MessageCircle} label="Total Comments" value="210" />
-            <KpiCard icon={ThumbsUp} label="Total Upvotes" value="620" />
+            <KpiCard
+              icon={BarChart3}
+              label="Total Blogs"
+              value={stats?.totalBlogs}
+            />
+            <KpiCard icon={Eye} label="Total Views" value={stats?.totalViews} />
+            <KpiCard
+              icon={MessageCircle}
+              label="Total Comments"
+              value={stats?.totalComments}
+            />
+            <KpiCard
+              icon={ThumbsUp}
+              label="Total Upvotes"
+              value={stats?.totalUpvotes}
+            />
           </div>
-          <StatsChart data={dummyEngagement} />
+
+          {/* CHARTS */}
+          <StatsChart blogs={blogs} />
         </TabsContent>
 
         <TabsContent value="blog-stats">
-          <BlogStatsTable blogs={dummyBlogs} />
+          <BlogStatsTable blogs={blogs} />
         </TabsContent>
 
-        <TabsContent value="analytics">
-          <BlogAnalytics analytics={dummyAnalytics} />
-        </TabsContent>
+        {/* <TabsContent value="analytics">
+          <BlogAnalytics analytics={blogs} />
+        </TabsContent> */}
       </Tabs>
     </div>
   );
