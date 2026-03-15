@@ -55,7 +55,7 @@ export default function StatsChart({ blogs }) {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div className="flex flex-col gap-4">
       {/* Views Chart */}
       <div className="w-full h-96 bg-background rounded-xl shadow p-4 dark:bg-gray-900">
         <h3 className="text-sm font-semibold mb-4">Views Per Blog</h3>
@@ -78,7 +78,14 @@ export default function StatsChart({ blogs }) {
 
             <YAxis />
 
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{
+                fill: document.documentElement.classList.contains("dark")
+                  ? "rgba(255,255,255,0.08)"
+                  : "rgba(0,0,0,0.05)",
+              }}
+            />
 
             <Bar
               dataKey="views"
@@ -112,7 +119,14 @@ export default function StatsChart({ blogs }) {
 
             <YAxis />
 
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{
+                fill: document.documentElement.classList.contains("dark")
+                  ? "rgba(255,255,255,0.08)"
+                  : "rgba(0,0,0,0.05)",
+              }}
+            />
 
             <Bar
               dataKey="engagement"
