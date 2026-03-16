@@ -186,9 +186,9 @@ const StatsContainer = () => {
           <BlogStatsTable blogs={blogs} />
         </TabsContent>
 
-        {/* <TabsContent value="analytics">
-          <BlogAnalytics analytics={blogs} />
-        </TabsContent> */}
+        <TabsContent value="analytics">
+          <BlogAnalytics blogs={blogs} />
+        </TabsContent>
       </Tabs>
     </div>
   );
