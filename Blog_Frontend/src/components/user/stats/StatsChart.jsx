@@ -2,6 +2,8 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   Tooltip,
@@ -53,6 +55,24 @@ export default function StatsChart({ blogs }) {
     if (!title) return "";
     return title.length > 15 ? title.slice(0, 15) + "..." : title;
   };
+
+  const postsPerMonth = {};
+
+  blogs?.forEach((blog) => {
+    if (!blog.created_at) return;
+
+    const date = new Date(blog.created_at);
+    const month = date.toLocaleString("default", { month: "short" });
+
+    postsPerMonth[month] = (postsPerMonth[month] || 0) + 1;
+  });
+
+  const publishingData = Object.entries(postsPerMonth).map(
+    ([month, count]) => ({
+      month,
+      posts: count,
+    }),
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -135,6 +155,35 @@ export default function StatsChart({ blogs }) {
               barSize={40}
             />
           </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Publishing Activity Chart */}
+      <div className="w-full h-96 bg-background rounded-xl shadow p-4 dark:bg-gray-900">
+        <h3 className="text-sm font-semibold mb-4">
+          Publishing Activity (Posts Per Month)
+        </h3>
+
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart
+            data={publishingData}
+            margin={{ top: 20, right: 20, left: 0, bottom: 20 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+
+            <XAxis dataKey="month" />
+
+            <YAxis allowDecimals={false} />
+
+            <Tooltip />
+
+            <Line
+              type="monotone"
+              dataKey="posts"
+              stroke="#6366f1"
+              strokeWidth={2}
+            />
+          </LineChart>
         </ResponsiveContainer>
       </div>
     </div>
