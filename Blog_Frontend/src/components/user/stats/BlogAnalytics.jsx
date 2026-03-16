@@ -53,7 +53,7 @@ export default function BlogAnalytics({ blogs }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="dark:bg-gray-900">
           <CardContent className="p-4 flex items-start gap-3">
-            <TrendingUp className="text-green-500 mt-1" size={20} />
+            <TrendingUp className="text-green-500 mt-1" size={32} />
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">
                 Top Performing Blog
@@ -68,7 +68,7 @@ export default function BlogAnalytics({ blogs }) {
 
         <Card className="dark:bg-gray-900">
           <CardContent className="p-4 flex items-start gap-3">
-            <Eye className="text-blue-500 mt-1" size={20} />
+            <Eye className="text-blue-500 mt-1" size={40} />
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Most Viewed Blog</p>
               <h3 className="text-lg font-semibold">{mostViewed.title}</h3>
@@ -81,7 +81,7 @@ export default function BlogAnalytics({ blogs }) {
 
         <Card className="dark:bg-gray-900">
           <CardContent className="p-4 flex items-start gap-3">
-            <MessageCircle className="text-orange-500 mt-1" size={20} />
+            <MessageCircle className="text-orange-500 mt-1" size={40} />
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">
                 Most Discussed Blog
@@ -96,7 +96,7 @@ export default function BlogAnalytics({ blogs }) {
 
         <Card className="dark:bg-gray-900">
           <CardContent className="p-4 flex items-start gap-3">
-            <BarChart3 className="text-purple-500 mt-1" size={20} />
+            <BarChart3 className="text-purple-500 mt-1" size={32} />
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">
                 Average Engagement Rate

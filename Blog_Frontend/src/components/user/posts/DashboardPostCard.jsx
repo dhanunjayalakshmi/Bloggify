@@ -39,7 +39,7 @@ const DashboardPostCard = ({ post, stats, onOpen }) => {
 
       {status === "published" && (
         <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
-          <span>👀 {post?.views ?? 0}</span>
+          <span>👀 {stats?.views ?? 0}</span>
           <span>💬 {stats?.comments ?? 0}</span>
           <span>👍 {stats?.upvotes ?? 0}</span>
         </div>
@@ -47,7 +47,7 @@ const DashboardPostCard = ({ post, stats, onOpen }) => {
 
       {status === "scheduled" && (
         <span className="inline-block rounded bg-orange-400 px-2 py-0.5 text-xs dark:text-black">
-          Scheduled for: {new Date(post.published_at).toLocaleString()}
+          Scheduled for: {new Date(post?.published_at).toLocaleString()}
         </span>
       )}
     </div>

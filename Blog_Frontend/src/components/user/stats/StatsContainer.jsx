@@ -1,115 +1,3 @@
-// import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-// import { BarChart3, Eye, MessageCircle, ThumbsUp } from "lucide-react";
-// import KpiCard from "./KpiCard";
-// import StatsChart from "./StatsChart";
-// import BlogAnalytics from "./BlogAnalytics";
-// import BlogStatsTable from "./BlogStatsTable";
-// import { useEffect, useState } from "react";
-// import {
-//   fetchDashboardStats,
-//   fetchDashboardPosts,
-// } from "@/services/dashboardService";
-
-// // const dummyEngagement = [
-// //   { date: "Apr 1", engagement: 10 },
-// //   { date: "Apr 2", engagement: 40 },
-// //   { date: "Apr 3", engagement: 25 },
-// // ];
-
-// // const dummyBlogs = [
-// //   {
-// //     id: 1,
-// //     title: "React Hooks",
-// //     views: 120,
-// //     upvotes: 30,
-// //     comments: 5,
-// //     status: "Published",
-// //     updated: "2025-04-25",
-// //   },
-// //   // ...
-// // ];
-
-// const dummyAnalytics = [
-//   {
-//     id: 1,
-//     title: "React Basics",
-//     readTime: 5,
-//     traffic: { direct: 30, search: 40, social: 20 },
-//   },
-// ];
-
-// const StatsContainer = () => {
-//   const [stats, setStats] = useState({});
-//   const [blogs, setBlogs] = useState([]);
-
-//   useEffect(() => {
-//     const loadStats = async () => {
-//       try {
-//         const res = await fetchDashboardStats();
-//         setStats(res?.data);
-//       } catch (err) {
-//         console.error("Stats load failed", err);
-//       }
-//     };
-
-//     const loadBlogs = async () => {
-//       try {
-//         const res = await fetchDashboardPosts();
-//         setBlogs(res?.data?.blogs);
-//       } catch (err) {
-//         console.log("Blogs load failed", err);
-//       }
-//     };
-
-//     loadStats();
-//     loadBlogs();
-//   }, []);
-
-//   return (
-//     <div className="p-4 space-y-6">
-//       <Tabs defaultValue="overview" className="space-y-4">
-//         <TabsList className="flex gap-4 dark:bg-gray-800">
-//           <TabsTrigger value="overview">Overview</TabsTrigger>
-//           <TabsTrigger value="blog-stats">Blog Stats</TabsTrigger>
-//           <TabsTrigger value="analytics">Analytics</TabsTrigger>
-//         </TabsList>
-
-//         <TabsContent value="overview" className="space-y-4">
-//           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-//             <KpiCard
-//               icon={BarChart3}
-//               label="Total Blogs"
-//               value={stats?.totalBlogs}
-//             />
-//             <KpiCard icon={Eye} label="Total Views" value={stats?.totalViews} />
-//             <KpiCard
-//               icon={MessageCircle}
-//               label="Total Comments"
-//               value={stats?.totalComments}
-//             />
-//             <KpiCard
-//               icon={ThumbsUp}
-//               label="Total Upvotes"
-//               value={stats?.totalUpvotes}
-//             />
-//           </div>
-//           <StatsChart data={blogs} />
-//         </TabsContent>
-
-//         <TabsContent value="blog-stats">
-//           <BlogStatsTable blogs={blogs} />
-//         </TabsContent>
-
-//         <TabsContent value="analytics">
-//           <BlogAnalytics analytics={dummyAnalytics} />
-//         </TabsContent>
-//       </Tabs>
-//     </div>
-//   );
-// };
-
-// export default StatsContainer;
-
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BarChart3, Eye, MessageCircle, ThumbsUp } from "lucide-react";
 import KpiCard from "./KpiCard";
@@ -118,8 +6,8 @@ import BlogAnalytics from "./BlogAnalytics";
 import BlogStatsTable from "./BlogStatsTable";
 import { useEffect, useState } from "react";
 import {
-  fetchDashboardStats,
-  fetchDashboardPosts,
+  fetchBlogStats,
+  fetchAggregatedStats,
 } from "@/services/dashboardService";
 
 const StatsContainer = () => {
@@ -129,7 +17,7 @@ const StatsContainer = () => {
   useEffect(() => {
     const loadStats = async () => {
       try {
-        const res = await fetchDashboardStats();
+        const res = await fetchAggregatedStats();
         setStats(res?.data);
       } catch (err) {
         console.error("Stats load failed", err);
@@ -138,7 +26,7 @@ const StatsContainer = () => {
 
     const loadBlogs = async () => {
       try {
-        const res = await fetchDashboardPosts();
+        const res = await fetchBlogStats();
         setBlogs(res?.data?.blogs || []);
       } catch (err) {
         console.log("Blogs load failed", err);
@@ -152,10 +40,25 @@ const StatsContainer = () => {
   return (
     <div className="p-4 space-y-6">
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="flex gap-4 dark:bg-gray-800">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="blog-stats">Blog Stats</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        <TabsList className="flex gap-4 dark:bg-gray-800 ">
+          <TabsTrigger
+            value="overview"
+            className="cursor-pointer p-4 hover:bg-gray-300 dark:hover:bg-gray-900"
+          >
+            Overview
+          </TabsTrigger>
+          <TabsTrigger
+            value="blog-stats"
+            className="cursor-pointer p-4 hover:bg-gray-300 dark:hover:bg-gray-900"
+          >
+            Blog Stats
+          </TabsTrigger>
+          <TabsTrigger
+            value="analytics"
+            className="cursor-pointer p-4 hover:bg-gray-300 dark:hover:bg-gray-900"
+          >
+            Analytics
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -164,17 +67,25 @@ const StatsContainer = () => {
               icon={BarChart3}
               label="Total Blogs"
               value={stats?.totalBlogs}
+              color="text-purple-500"
             />
-            <KpiCard icon={Eye} label="Total Views" value={stats?.totalViews} />
+            <KpiCard
+              icon={Eye}
+              label="Total Views"
+              value={stats?.totalViews}
+              color="text-blue-500"
+            />
             <KpiCard
               icon={MessageCircle}
               label="Total Comments"
               value={stats?.totalComments}
+              color="text-orange-500"
             />
             <KpiCard
               icon={ThumbsUp}
               label="Total Upvotes"
               value={stats?.totalUpvotes}
+              color="text-green-500"
             />
           </div>
 

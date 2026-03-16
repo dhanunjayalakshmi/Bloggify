@@ -12,21 +12,15 @@ export const fetchMyBlogs = ({ status, search, sort, tags, dateRange }) => {
   if (dateRange?.from) params?.append("from", dateRange.from.toISOString());
   if (dateRange?.to) params?.append("to", dateRange.to.toISOString());
 
-  return api.get(`/dashboard/posts?${params}`);
+  return api.get(`/dashboard/blog-stats?${params}`);
 };
 
-export const fetchDashboardStats = () => {
+export const fetchAggregatedStats = () => {
   return api.get("/dashboard/stats");
 };
 
-export const fetchBlogStats = ({ blogIds }) => {
+export const fetchBlogStats = ({ page = 1, limit = 10 } = {}) => {
   return api.get("/dashboard/blog-stats", {
-    params: { blogIds: blogIds },
-  });
-};
-
-export const fetchDashboardPosts = ({ page = 1, limit = 10 } = {}) => {
-  return api.get("/dashboard/blog-post-stats", {
     params: { page, limit },
   });
 };

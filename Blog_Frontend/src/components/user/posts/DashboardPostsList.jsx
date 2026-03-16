@@ -1,28 +1,8 @@
-import { useEffect, useState } from "react";
 import DashboardPostCard from "./DashboardPostCard";
-import { fetchBlogStats } from "@/services/dashboardService";
 import { useNavigate } from "react-router";
 
 const DashboardPostsList = ({ posts, loading, error }) => {
-  const [stats, setStats] = useState({});
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      if (!posts?.length) return;
-
-      const blogIds = posts?.map((post) => post?.id);
-
-      try {
-        const res = await fetchBlogStats({ blogIds });
-        setStats(res?.data);
-      } catch (err) {
-        console.error("Dashboard stats error", err);
-      }
-    };
-
-    fetchStats();
-  }, [posts]);
 
   if (loading && !posts.length) return <p>Loading posts...</p>;
 
@@ -37,7 +17,11 @@ const DashboardPostsList = ({ posts, loading, error }) => {
         <DashboardPostCard
           key={post?.id}
           post={post}
-          stats={stats[post?.id]}
+          stats={{
+            views: post?.views,
+            comments: post?.comments,
+            upvotes: post?.upvotes,
+          }}
           onOpen={() => navigate(`/dashboard/posts/${post?.id}`)}
         />
       ))}
