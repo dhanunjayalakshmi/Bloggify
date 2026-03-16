@@ -6,8 +6,8 @@ import BlogAnalytics from "./BlogAnalytics";
 import BlogStatsTable from "./BlogStatsTable";
 import { useEffect, useState } from "react";
 import {
-  fetchBlogStats,
   fetchAggregatedStats,
+  fetchDashboardBlogs,
 } from "@/services/dashboardService";
 
 const StatsContainer = () => {
@@ -26,7 +26,7 @@ const StatsContainer = () => {
 
     const loadBlogs = async () => {
       try {
-        const res = await fetchBlogStats();
+        const res = await fetchDashboardBlogs();
         setBlogs(res?.data?.blogs || []);
       } catch (err) {
         console.log("Blogs load failed", err);

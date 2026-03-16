@@ -11,7 +11,7 @@ const buildBlogsQuery = (supabase, userId, queryParams) => {
     from,
     to,
     page = 1,
-    limit = 10,
+    limit = 5,
   } = queryParams;
 
   page = Number(page);
@@ -62,6 +62,12 @@ const buildBlogsQuery = (supabase, userId, queryParams) => {
   return { query, page, limit };
 };
 
+const getPreview = (html) => {
+  if (!html) return "Welcome to my blog";
+
+  return html.replace(/<[^>]*>/g, "").substring(0, 100) + "...";
+};
+
 // Get all the logged-in user owned posts with stats for dashboard
 router.get("/blog-stats", verifyToken, async (req, res) => {
   try {
@@ -74,12 +80,21 @@ router.get("/blog-stats", verifyToken, async (req, res) => {
 
     if (error) throw error;
 
-    const blogIds = blogs.map((b) => b.id);
+    const blogIds = blogs?.map((blog) => blog?.id) || [];
+
+    if (!blogIds?.length) {
+      return res.json({
+        blogs: [],
+        page,
+        limit,
+        hasMore: false,
+      });
+    }
 
     // comments
     const { data: comments } = await supabase
       .from("comments")
-      .select("blog_id")
+      .select("blog_id", { count: "exact" })
       .in("blog_id", blogIds);
 
     // upvotes
@@ -110,7 +125,7 @@ router.get("/blog-stats", verifyToken, async (req, res) => {
       id: blog?.id,
       title: blog?.title,
       views: blog?.views,
-      content: blog?.content,
+      content: getPreview(blog?.content),
       comments: commentMap[blog?.id],
       upvotes: voteMap[blog?.id],
       status: blog?.is_published ? "Published" : "Draft",
@@ -124,7 +139,7 @@ router.get("/blog-stats", verifyToken, async (req, res) => {
       blogs: result,
       page,
       limit,
-      hasMore: blogs.length === limit,
+      hasMore: blogs?.length === limit,
     });
   } catch (err) {
     console.error("Dashboard posts error:", err);
@@ -159,7 +174,7 @@ router.get("/posts/:id", verifyToken, async (req, res) => {
 
     res.status(200).json(blog);
   } catch (err) {
-    conaole.log("Error...", err);
+    console.log("Error...", err);
     res.status(500).json({ error: err.message });
   }
 });

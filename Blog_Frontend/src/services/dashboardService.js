@@ -1,9 +1,19 @@
 import api from "@/lib/apiClient";
 
-export const fetchMyBlogs = ({ status, search, sort, tags, dateRange }) => {
+export const fetchDashboardBlogs = ({
+  status,
+  search,
+  sort,
+  tags,
+  dateRange,
+  page,
+  limit,
+} = {}) => {
   const params = new URLSearchParams();
 
   params?.append("status", status);
+  if (page) params?.append("page", page);
+  if (limit) params?.append("limit", limit);
 
   if (search) params?.append("search", search);
   if (sort) params?.append("sort", sort);
@@ -11,16 +21,11 @@ export const fetchMyBlogs = ({ status, search, sort, tags, dateRange }) => {
 
   if (dateRange?.from) params?.append("from", dateRange.from.toISOString());
   if (dateRange?.to) params?.append("to", dateRange.to.toISOString());
+  console.log(params);
 
   return api.get(`/dashboard/blog-stats?${params}`);
 };
 
 export const fetchAggregatedStats = () => {
   return api.get("/dashboard/stats");
-};
-
-export const fetchBlogStats = ({ page = 1, limit = 10 } = {}) => {
-  return api.get("/dashboard/blog-stats", {
-    params: { page, limit },
-  });
 };

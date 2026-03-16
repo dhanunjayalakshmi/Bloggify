@@ -1,11 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { useMemo } from "react";
 const DashboardPostCard = ({ post, stats, onOpen }) => {
-  const preview = useMemo(() => {
-    if (!post?.content) return "Welcome to my blog";
-    return post.content.replace(/<[^>]*>/g, "").substring(0, 100) + "...";
-  }, [post?.content]);
-
   const status = useMemo(() => {
     if (!post?.is_published) {
       if (post?.published_at && new Date(post?.published_at) > new Date()) {
@@ -33,7 +27,7 @@ const DashboardPostCard = ({ post, stats, onOpen }) => {
             </span>
           </div>
 
-          <p className="text-muted-foreground text-md">{preview}</p>
+          <p className="text-muted-foreground text-md">{post?.content}</p>
         </div>
       </div>
 

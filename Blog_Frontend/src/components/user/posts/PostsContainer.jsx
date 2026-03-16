@@ -3,7 +3,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PostsFilters from "./PostsFilters";
 import DashboardPostsList from "./DashboardPostsList";
 import { Button } from "@/components/ui/button";
-import { fetchMyBlogs } from "@/services/dashboardService";
+import { fetchDashboardBlogs } from "@/services/dashboardService";
 
 const DEFAULT_FILTERS = {
   search: "",
@@ -56,7 +56,7 @@ const PostsContainer = () => {
       setDataState((prev) => ({ ...prev, loading: true, error: null }));
 
       try {
-        const res = await fetchMyBlogs({
+        const res = await fetchDashboardBlogs({
           status: activeTab,
           search: debouncedSearch,
           sort: filters?.sort,
