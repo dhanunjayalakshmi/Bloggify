@@ -137,6 +137,56 @@ router.get("/suggestions", verifyToken, async (req, res) => {
   }
 });
 
+// Get other Profile Suggestions
+router.get("/explore", verifyToken, async (req, res) => {
+  try {
+    const supabase = req?.supabase;
+    const userId = req?.user.id;
+
+    // Users current user is already following
+    const { data: following } = await supabase
+      .from("follows")
+      .select("following_id")
+      .eq("follower_id", userId);
+
+    const followingIds = following?.map((f) => f.following_id) || [];
+
+    let query = supabase
+      .from("users")
+      .select("id, name, username, bio, avatar")
+      .neq("id", userId); // remove self
+
+    if (followingIds.length > 0) {
+      const formatted = followingIds.map((id) => `'${id}'`).join(",");
+      query = query.not("id", "in", `(${formatted})`);
+    }
+
+    // ---------- Suggested Users ----------
+    const { data: suggested } = await query.limit(10);
+
+    // ---------- Popular Users ----------
+    const { data: popular } = await supabase.rpc("get_popular_users", {
+      current_user_id: userId,
+      limit_count: 10,
+    });
+
+    // ---------- Active Users ----------
+    const { data: active } = await supabase.rpc("get_active_users", {
+      current_user_id: userId,
+      limit_count: 10,
+    });
+
+    res.json({
+      suggested: suggested || [],
+      popular: popular || [],
+      active: active || [],
+    });
+  } catch (err) {
+    console.error("Explore users error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Author Public Profile
 router.get("/:userId", verifyToken, async (req, res) => {
   try {
