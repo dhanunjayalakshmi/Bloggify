@@ -143,6 +143,26 @@ router.get("/explore", verifyToken, async (req, res) => {
     const supabase = req?.supabase;
     const userId = req?.user.id;
 
+    // Helper function
+    const attachFollowState = async (users) => {
+      if (!users?.length) return [];
+
+      const ids = users?.map((user) => user?.id);
+
+      const { data: follows } = await supabase
+        .from("follows")
+        .select("following_id")
+        .eq("follower_id", userId)
+        .in("following_id", ids);
+
+      const followSet = new Set(follows?.map((f) => f.following_id));
+
+      return users?.map((user) => ({
+        ...user,
+        is_following: followSet.has(user?.id),
+      }));
+    };
+
     // Users current user is already following
     const { data: following } = await supabase
       .from("follows")
@@ -162,19 +182,23 @@ router.get("/explore", verifyToken, async (req, res) => {
     }
 
     // ---------- Suggested Users ----------
-    const { data: suggested } = await query.limit(10);
+    const { data: suggestedRaw } = await query.limit(10);
 
     // ---------- Popular Users ----------
-    const { data: popular } = await supabase.rpc("get_popular_users", {
+    const { data: popularRaw } = await supabase.rpc("get_popular_users", {
       current_user_id: userId,
       limit_count: 10,
     });
 
     // ---------- Active Users ----------
-    const { data: active } = await supabase.rpc("get_active_users", {
+    const { data: activeRaw } = await supabase.rpc("get_active_users", {
       current_user_id: userId,
       limit_count: 10,
     });
+
+    const suggested = await attachFollowState(suggestedRaw);
+    const popular = await attachFollowState(popularRaw);
+    const active = await attachFollowState(activeRaw);
 
     res.json({
       suggested: suggested || [],

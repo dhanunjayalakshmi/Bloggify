@@ -27,7 +27,7 @@ const MiniBlogList = ({
           <div
             key={blog?.id}
             onClick={() => navigate(`/blogs/${blog?.id}`)}
-            className="flex items-center gap-3 mb-4 p-2 cursor-pointer rounded-2xl shadow-sm hover:shadow-lg transition"
+            className="flex items-center dark:bg-gray-900 gap-3 mb-4 p-2 cursor-pointer rounded-2xl shadow-lg hover:shadow-xl transition"
           >
             <img
               src={
