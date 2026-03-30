@@ -27,7 +27,11 @@ const ExploreUserCard = ({ user }) => {
       </div>
 
       <div onClick={(e) => e.stopPropagation()}>
-        <FollowButton userId={user?.id} initialFollowing={user?.is_following} />
+        <FollowButton
+          userId={user?.id}
+          initialFollowing={user?.is_following}
+          hasInitialFollowing={true}
+        />
       </div>
     </div>
   );

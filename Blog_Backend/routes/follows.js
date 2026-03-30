@@ -1,6 +1,7 @@
 const express = require("express");
 const supabase = require("../config/supabaseClient");
 const { verifyToken } = require("../middlewares/authMiddleware");
+const { attachFollowState } = require("../utils/followHelpers");
 
 const router = express.Router();
 
@@ -30,9 +31,11 @@ router.get("/is-following", verifyToken, async (req, res) => {
 });
 
 // Get Followers of a User
-router.get("/followers/:userId", async (req, res) => {
+router.get("/followers/:userId", verifyToken, async (req, res) => {
   try {
     const { userId } = req.params;
+    const currentUserId = req?.user?.id;
+    const supabase = req.supabase;
 
     const { data, error } = await supabase
       .from("follows")
@@ -50,18 +53,28 @@ router.get("/followers/:userId", async (req, res) => {
 
     if (error) throw error;
 
-    const followers = data.map((item) => item.follower);
+    const followers = (data || [])
+      .map((item) => item?.follower)
+      .filter(Boolean);
 
-    res.status(200).json({ followers });
+    const enrichedFollowers = await attachFollowState(
+      supabase,
+      currentUserId,
+      followers,
+    );
+
+    res.status(200).json({ followers: enrichedFollowers });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
 // ✅ Get Following List of a User
-router.get("/following/:userId", async (req, res) => {
+router.get("/following/:userId", verifyToken, async (req, res) => {
   try {
     const { userId } = req.params;
+    const currentUserId = req?.user?.id;
+    const supabase = req?.supabase;
 
     const { data, error } = await supabase
       .from("follows")
@@ -79,9 +92,17 @@ router.get("/following/:userId", async (req, res) => {
 
     if (error) throw error;
 
-    const following = data.map((item) => item.following);
+    const following = (data || [])
+      .map((item) => item.following)
+      .filter(Boolean);
 
-    res.status(200).json({ following });
+    const enrichedFollowers = await attachFollowState(
+      supabase,
+      currentUserId,
+      following,
+    );
+
+    res.status(200).json({ following: enrichedFollowers });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

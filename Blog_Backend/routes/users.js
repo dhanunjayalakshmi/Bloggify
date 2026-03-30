@@ -1,5 +1,6 @@
 const express = require("express");
 const { verifyToken } = require("../middlewares/authMiddleware");
+const { attachFollowState } = require("../utils/followHelpers");
 
 const router = express.Router();
 
@@ -108,8 +109,16 @@ router.get("/suggestions", verifyToken, async (req, res) => {
     const currentUserId = req.user.id;
     const limit = parseInt(req.query.limit) || 5;
 
-    // Get users with published blogs count
-    const { data, error } = await supabase
+    const { data: followingRows, error: followingError } = await supabase
+      .from("follows")
+      .select("following_id")
+      .eq("follower_id", currentUserId);
+
+    if (followingError) throw followingError;
+
+    const followingIds = (followingRows || []).map((row) => row.following_id);
+
+    let query = supabase
       .from("users")
       .select(
         `
@@ -120,17 +129,24 @@ router.get("/suggestions", verifyToken, async (req, res) => {
         blogs:blogs(count)
       `,
       )
-      .neq("id", currentUserId)
-      .limit(limit);
+      .neq("id", currentUserId);
+
+    if (followingIds?.length > 0) {
+      const formatted = followingIds.join(",");
+      query = query.not("id", "in", `(${formatted})`);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
 
-    // Optional: sort by blog count descending
-    const sorted = data.sort(
-      (a, b) => (b.blogs?.length || 0) - (a.blogs?.length || 0),
-    );
+    const sorted = (data || [])
+      .sort((a, b) => (b.blogs?.length || 0) - (a.blogs?.length || 0))
+      .slice(0, limit);
 
-    res.json({ users: sorted });
+    const users = await attachFollowState(supabase, currentUserId, sorted);
+
+    res.json({ users });
   } catch (err) {
     console.error("Profile suggestions error:", err.message);
     res.status(500).json({ error: err.message });
@@ -142,26 +158,6 @@ router.get("/explore", verifyToken, async (req, res) => {
   try {
     const supabase = req?.supabase;
     const userId = req?.user.id;
-
-    // Helper function
-    const attachFollowState = async (users) => {
-      if (!users?.length) return [];
-
-      const ids = users?.map((user) => user?.id);
-
-      const { data: follows } = await supabase
-        .from("follows")
-        .select("following_id")
-        .eq("follower_id", userId)
-        .in("following_id", ids);
-
-      const followSet = new Set(follows?.map((f) => f.following_id));
-
-      return users?.map((user) => ({
-        ...user,
-        is_following: followSet.has(user?.id),
-      }));
-    };
 
     // Users current user is already following
     const { data: following } = await supabase
@@ -176,8 +172,8 @@ router.get("/explore", verifyToken, async (req, res) => {
       .select("id, name, username, bio, avatar")
       .neq("id", userId); // remove self
 
-    if (followingIds.length > 0) {
-      const formatted = followingIds.map((id) => `'${id}'`).join(",");
+    if (followingIds?.length > 0) {
+      const formatted = followingIds.join(",");
       query = query.not("id", "in", `(${formatted})`);
     }
 
@@ -196,9 +192,13 @@ router.get("/explore", verifyToken, async (req, res) => {
       limit_count: 10,
     });
 
-    const suggested = await attachFollowState(suggestedRaw);
-    const popular = await attachFollowState(popularRaw);
-    const active = await attachFollowState(activeRaw);
+    const suggested = await attachFollowState(
+      supabase,
+      userId,
+      suggestedRaw || [],
+    );
+    const popular = await attachFollowState(supabase, userId, popularRaw || []);
+    const active = await attachFollowState(supabase, userId, activeRaw || []);
 
     res.json({
       suggested: suggested || [],

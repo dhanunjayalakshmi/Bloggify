@@ -37,7 +37,11 @@ const ProfileSuggestions = () => {
               <p className="font-medium text-sm">{user?.name}</p>
             </div>
 
-            <FollowButton userId={user?.id} />
+            <FollowButton
+              userId={user?.id}
+              initialFollowing={user?.is_following}
+              hasInitialFollowing={true}
+            />
           </div>
         ))}
 

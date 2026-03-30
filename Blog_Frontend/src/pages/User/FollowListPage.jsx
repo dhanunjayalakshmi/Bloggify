@@ -47,7 +47,11 @@ const FollowListPage = () => {
               </div>
             </div>
 
-            <FollowButton userId={user.id} />
+            <FollowButton
+              userId={user?.id}
+              initialFollowing={user?.is_following}
+              hasInitialFollowing={true}
+            />
           </div>
         ))}
       </div>
