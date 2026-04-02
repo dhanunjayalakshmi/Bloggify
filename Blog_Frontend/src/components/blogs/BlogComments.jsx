@@ -213,12 +213,17 @@ const BlogComments = ({ blogId }) => {
   const [hasMore, setHasMore] = useState(true);
   const [forceReload, setForceReload] = useState(0);
 
+  const COMMENTS_PAGE_SIZE = 10;
+
   useEffect(() => {
     const fetchComments = async () => {
-      const res = await api.get(`/comments/${blogId}?page=1&limit=10`);
+      const res = await api.get(
+        `/comments/${blogId}?page=1&limit=${COMMENTS_PAGE_SIZE}`,
+      );
+
       setComments(res?.data?.comments || []);
       setPage(2);
-      setHasMore((res?.data?.comments?.length || 0) === 10);
+      setHasMore((res?.data?.comments?.length || 0) === COMMENTS_PAGE_SIZE);
     };
     fetchComments();
   }, [blogId, forceReload]);
@@ -233,13 +238,16 @@ const BlogComments = ({ blogId }) => {
   }, [comments]);
 
   const loadMoreComments = async () => {
-    const res = await api.get(`/comments/${blogId}?page=${page}&limit=1`);
+    const res = await api.get(
+      `/comments/${blogId}?page=${page}&limit=${COMMENTS_PAGE_SIZE}`,
+    );
+
     const newComments = (res?.data?.comments || []).filter(
       (newC) => !comments.some((oldC) => oldC.id === newC.id),
     );
     setComments((comments) => [...comments, ...newComments]);
     setPage((page) => page + 1);
-    setHasMore((res?.data?.comments?.length || 0) === 10);
+    setHasMore((res?.data?.comments?.length || 0) === COMMENTS_PAGE_SIZE);
   };
 
   const refresh = () => setForceReload((v) => v + 1);
