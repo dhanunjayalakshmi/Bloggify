@@ -19,14 +19,11 @@ import AboutPage from "@/pages/LandingPage/AboutPage";
 import ContactPage from "@/pages/LandingPage/ContactPage";
 import TermsPage from "@/pages/LandingPage/TermsPage";
 import PublicLayout from "@/layouts/PublicLayout";
-import useAuthInit from "@/hooks/useAuthInit";
 import Explore from "@/pages/Explore";
 import FollowListPage from "@/pages/User/FollowListPage";
 import ExplorePeople from "@/pages/ExplorePeople";
 
 const AppRoutes = () => {
-  useAuthInit();
-
   return (
     <Routes>
       <Route element={<PublicLayout />}>
