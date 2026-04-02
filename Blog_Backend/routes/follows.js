@@ -135,7 +135,10 @@ router.post("/", verifyToken, async (req, res) => {
 
       if (deleteError) throw deleteError;
 
-      return res.status(200).json({ message: "Unfollowed successfully" });
+      return res.status(200).json({
+        message: "Unfollowed successfully",
+        is_following: false,
+      });
     }
 
     const { error: insertError } = await req?.supabase
@@ -144,7 +147,10 @@ router.post("/", verifyToken, async (req, res) => {
 
     if (insertError) throw insertError;
 
-    res.status(201).json({ message: "Followed successfully" });
+    res.status(201).json({
+      message: "Followed successfully",
+      is_following: true,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

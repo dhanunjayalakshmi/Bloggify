@@ -70,9 +70,9 @@ const FollowButton = ({
     try {
       setLoading(true);
 
-      await api.post("/follows", { following_id: userId });
+      const res = await api.post("/follows", { following_id: userId });
 
-      setIsFollowing((prev) => !prev);
+      setIsFollowing(res?.data?.is_following);
     } catch (err) {
       console.log("Follow toggle error:", err);
     } finally {
