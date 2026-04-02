@@ -168,12 +168,12 @@ router.get("/:blogId", verifyToken, async (req, res) => {
       return res.status(404).json({ error: "Blog not found" });
     }
 
-    if (!blog?.is_published && (!userId || blog?.user_id !== userId)) {
-      return res.status(404).json({ error: "Access denied" });
+    if (!userId) {
+      return res.status(403).json({ error: "Authentication required" });
     }
 
-    if (blog?.is_published && !blog?.is_public && !userId) {
-      return res.status(403).json({ error: "Authentication required" });
+    if (!blog?.is_published && blog?.user_id !== userId) {
+      return res.status(404).json({ error: "Access denied" });
     }
 
     const { data: viewsUpdate, error: updateError } = await req?.supabase
