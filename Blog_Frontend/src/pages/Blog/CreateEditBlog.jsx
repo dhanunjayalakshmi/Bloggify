@@ -89,6 +89,7 @@ const CreateEditBlog = () => {
   const [pendingBlogId, setPendingBlogId] = useState(null);
   const [showDraftConflict, setShowDraftConflict] = useState(false);
   const [conflictingDraft, setConflictingDraft] = useState(null);
+  const [draftConflictMode, setDraftConflictMode] = useState("edit");
 
   const lastSavedDraft = useRef({
     html: "",
@@ -149,6 +150,27 @@ const CreateEditBlog = () => {
     [initialContent, isDraftLoaded],
   );
 
+  const createFreshDraft = useCallback(() => {
+    const newDraftId = randomDraftId();
+
+    const freshDraft = {
+      draftId: newDraftId,
+      blogId: null,
+      mode: "create",
+      title: "",
+      tags: [],
+      coverImageUrl: "",
+      html: "<p></p>",
+    };
+
+    loadEditorState(freshDraft);
+    saveDraft(freshDraft);
+    setConflictingDraft(null);
+    setPendingBlogId(null);
+    setShowDraftConflict(false);
+    setDraftConflictMode("create");
+  }, [loadEditorState, saveDraft]);
+
   const handleContinueCurrentDraft = () => {
     setShowDraftConflict(false);
     setPendingBlogId(null);
@@ -156,12 +178,19 @@ const CreateEditBlog = () => {
     if (conflictingDraft) {
       loadEditorState(conflictingDraft);
     }
+
+    setConflictingDraft(null);
   };
 
-  const handleDiscardAndOpenBlog = useCallback(async () => {
+  const handleDiscardAndProceed = useCallback(async () => {
     try {
       setShowDraftConflict(false);
       await clearDraft(true);
+
+      if (draftConflictMode === "create") {
+        createFreshDraft();
+        return;
+      }
 
       if (!pendingBlogId) return;
 
@@ -185,13 +214,22 @@ const CreateEditBlog = () => {
 
       setPendingBlogId(null);
       setConflictingDraft(null);
+      setShowDraftConflict(false);
     } catch (err) {
-      console.error("Failed to discard draft and open blog:", err);
-      toast.error("Failed to open blog");
+      console.error("Failed to discard draft and continue:", err);
+      toast.error("Failed to continue");
     }
-  }, [clearDraft, pendingBlogId, fetchBlogById, loadEditorState, saveDraft]);
+  }, [
+    clearDraft,
+    draftConflictMode,
+    createFreshDraft,
+    pendingBlogId,
+    fetchBlogById,
+    loadEditorState,
+    saveDraft,
+  ]);
 
-  const handleSaveDraftToDbAndOpenBlog = useCallback(async () => {
+  const handleSaveDraftToDbAndProceed = useCallback(async () => {
     try {
       if (!conflictingDraft) return;
 
@@ -228,53 +266,39 @@ const CreateEditBlog = () => {
       }
 
       toast.success("Draft saved successfully");
-      await handleDiscardAndOpenBlog();
+      await handleDiscardAndProceed();
     } catch (err) {
       console.error("Failed to save conflicting draft:", err);
       toast.error("Failed to save current draft");
     }
-  }, [conflictingDraft, handleDiscardAndOpenBlog]);
+  }, [conflictingDraft, handleDiscardAndProceed]);
 
   useEffect(() => {
     const initEditor = async () => {
       try {
         const localDraft = loadDraft();
 
+        // CREATE MODE
         if (!isEditMode) {
-          if (localDraft && isMeaningfulDraft(localDraft)) {
-            loadEditorState(localDraft);
-          } else {
+          if (!localDraft || !isMeaningfulDraft(localDraft)) {
             if (localDraft && !isMeaningfulDraft(localDraft)) {
               await clearDraft(true);
             }
 
-            const newDraftId = randomDraftId();
-
-            loadEditorState({
-              draftId: newDraftId,
-              blogId: null,
-              mode: "create",
-              title: "",
-              tags: [],
-              coverImageUrl: "",
-              html: "<p></p>",
-            });
-
-            saveDraft({
-              draftId: newDraftId,
-              blogId: null,
-              mode: "create",
-              title: "",
-              tags: [],
-              coverImageUrl: "",
-              html: "<p></p>",
-            });
+            createFreshDraft();
+            setIsDraftLoaded(true);
+            return;
           }
 
+          setConflictingDraft(localDraft);
+          setPendingBlogId(null);
+          setDraftConflictMode("create");
+          setShowDraftConflict(true);
           setIsDraftLoaded(true);
           return;
         }
 
+        // EDIT MODE
         if (!localDraft || !isMeaningfulDraft(localDraft)) {
           if (localDraft && !isMeaningfulDraft(localDraft)) {
             await clearDraft(true);
@@ -302,14 +326,17 @@ const CreateEditBlog = () => {
           return;
         }
 
+        // Restore same blog draft directly
         if (localDraft?.blogId === blogId) {
           loadEditorState(localDraft);
           setIsDraftLoaded(true);
           return;
         }
 
+        // Different draft exists, show conflict
         setConflictingDraft(localDraft);
         setPendingBlogId(blogId);
+        setDraftConflictMode("edit");
         setShowDraftConflict(true);
         setIsDraftLoaded(true);
       } catch (err) {
@@ -329,6 +356,7 @@ const CreateEditBlog = () => {
     loadEditorState,
     fetchBlogById,
     isMeaningfulDraft,
+    createFreshDraft,
     navigate,
   ]);
 
@@ -459,9 +487,10 @@ const CreateEditBlog = () => {
     return (
       <DraftConflictPrompt
         draft={conflictingDraft}
+        mode={draftConflictMode}
         onContinue={handleContinueCurrentDraft}
-        onDiscard={handleDiscardAndOpenBlog}
-        onSaveToDb={handleSaveDraftToDbAndOpenBlog}
+        onDiscard={handleDiscardAndProceed}
+        onSaveToDb={handleSaveDraftToDbAndProceed}
       />
     );
   }
