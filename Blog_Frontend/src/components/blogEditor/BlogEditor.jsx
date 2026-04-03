@@ -2,8 +2,8 @@ import { EditorContent } from "@tiptap/react";
 import { useEffect, useRef, useState } from "react";
 import EditorToolbar from "./EditorToolbar";
 import CoverImageUpload from "./CoverImageUpload";
-import { useEditorImageUpload } from "@/hooks/useEditorImageUpload";
 import FloatingPlusMenu from "./FloatingPlusMenu";
+import { useEditorImageUpload } from "@/hooks/useEditorImageUpload";
 
 const BlogEditor = ({
   editor,

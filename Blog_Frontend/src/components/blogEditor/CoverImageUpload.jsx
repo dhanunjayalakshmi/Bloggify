@@ -9,7 +9,7 @@ const CoverImageUpload = ({ coverImageUrl, setCoverImageUrl, draftId }) => {
       console.error("No draftId available for image upload");
       return;
     }
-    
+
     const imageUrl = await handleImageUpload({ insertToEditor: false });
     if (imageUrl) {
       setCoverImageUrl(imageUrl);
