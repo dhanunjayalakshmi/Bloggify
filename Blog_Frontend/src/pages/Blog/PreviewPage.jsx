@@ -92,9 +92,9 @@ const PreviewPage = () => {
         </div>
       </div>
 
-      {blog?.cover_image && (
+      {blog?.coverImageUrl && (
         <img
-          src={blog?.cover_image}
+          src={blog?.coverImageUrl}
           alt="Cover"
           className="w-full max-h-[400px] object-cover rounded-lg shadow"
         />

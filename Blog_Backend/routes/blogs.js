@@ -301,14 +301,22 @@ router.post(
 router.put("/:blogId", verifyToken, async (req, res) => {
   try {
     const { blogId } = req?.params;
-    const { title, content, tags, is_published, is_public, read_time } =
-      req?.body;
+    const {
+      title,
+      content,
+      tags,
+      is_published,
+      is_public,
+      read_time,
+      coverImageUrl,
+      draftId,
+    } = req?.body;
 
     const userId = req?.user?.id;
 
     const { data: blog, error: fetchError } = await supabase
       .from("blogs")
-      .select("user_id")
+      .select("user_id, draft_id, published_at")
       .eq("id", blogId)
       .single();
 
@@ -317,19 +325,26 @@ router.put("/:blogId", verifyToken, async (req, res) => {
     if (!blog || blog?.user_id !== userId) {
       return res.status(403).json({ error: "Unauthorized" });
     }
+    const updatePayload = {
+      title,
+      content,
+      tags,
+      cover_image: coverImageUrl,
+      is_published,
+      is_public,
+      read_time,
+      draft_id: draftId || blog.draft_id,
+      published_at: is_published
+        ? blog.published_at || new Date().toISOString()
+        : null,
+    };
 
     const { data, error } = await req?.supabase
       .from("blogs")
-      .update({
-        title,
-        content,
-        tags,
-        is_published,
-        is_public,
-        read_time,
-      })
+      .update(updatePayload)
       .eq("id", blogId)
-      .select();
+      .select()
+      .single();
 
     if (error) throw error;
 
