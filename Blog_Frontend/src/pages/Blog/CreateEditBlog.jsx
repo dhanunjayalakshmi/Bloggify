@@ -117,6 +117,22 @@ const CreateEditBlog = () => {
     return res?.data;
   }, []);
 
+  const onUpdate = ({ editor }) => {
+    const html = editor?.getHTML();
+
+    const hasContentChanged =
+      html !== lastSavedDraft?.current?.html ||
+      title !== lastSavedDraft?.current?.title ||
+      coverImageUrl !== lastSavedDraft?.current?.coverImageUrl ||
+      JSON.stringify(selectedTags) !==
+        JSON.stringify(lastSavedDraft?.current?.tags);
+
+    if (hasContentChanged) {
+      setDirty(true);
+    }
+  };
+
+  // Initialize editor AFTER draft is loaded
   const editor = useEditor(
     {
       extensions,
@@ -128,22 +144,9 @@ const CreateEditBlog = () => {
             "focus:outline-none prose dark:prose-invert prose-lg max-w-3xl mx-auto py-12 px-4",
         },
       },
-      onUpdate: ({ editor }) => {
-        const html = editor?.getHTML();
-
-        const hasContentChanged =
-          html !== lastSavedDraft.current.html ||
-          title !== lastSavedDraft.current.title ||
-          coverImageUrl !== lastSavedDraft.current.coverImageUrl ||
-          JSON.stringify(selectedTags) !==
-            JSON.stringify(lastSavedDraft.current.tags);
-
-        if (hasContentChanged) {
-          setDirty(true);
-        }
-      },
+      onUpdate,
     },
-    [initialContent, isDraftLoaded, title, coverImageUrl, selectedTags],
+    [initialContent, isDraftLoaded],
   );
 
   const handleContinueCurrentDraft = () => {

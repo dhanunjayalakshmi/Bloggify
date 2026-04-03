@@ -20,7 +20,7 @@ const BlogEditor = ({
 
   const showToolbarAtSelection = () => {
     const selection = window.getSelection();
-    if (!selection || selection.isCollapsed) {
+    if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
       setShowToolbar(false);
       return;
     }
@@ -34,9 +34,24 @@ const BlogEditor = ({
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
 
+    const toolbarWidth = 720;
+    const viewportPadding = 16;
+    const viewportWidth = window.innerWidth;
+
+    const centeredLeft =
+      rect.left + window.scrollX + rect.width / 2 - toolbarWidth / 2;
+
+    const safeLeft = Math.max(
+      viewportPadding + window.scrollX,
+      Math.min(
+        centeredLeft,
+        window.scrollX + viewportWidth - toolbarWidth - viewportPadding,
+      ),
+    );
+
     setToolbarPosition({
-      top: rect.top + window.scrollY - 50,
-      left: rect.left + window.scrollX,
+      top: rect.top + window.scrollY - 60,
+      left: safeLeft,
     });
 
     setShowToolbar(true);

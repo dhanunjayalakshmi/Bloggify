@@ -7,58 +7,83 @@ const FloatingPlusMenu = ({ editor, onPlusClick }) => {
   const [pos, setPos] = useState({ top: 0, left: 0 });
 
   const updatePlus = useCallback(() => {
-    if (!editor || !editor.isFocused) {
+    if (!editor || editor.isDestroyed || !editor.isFocused) {
       setVisible(false);
       return;
     }
-    const { state, view } = editor;
+
+    const view = editor.view;
+    const state = editor.state;
+
+    if (!view || view.isDestroyed || !view.dom?.isConnected || !state) {
+      setVisible(false);
+      return;
+    }
+
     const { from, empty } = state.selection;
+
     if (!empty) {
       setVisible(false);
       return;
     }
 
-    // Find the parent node for the cursor
-    const resolved = state.doc.resolve(from);
-    const parent = resolved.parent;
-    if (parent.type.name === "paragraph" && parent.content.size === 0) {
-      const paraPos = from - resolved.parentOffset; // position of paragraph start
-      try {
-        const coords = view.coordsAtPos(paraPos);
-        setPos({
-          top: coords.top + window.scrollY,
-          left: coords.left + window.scrollX - 40, // tune this value for margin
-        });
-        setVisible(true);
-        return;
-      } catch (err) {
+    try {
+      const resolved = state.doc.resolve(from);
+      const parent = resolved.parent;
+
+      if (parent.type.name !== "paragraph" || parent.content.size !== 0) {
         setVisible(false);
-        console.error("FloatingPlusMenu error:", {
-          message: err?.message,
-          response: err?.response?.data,
-        });
         return;
       }
+
+      const paraPos = from - resolved.parentOffset;
+      const coords = view.coordsAtPos(paraPos);
+
+      if (!coords) {
+        setVisible(false);
+        return;
+      }
+
+      setPos({
+        top: coords.top + window.scrollY,
+        left: coords.left + window.scrollX - 40,
+      });
+
+      setVisible(true);
+    } catch (err) {
+      setVisible(false);
+      console.error("FloatingPlusMenu error:", {
+        message: err?.message,
+        response: err?.response?.data,
+      });
     }
-    setVisible(false);
   }, [editor]);
 
   useEffect(() => {
     if (!editor) return;
-    const fn = () => updatePlus();
+
+    const fn = () => {
+      requestAnimationFrame(() => {
+        updatePlus();
+      });
+    };
+
+    const handleBlur = () => setVisible(false);
 
     editor.on("transaction", fn);
     editor.on("focus", fn);
-    editor.on("blur", () => setVisible(false));
+    editor.on("blur", handleBlur);
+
     window.addEventListener("scroll", fn, true);
     window.addEventListener("resize", fn);
 
-    updatePlus();
+    fn();
 
     return () => {
       editor.off("transaction", fn);
       editor.off("focus", fn);
-      editor.off("blur", () => setVisible(false));
+      editor.off("blur", handleBlur);
+
       window.removeEventListener("scroll", fn, true);
       window.removeEventListener("resize", fn);
     };
