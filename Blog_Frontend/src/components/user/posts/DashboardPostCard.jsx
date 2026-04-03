@@ -23,7 +23,7 @@ const DashboardPostCard = ({ post, stats, onOpen }) => {
 
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>
-              Last updated: {new Date(post?.updated_at).toLocaleDateString()}
+              Last updated: {new Date(post?.updated).toLocaleDateString()}
             </span>
           </div>
 

@@ -85,6 +85,7 @@ const CreateEditBlog = () => {
   const [isDraftLoaded, setIsDraftLoaded] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [isPublishedBlog, setIsPublishedBlog] = useState(false);
 
   const [pendingBlogId, setPendingBlogId] = useState(null);
   const [showDraftConflict, setShowDraftConflict] = useState(false);
@@ -104,6 +105,7 @@ const CreateEditBlog = () => {
     setCoverImageUrl(data?.coverImageUrl || data?.cover_image || "");
     setDraftId(data?.draftId || data?.draft_id || randomDraftId());
     setInitialContent(data?.html || data?.content || "<p></p>");
+    setIsPublishedBlog(Boolean(data?.is_published));
 
     lastSavedDraft.current = {
       html: data?.html || data?.content || "<p></p>",
@@ -290,6 +292,14 @@ const CreateEditBlog = () => {
             return;
           }
 
+          // If the existing local draft already belongs to create mode,
+          // just continue it directly instead of showing a conflict prompt.
+          if (!localDraft.blogId && localDraft.mode === "create") {
+            loadEditorState(localDraft);
+            setIsDraftLoaded(true);
+            return;
+          }
+
           setConflictingDraft(localDraft);
           setPendingBlogId(null);
           setDraftConflictMode("create");
@@ -415,6 +425,7 @@ const CreateEditBlog = () => {
       content: html,
       tags: selectedTags,
       coverImageUrl,
+      cover_image: coverImageUrl,
       read_time: Math.ceil(
         html
           .replace(/<[^>]*>/g, " ")
@@ -526,11 +537,17 @@ const CreateEditBlog = () => {
           onClick={() => saveBlog("draft")}
           disabled={saving}
         >
-          {saving ? "Saving..." : "Save Draft"}
+          {saving ? "Saving..." : isEditMode ? "Update Draft" : "Save Draft"}
         </Button>
 
         <Button onClick={() => saveBlog("published")} disabled={saving}>
-          {saving ? "Saving..." : isEditMode ? "Update Blog" : "Save & Publish"}
+          {saving
+            ? "Saving..."
+            : isEditMode
+              ? isPublishedBlog
+                ? "Update Published Blog"
+                : "Publish Blog"
+              : "Save & Publish"}
         </Button>
       </div>
     </div>

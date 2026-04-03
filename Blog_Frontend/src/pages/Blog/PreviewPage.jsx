@@ -17,6 +17,7 @@ const PreviewPage = () => {
   const [blog, setBlog] = useState(location?.state || null);
   const [loading, setLoading] = useState(!isEditorPreview);
   const [error, setError] = useState(null);
+  const previewCoverImage = blog?.cover_image || blog?.coverImageUrl || "";
 
   useEffect(() => {
     if (mode === "dashboard") {
@@ -92,9 +93,9 @@ const PreviewPage = () => {
         </div>
       </div>
 
-      {blog?.coverImageUrl && (
+      {previewCoverImage && (
         <img
-          src={blog?.coverImageUrl}
+          src={previewCoverImage}
           alt="Cover"
           className="w-full max-h-[400px] object-cover rounded-lg shadow"
         />
