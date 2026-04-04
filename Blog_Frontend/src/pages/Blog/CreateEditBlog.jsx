@@ -86,6 +86,7 @@ const CreateEditBlog = () => {
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [isPublishedBlog, setIsPublishedBlog] = useState(false);
+  const [autosaveStatus, setAutosaveStatus] = useState("idle");
 
   const [pendingBlogId, setPendingBlogId] = useState(null);
   const [showDraftConflict, setShowDraftConflict] = useState(false);
@@ -388,7 +389,9 @@ const CreateEditBlog = () => {
         coverImageUrl,
       };
 
+      setAutosaveStatus("saving");
       const saved = saveDraft(draftData);
+      setAutosaveStatus(saved ? "saved" : "idle");
 
       if (saved) {
         lastSavedDraft.current = {
@@ -527,28 +530,48 @@ const CreateEditBlog = () => {
 
       <TagInput selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
 
-      <div className="p-4 flex flex-wrap justify-end gap-2 mt-2">
-        <Button variant="outline" onClick={handlePreview} disabled={saving}>
-          Preview
-        </Button>
+      <div className="sticky bottom-4 z-40 mt-6 px-4">
+        <div className="ml-auto my-4 flex justify-between gap-2 rounded-2xl border border-slate-700/60 bg-slate-900/90 px-3 py-3 shadow-2xl backdrop-blur">
+          <p className="text-xs text-slate-300">
+            {saving
+              ? "Saving blog..."
+              : autosaveStatus === "saving"
+                ? "Autosaving draft..."
+                : autosaveStatus === "saved"
+                  ? "Draft saved locally"
+                  : dirty
+                    ? "Unsaved local changes"
+                    : "All changes are local until you save"}
+          </p>
 
-        <Button
-          variant="outline"
-          onClick={() => saveBlog("draft")}
-          disabled={saving}
-        >
-          {saving ? "Saving..." : isEditMode ? "Update Draft" : "Save Draft"}
-        </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" onClick={handlePreview} disabled={saving}>
+              Preview
+            </Button>
 
-        <Button onClick={() => saveBlog("published")} disabled={saving}>
-          {saving
-            ? "Saving..."
-            : isEditMode
-              ? isPublishedBlog
-                ? "Update Published Blog"
-                : "Publish Blog"
-              : "Save & Publish"}
-        </Button>
+            <Button
+              variant="outline"
+              onClick={() => saveBlog("draft")}
+              disabled={saving}
+            >
+              {saving
+                ? "Saving..."
+                : isEditMode
+                  ? "Update Draft"
+                  : "Save Draft"}
+            </Button>
+
+            <Button onClick={() => saveBlog("published")} disabled={saving}>
+              {saving
+                ? "Saving..."
+                : isEditMode
+                  ? isPublishedBlog
+                    ? "Update Published Blog"
+                    : "Publish Blog"
+                  : "Save & Publish"}
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
