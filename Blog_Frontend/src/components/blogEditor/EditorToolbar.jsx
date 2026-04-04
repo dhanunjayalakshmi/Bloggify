@@ -18,7 +18,6 @@ import {
   AlignJustify,
   Highlighter,
 } from "lucide-react";
-
 import { Button } from "../ui/button";
 
 const getButtonClass = (isActive) =>
@@ -28,15 +27,21 @@ const getButtonClass = (isActive) =>
       : ""
   }`;
 
+const Divider = () => (
+  <div className="mx-1 h-8 w-px bg-slate-300 dark:bg-slate-600 shrink-0" />
+);
+
 const EditorToolbar = ({ editor }) => {
   return (
     <div className="relative w-full">
       <div className="w-full overflow-x-auto rounded-md border bg-background/95 dark:bg-gray-800 shadow-md">
-        <div className="min-w-max p-2 flex gap-2">
+        <div className="min-w-max p-2 flex gap-2 items-center">
           <Button
             type="button"
             size="icon"
             variant="ghost"
+            title="Bold"
+            aria-label="Bold"
             className={getButtonClass(editor.isActive("bold"))}
             onClick={() => editor.chain().focus().toggleBold().run()}
           >
@@ -47,6 +52,8 @@ const EditorToolbar = ({ editor }) => {
             type="button"
             size="icon"
             variant="ghost"
+            title="Italic"
+            aria-label="Italic"
             className={getButtonClass(editor.isActive("italic"))}
             onClick={() => editor.chain().focus().toggleItalic().run()}
           >
@@ -57,6 +64,8 @@ const EditorToolbar = ({ editor }) => {
             type="button"
             size="icon"
             variant="ghost"
+            title="Strikethrough"
+            aria-label="Strikethrough"
             className={getButtonClass(editor.isActive("strike"))}
             onClick={() => editor.chain().focus().toggleStrike().run()}
           >
@@ -67,6 +76,8 @@ const EditorToolbar = ({ editor }) => {
             type="button"
             size="icon"
             variant="ghost"
+            title="Underline"
+            aria-label="Underline"
             className={getButtonClass(editor.isActive("underline"))}
             onClick={() => editor.chain().focus().toggleUnderline().run()}
           >
@@ -77,16 +88,22 @@ const EditorToolbar = ({ editor }) => {
             type="button"
             size="icon"
             variant="ghost"
+            title="Highlight"
+            aria-label="Highlight"
             className={getButtonClass(editor.isActive("highlight"))}
             onClick={() => editor.chain().focus().toggleHighlight().run()}
           >
             <Highlighter size={18} />
           </Button>
 
+          <Divider />
+
           <Button
             type="button"
             size="icon"
             variant="ghost"
+            title="Heading 1"
+            aria-label="Heading 1"
             className={getButtonClass(editor.isActive("heading", { level: 1 }))}
             onClick={() =>
               editor.chain().focus().toggleHeading({ level: 1 }).run()
@@ -99,6 +116,8 @@ const EditorToolbar = ({ editor }) => {
             type="button"
             size="icon"
             variant="ghost"
+            title="Heading 2"
+            aria-label="Heading 2"
             className={getButtonClass(editor.isActive("heading", { level: 2 }))}
             onClick={() =>
               editor.chain().focus().toggleHeading({ level: 2 }).run()
@@ -107,10 +126,14 @@ const EditorToolbar = ({ editor }) => {
             <Heading2 size={18} />
           </Button>
 
+          <Divider />
+
           <Button
             type="button"
             size="icon"
             variant="ghost"
+            title="Bullet List"
+            aria-label="Bullet List"
             className={getButtonClass(editor.isActive("bulletList"))}
             onClick={() => editor.chain().focus().toggleBulletList().run()}
           >
@@ -121,16 +144,22 @@ const EditorToolbar = ({ editor }) => {
             type="button"
             size="icon"
             variant="ghost"
+            title="Ordered List"
+            aria-label="Ordered List"
             className={getButtonClass(editor.isActive("orderedList"))}
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
           >
             <ListOrdered size={18} />
           </Button>
 
+          <Divider />
+
           <Button
             type="button"
             size="icon"
             variant="ghost"
+            title="Code Block"
+            aria-label="Code Block"
             className={getButtonClass(editor.isActive("codeBlock"))}
             onClick={() => editor.chain().focus().toggleCodeBlock().run()}
           >
@@ -141,6 +170,8 @@ const EditorToolbar = ({ editor }) => {
             type="button"
             size="icon"
             variant="ghost"
+            title="Blockquote"
+            aria-label="Blockquote"
             className={getButtonClass(editor.isActive("blockquote"))}
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
           >
@@ -151,17 +182,23 @@ const EditorToolbar = ({ editor }) => {
             type="button"
             size="icon"
             variant="ghost"
+            title="Horizontal Rule"
+            aria-label="Horizontal Rule"
             className="shrink-0 hover:bg-gray-200 dark:hover:bg-gray-700"
             onClick={() => editor.chain().focus().setHorizontalRule().run()}
           >
             <Minus size={18} />
           </Button>
 
+          <Divider />
+
           <Button
             type="button"
             size="icon"
             variant="ghost"
-            className={getButtonClass(editor.isActive("left"))}
+            title="Align Left"
+            aria-label="Align Left"
+            className={getButtonClass(editor.isActive({ textAlign: "left" }))}
             onClick={() => editor.chain().focus().setTextAlign("left").run()}
           >
             <AlignLeft size={18} />
@@ -171,7 +208,9 @@ const EditorToolbar = ({ editor }) => {
             type="button"
             size="icon"
             variant="ghost"
-            className={getButtonClass(editor.isActive("center"))}
+            title="Align Center"
+            aria-label="Align Center"
+            className={getButtonClass(editor.isActive({ textAlign: "center" }))}
             onClick={() => editor.chain().focus().setTextAlign("center").run()}
           >
             <AlignCenter size={18} />
@@ -181,7 +220,9 @@ const EditorToolbar = ({ editor }) => {
             type="button"
             size="icon"
             variant="ghost"
-            className={getButtonClass(editor.isActive("right"))}
+            title="Align Right"
+            aria-label="Align Right"
+            className={getButtonClass(editor.isActive({ textAlign: "right" }))}
             onClick={() => editor.chain().focus().setTextAlign("right").run()}
           >
             <AlignRight size={18} />
@@ -191,16 +232,24 @@ const EditorToolbar = ({ editor }) => {
             type="button"
             size="icon"
             variant="ghost"
-            className={getButtonClass(editor.isActive("justify"))}
+            title="Justify"
+            aria-label="Justify"
+            className={getButtonClass(
+              editor.isActive({ textAlign: "justify" }),
+            )}
             onClick={() => editor.chain().focus().setTextAlign("justify").run()}
           >
             <AlignJustify size={18} />
           </Button>
 
+          <Divider />
+
           <Button
             type="button"
             size="icon"
             variant="ghost"
+            title="Undo"
+            aria-label="Undo"
             className="shrink-0 hover:bg-gray-200 dark:hover:bg-gray-700"
             onClick={() => editor.chain().focus().undo().run()}
           >
@@ -211,6 +260,8 @@ const EditorToolbar = ({ editor }) => {
             type="button"
             size="icon"
             variant="ghost"
+            title="Redo"
+            aria-label="Redo"
             className="shrink-0 hover:bg-gray-200 dark:hover:bg-gray-700"
             onClick={() => editor.chain().focus().redo().run()}
           >
