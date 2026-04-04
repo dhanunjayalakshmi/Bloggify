@@ -18,7 +18,7 @@ export const deleteDraftImages = async (draftId) => {
         console.error(
           "Failed to delete images for draftId:",
           draftId,
-          deleteError
+          deleteError,
         );
       }
     }
@@ -26,6 +26,33 @@ export const deleteDraftImages = async (draftId) => {
     return true;
   } catch (err) {
     console.error("Unexpected error deleting draft images:", err);
+    return false;
+  }
+};
+
+export const deleteImageByUrl = async (imageUrl) => {
+  try {
+    if (!imageUrl) return false;
+
+    const marker = "/storage/v1/object/public/blog-images/";
+    const idx = imageUrl.indexOf(marker);
+
+    if (idx === -1) return false;
+
+    const filePath = imageUrl.slice(idx + marker.length);
+
+    const { error } = await supabase.storage
+      .from("blog-images")
+      .remove([filePath]);
+
+    if (error) {
+      console.error("Failed to delete image:", error);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error("Unexpected error deleting image by URL:", err);
     return false;
   }
 };
