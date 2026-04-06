@@ -91,7 +91,7 @@ const BlogEditor = ({
   }, [editor]);
 
   return (
-    <div className="bg-white dark:bg-gray-800 mt-6 pt-6 rounded-lg">
+    <div className="mt-6 rounded-3xl border border-slate-700/40 bg-slate-900/60 shadow-xl backdrop-blur">
       {editor && showToolbar && (
         <div
           className="tiptap-toolbar absolute z-50 bg-background dark:bg-gray-800 rounded shadow-md transition-all"
@@ -104,13 +104,13 @@ const BlogEditor = ({
         </div>
       )}
 
-      <div ref={editorRef} className="w-full mx-auto px-4 pb-16">
+      <div ref={editorRef} className="w-full mx-auto px-5 md:px-8 pb-16 pt-6">
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Title..."
-          className="w-full text-4xl px-2 font-bold bg-transparent border-none outline-none mb-4 placeholder:text-gray-400 dark:placeholder:text-gray-500"
+          className="w-full bg-transparent border-none outline-none px-1 mb-6 text-4xl md:text-5xl font-extrabold tracking-tight text-white placeholder:text-slate-500"
         />
 
         <CoverImageUpload
