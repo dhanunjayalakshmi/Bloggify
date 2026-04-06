@@ -47,10 +47,8 @@ const PreviewPage = () => {
 
     try {
       await api.delete(`/blogs/${blog.id}`);
-
       toast.success("Blog deleted successfully");
-
-      navigate("/profile/posts"); // or dashboard posts page
+      navigate("/profile/posts");
     } catch (err) {
       console.error("Delete blog error:", err);
       toast.error("Failed to delete blog");
@@ -58,12 +56,12 @@ const PreviewPage = () => {
   };
 
   if (loading) {
-    return <p className="text-center mt-20">Loading preview...</p>;
+    return <p className="mt-20 text-center">Loading preview...</p>;
   }
 
   if (error || !blog) {
     return (
-      <div className="max-w-4xl mx-auto flex flex-col items-center justify-center h-screen space-y-6">
+      <div className="mx-auto flex h-screen max-w-4xl flex-col items-center justify-center space-y-6">
         <h2 className="text-2xl font-semibold">Invalid Preview</h2>
         <p className="text-muted-foreground">{error}</p>
         <Button onClick={() => navigate(-1)}>Go Back</Button>
@@ -72,70 +70,74 @@ const PreviewPage = () => {
   }
 
   return (
-    <div className="flex flex-col gap-8 bg-white dark:bg-gray-800 m-6 px-4 py-6 rounded-lg max-w-4xl mx-auto">
-      {mode === "editor" && (
-        <div className="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-4 py-2 text-center text-sm font-medium rounded-lg">
-          🛈 This is a preview. Your blog is not yet published.
-        </div>
-      )}
-
-      <div className="flex flex-col gap-2">
-        <h1 className="text-4xl font-bold">{blog?.title || "Untitled Blog"}</h1>
-
-        <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 mt-2">
-          <span>{mode === "editor" ? "Preview Mode" : "Owner Preview"}</span>
-          <span>•</span>
-          <span>{blog?.read_time || 1} min read</span>
-          <span>•</span>
-          <span>
-            {new Date(blog?.updated_at || Date.now()).toLocaleDateString()}
-          </span>
-        </div>
-      </div>
-
-      {previewCoverImage && (
-        <img
-          src={previewCoverImage}
-          alt="Cover"
-          className="w-full max-h-[400px] object-cover rounded-lg shadow"
-        />
-      )}
-
-      <div className="prose prose-lg dark:prose-invert">
-        <BlogContentRenderer content={blog?.content} />
-      </div>
-
-      {blog?.tags?.length > 0 && (
-        <div className="flex gap-2 flex-wrap">
-          {blog?.tags?.map((tag, index) => (
-            <span
-              key={index}
-              className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 px-2 py-1 rounded text-xs"
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
-      )}
-
-      <div className="flex justify-center gap-4">
+    <div className="mx-auto my-6 max-w-5xl px-4">
+      <div className="rounded-3xl border border-slate-200 bg-white px-5 py-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:px-8 md:py-8">
         {mode === "editor" && (
-          <Button onClick={() => navigate(-1)}>← Back to Editor</Button>
+          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
+            This is a preview. Your blog is not yet published.
+          </div>
         )}
 
-        {mode === "dashboard" && (
-          <>
-            <Button size="sm" onClick={() => navigate(`/editor/${blog?.id}`)}>
-              <Edit className="w-4 h-4 mr-1" />
-              Edit
-            </Button>
+        <div className="mb-6 flex flex-col gap-3">
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 md:text-5xl">
+            {blog?.title || "Untitled Blog"}
+          </h1>
 
-            <Button size="sm" variant="destructive" onClick={handleDelete}>
-              <Trash2 className="w-4 h-4 mr-1" />
-              Delete
-            </Button>
-          </>
+          <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+            <span>{mode === "editor" ? "Preview Mode" : "Owner Preview"}</span>
+            <span>•</span>
+            <span>{blog?.read_time || 1} min read</span>
+            <span>•</span>
+            <span>
+              {new Date(blog?.updated_at || Date.now()).toLocaleDateString()}
+            </span>
+          </div>
+        </div>
+
+        {previewCoverImage && (
+          <img
+            src={previewCoverImage}
+            alt="Cover"
+            className="mb-8 max-h-[420px] w-full rounded-3xl object-cover shadow-sm"
+          />
         )}
+
+        <div className="prose prose-slate prose-lg max-w-3xl dark:prose-invert dark:prose-headings:text-slate-100 dark:prose-p:text-slate-300 dark:prose-strong:text-slate-100 dark:prose-li:text-slate-300">
+          <BlogContentRenderer content={blog?.content} />
+        </div>
+
+        {blog?.tags?.length > 0 && (
+          <div className="mt-8 flex flex-wrap gap-2">
+            {blog.tags.map((tag, index) => (
+              <span
+                key={index}
+                className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-10 flex flex-wrap justify-center gap-3">
+          {mode === "editor" && (
+            <Button onClick={() => navigate(-1)}>Back to Editor</Button>
+          )}
+
+          {mode === "dashboard" && (
+            <>
+              <Button size="sm" onClick={() => navigate(`/editor/${blog?.id}`)}>
+                <Edit className="mr-1 h-4 w-4" />
+                Edit
+              </Button>
+
+              <Button size="sm" variant="destructive" onClick={handleDelete}>
+                <Trash2 className="mr-1 h-4 w-4" />
+                Delete
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

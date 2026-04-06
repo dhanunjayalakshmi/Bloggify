@@ -91,13 +91,15 @@ const BlogEditor = ({
   }, [editor]);
 
   return (
-    <div className="mt-6 rounded-3xl border border-slate-700/40 bg-slate-900/60 shadow-xl backdrop-blur">
+    <div className="mt-6 rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
       {editor && showToolbar && (
         <div
-          className="tiptap-toolbar absolute z-50 bg-background dark:bg-gray-800 rounded shadow-md transition-all"
+          className="tiptap-toolbar absolute z-50 transition-all"
           style={{
             top: `${toolbarPosition.top}px`,
             left: `${toolbarPosition.left}px`,
+            maxWidth: "calc(100vw - 32px)",
+            width: "min(720px, calc(100vw - 32px))",
           }}
         >
           <EditorToolbar editor={editor} />
@@ -110,7 +112,7 @@ const BlogEditor = ({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Title..."
-          className="w-full bg-transparent border-none outline-none px-1 mb-6 text-4xl md:text-5xl font-extrabold tracking-tight text-white placeholder:text-slate-500"
+          className="w-full bg-transparent border-none outline-none px-1 mb-6 text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
         />
 
         <CoverImageUpload

@@ -41,7 +41,7 @@ const CoverImageUpload = ({ coverImageUrl, setCoverImageUrl, draftId }) => {
   return (
     <div
       onClick={handleUpload}
-      className="relative mb-6 h-64 w-full md:w-4/5 mx-auto cursor-pointer overflow-hidden rounded-2xl border border-dashed border-slate-400/60 bg-slate-800/30 hover:border-orange-400 transition-colors"
+      className="relative mb-8 h-64 md:h-72 w-full md:w-4/5 mx-auto cursor-pointer overflow-hidden rounded-3xl border border-dashed border-slate-300 bg-slate-50 hover:border-orange-400 hover:bg-slate-100 transition-all dark:border-slate-700 dark:bg-slate-900/70 dark:hover:bg-slate-800/80"
     >
       {uploading && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
@@ -64,17 +64,17 @@ const CoverImageUpload = ({ coverImageUrl, setCoverImageUrl, draftId }) => {
             <X size={16} />
           </button>
 
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3 text-sm text-white">
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-4 py-3 text-sm text-white">
             Click to replace cover image
           </div>
         </>
       ) : (
-        <div className="flex h-full flex-col items-center justify-center text-slate-300">
+        <div className="flex h-full flex-col items-center justify-center text-slate-500 dark:text-slate-300">
           <ImageIcon size={34} />
           <span className="mt-2 text-sm font-medium">
             Click to upload cover image
           </span>
-          <span className="mt-1 text-xs text-slate-400">
+          <span className="mt-1 text-xs text-slate-400 dark:text-slate-500">
             Recommended wide image for best preview
           </span>
         </div>

@@ -34,13 +34,13 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
       const result = await getTagSuggestions(query);
       const filtered = result.filter(
         (tag) =>
-          !selectedTags.map((t) => t.toLowerCase()).includes(tag.toLowerCase())
+          !selectedTags.map((t) => t.toLowerCase()).includes(tag.toLowerCase()),
       );
       setSuggestions(filtered);
       setHighlightedIndex(-1);
       setLoading(false);
     }, 300),
-    [selectedTags]
+    [selectedTags],
   );
 
   useEffect(() => {
@@ -108,8 +108,11 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
   const remainingTags = MAX_TAGS - selectedTags.length;
 
   return (
-    <div className="space-y-4 mt-2">
-      <Label htmlFor="tagInput" className="text-base font-medium flex gap-2">
+    <div className="mt-6 space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <Label
+        htmlFor="tagInput"
+        className="flex gap-2 text-sm font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300"
+      >
         Tags ({selectedTags.length}/{MAX_TAGS})
       </Label>
 
@@ -151,14 +154,14 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
             isDisabled
               ? `Tag limit reached (${MAX_TAGS})`
               : remainingTags === 1
-              ? "Add 1 more tag..."
-              : `Add up to ${remainingTags} more tags...`
+                ? "Add 1 more tag..."
+                : `Add up to ${remainingTags} more tags...`
           }
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           autoComplete="off"
           maxLength={MAX_TAG_LENGTH}
-          className={`text-base ${
+          className={`border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 ${
             isDisabled ? "opacity-50 cursor-not-allowed" : ""
           } ${
             inputValue && !isValidTag(inputValue)
@@ -173,9 +176,9 @@ const TagInput = ({ selectedTags, setSelectedTags }) => {
           </div>
         )}
 
-        {!loading && suggestions.length > 0 && (
+        {!loading && suggestions?.length > 0 && (
           <div className="absolute z-20 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-48 overflow-y-auto">
-            {suggestions.map((s, i) => (
+            {suggestions?.map((s, i) => (
               <button
                 key={i}
                 type="button"

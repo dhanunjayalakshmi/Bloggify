@@ -145,7 +145,7 @@ const CreateEditBlog = () => {
       editorProps: {
         attributes: {
           class:
-            "focus:outline-none prose dark:prose-invert prose-lg max-w-3xl mx-auto py-12 px-4",
+            "focus:outline-none prose prose-lg max-w-3xl mx-auto px-2 py-10 prose-slate dark:prose-invert prose-headings:text-slate-900 prose-p:text-slate-700 prose-strong:text-slate-900 prose-li:text-slate-700 dark:prose-headings:text-slate-100 dark:prose-p:text-slate-300 dark:prose-strong:text-slate-100 dark:prose-li:text-slate-300",
         },
       },
       onUpdate,
@@ -519,6 +519,18 @@ const CreateEditBlog = () => {
 
   return (
     <div>
+      <div className="px-4 pt-2 mt-4">
+        <div className="mx-auto">
+          <span className="inline-flex items-center rounded-full border border-orange-300 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-600 dark:border-orange-500/30 dark:bg-orange-500/10 dark:text-orange-300">
+            {isEditMode
+              ? isPublishedBlog
+                ? "Editing published blog"
+                : "Editing draft blog"
+              : "New draft"}
+          </span>
+        </div>
+      </div>
+
       <BlogEditor
         editor={editor}
         title={title}
@@ -530,9 +542,9 @@ const CreateEditBlog = () => {
 
       <TagInput selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
 
-      <div className="sticky bottom-4 z-40 mt-6 px-4">
-        <div className="ml-auto my-4 flex justify-between gap-2 rounded-2xl border border-slate-700/60 bg-slate-900/90 px-3 py-3 shadow-2xl backdrop-blur">
-          <p className="text-xs text-slate-300">
+      <div className="sticky bottom-3 z-40 mt-6 px-3 md:bottom-4 md:px-4">
+        <div className="mx-auto my-4 flex max-w-5xl flex-col gap-3 rounded-2xl border border-slate-200 bg-white/95 px-3 py-3 shadow-lg backdrop-blur dark:border-slate-700 dark:bg-slate-900/90 dark:shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:flex-row md:items-center md:justify-between md:px-4">
+          <p className="text-xs leading-5 text-slate-500 dark:text-slate-300">
             {saving
               ? "Saving blog..."
               : autosaveStatus === "saving"
@@ -544,7 +556,7 @@ const CreateEditBlog = () => {
                     : "All changes are local until you save"}
           </p>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 md:flex md:flex-wrap md:items-center">
             <Button variant="outline" onClick={handlePreview} disabled={saving}>
               Preview
             </Button>
