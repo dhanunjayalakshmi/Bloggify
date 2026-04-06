@@ -18,6 +18,7 @@ import useBlogEditorDraft, {
   isEmptyContent,
   randomDraftId,
 } from "@/hooks/useBlogEditorDraft";
+import { deleteImageByUrl } from "@/services/blogStorage";
 
 const CustomImage = Image.extend({
   addAttributes() {
@@ -30,10 +31,9 @@ const CustomImage = Image.extend({
       },
       align: {
         default: "center",
-        parseHTML: () => "center",
-        renderHTML: () => ({
-          "data-align": "center",
-          class: "align-center rounded-lg",
+        parseHTML: (element) => element.getAttribute("data-align") || "center",
+        renderHTML: (attributes) => ({
+          "data-align": attributes.align || "center",
         }),
       },
     };
@@ -100,6 +100,21 @@ const CreateEditBlog = () => {
     coverImageUrl: "",
   });
 
+  const lastKnownImageUrls = useRef(new Set());
+
+  const extractImageUrlsFromHtml = useCallback((html) => {
+    if (!html) return new Set();
+
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html;
+
+    const urls = Array.from(tempDiv.querySelectorAll("img"))
+      .map((img) => img.getAttribute("src"))
+      .filter(Boolean);
+
+    return new Set(urls);
+  }, []);
+
   const loadEditorState = useCallback((data) => {
     setTitle(data?.title || "");
     setSelectedTags(data?.tags || []);
@@ -108,12 +123,15 @@ const CreateEditBlog = () => {
     setInitialContent(data?.html || data?.content || "<p></p>");
     setIsPublishedBlog(Boolean(data?.is_published));
 
+    const initialHtml = data?.html || data?.content || "<p></p>";
+
     lastSavedDraft.current = {
       html: data?.html || data?.content || "<p></p>",
       title: data?.title || "",
       tags: data?.tags || [],
       coverImageUrl: data?.coverImageUrl || data?.cover_image || "",
     };
+    lastKnownImageUrls.current = extractImageUrlsFromHtml(initialHtml);
   }, []);
 
   const fetchBlogById = useCallback(async (id) => {
@@ -123,6 +141,19 @@ const CreateEditBlog = () => {
 
   const onUpdate = ({ editor }) => {
     const html = editor?.getHTML();
+
+    const currentImageUrls = extractImageUrlsFromHtml(html);
+    const removedUrls = [...lastKnownImageUrls.current].filter(
+      (url) => !currentImageUrls.has(url),
+    );
+
+    if (removedUrls.length > 0) {
+      removedUrls.forEach(async (url) => {
+        await deleteImageByUrl(url);
+      });
+    }
+
+    lastKnownImageUrls.current = currentImageUrls;
 
     const hasContentChanged =
       html !== lastSavedDraft?.current?.html ||
