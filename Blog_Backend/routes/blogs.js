@@ -1,7 +1,6 @@
 const express = require("express");
 const supabase = require("../config/supabaseClient");
 const { validateBlog } = require("../utils/validators");
-const { uploadImage } = require("../utils/uploadImage");
 const { verifyToken } = require("../middlewares/authMiddleware");
 const path = require("path");
 const crypto = require("crypto");
@@ -148,7 +147,6 @@ router.get("/:blogId", verifyToken, async (req, res) => {
   try {
     const userId = req?.user?.id;
     const blogId = req?.params?.blogId;
-
     const { data: blog, error } = await supabase
       .from("blogs")
       .select(

@@ -21,7 +21,6 @@ const buildBlogsQuery = (supabase, userId, queryParams) => {
   const toRange = fromRange + limit - 1;
 
   let query = supabase.from("blogs").select("*").eq("user_id", userId);
-
   if (status === "published") {
     query = query
       .eq("is_published", true)
