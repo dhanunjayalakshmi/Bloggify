@@ -18,6 +18,7 @@ import useProfileNavigation from "@/hooks/useProfileNavigation";
 const BlogDetails = () => {
   const { blogId } = useParams();
   const [blog, setBlog] = useState(null);
+  const [commentsCount, setCommentsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const { isBookmarked, toggle } = useBookmark(blogId);
 
@@ -30,8 +31,15 @@ const BlogDetails = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const res = await api.get(`/blogs/${blogId}`);
-        setBlog(res?.data);
+        const [blogRes, commentsCountRes] = await Promise.all([
+          api.get(`/blogs/${blogId}`),
+          api.get(`/comments/counts`, {
+            params: { blogIds: blogId },
+          }),
+        ]);
+
+        setBlog(blogRes?.data);
+        setCommentsCount(commentsCountRes?.data?.[0]?.count || 0);
       } catch (err) {
         console.error("BlogDetails error:", {
           message: err?.message,
@@ -109,7 +117,7 @@ const BlogDetails = () => {
 
         <Button variant="ghostButton" aria-label="Comment">
           <MessageCircle className="h-5 w-5" />
-          <span>56</span>
+          <span>{commentsCount}</span>
         </Button>
 
         <Button variant="ghostButton" aria-label="Views">

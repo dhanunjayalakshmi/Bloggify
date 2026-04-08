@@ -9,6 +9,7 @@ router.get("/me", verifyToken, async (req, res) => {
   try {
     const supabase = req?.supabase;
     const authId = req?.user?.auth_id;
+    const nowIso = new Date().toISOString();
 
     const { data: user, error } = await supabase
       .from("users")
@@ -25,7 +26,6 @@ router.get("/me", verifyToken, async (req, res) => {
     // Aggregate stats
     const [
       { count: blogs_published },
-      { count: total_comments },
       { count: followers },
       { count: following },
     ] = await Promise?.all([
@@ -33,12 +33,8 @@ router.get("/me", verifyToken, async (req, res) => {
         .from("blogs")
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id)
-        .eq("is_published", true),
-
-      supabase
-        .from("comments")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id),
+        .eq("is_published", true)
+        .lte("published_at", nowIso),
 
       supabase
         .from("follows")
@@ -55,25 +51,38 @@ router.get("/me", verifyToken, async (req, res) => {
       .from("blogs")
       .select("id")
       .eq("user_id", user.id)
-      .eq("is_published", true);
+      .eq("is_published", true)
+      .lte("published_at", nowIso);
 
     if (blogsError) throw blogsError;
 
     const blogIds = userBlogs?.map((b) => b.id) || [];
 
     let total_upvotes = 0;
+    let total_comments = 0;
 
     if (blogIds.length > 0) {
-      const { count, error: votesError } = await supabase
-        .from("votes")
-        .select("*", { count: "exact", head: true })
-        .in("content_id", blogIds)
-        .eq("content_type", "blog")
-        .eq("vote_type", "upvote");
+      const [
+        { count: upvotesCount, error: votesError },
+        { count: commentsCount, error: commentsError },
+      ] = await Promise.all([
+        supabase
+          .from("votes")
+          .select("*", { count: "exact", head: true })
+          .in("content_id", blogIds)
+          .eq("content_type", "blog")
+          .eq("vote_type", "upvote"),
+        supabase
+          .from("comments")
+          .select("*", { count: "exact", head: true })
+          .in("blog_id", blogIds),
+      ]);
 
       if (votesError) throw votesError;
+      if (commentsError) throw commentsError;
 
-      total_upvotes = count || 0;
+      total_upvotes = upvotesCount || 0;
+      total_comments = commentsCount || 0;
     }
 
     res.json({
@@ -217,6 +226,7 @@ router.get("/:userId", verifyToken, async (req, res) => {
     const supabase = req?.supabase;
     const { userId } = req?.params;
     const viewerId = req?.user?.id;
+    const nowIso = new Date().toISOString();
 
     const { data: user, error } = await supabase
       .from("users")
@@ -234,7 +244,6 @@ router.get("/:userId", verifyToken, async (req, res) => {
 
     const [
       { count: blogs_published },
-      { count: total_comments },
       { count: followers },
       { count: following },
     ] = await Promise?.all([
@@ -242,12 +251,8 @@ router.get("/:userId", verifyToken, async (req, res) => {
         .from("blogs")
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id)
-        .eq("is_published", true),
-
-      supabase
-        .from("comments")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id),
+        .eq("is_published", true)
+        .lte("published_at", nowIso),
 
       supabase
         .from("follows")
@@ -264,25 +269,38 @@ router.get("/:userId", verifyToken, async (req, res) => {
       .from("blogs")
       .select("id")
       .eq("user_id", user.id)
-      .eq("is_published", true);
+      .eq("is_published", true)
+      .lte("published_at", nowIso);
 
     if (blogsError) throw blogsError;
 
     const blogIds = userBlogs?.map((b) => b.id) || [];
 
     let total_upvotes = 0;
+    let total_comments = 0;
 
     if (blogIds.length > 0) {
-      const { count, error: votesError } = await supabase
-        .from("votes")
-        .select("*", { count: "exact", head: true })
-        .in("content_id", blogIds)
-        .eq("content_type", "blog")
-        .eq("vote_type", "upvote");
+      const [
+        { count: upvotesCount, error: votesError },
+        { count: commentsCount, error: commentsError },
+      ] = await Promise.all([
+        supabase
+          .from("votes")
+          .select("*", { count: "exact", head: true })
+          .in("content_id", blogIds)
+          .eq("content_type", "blog")
+          .eq("vote_type", "upvote"),
+        supabase
+          .from("comments")
+          .select("*", { count: "exact", head: true })
+          .in("blog_id", blogIds),
+      ]);
 
       if (votesError) throw votesError;
+      if (commentsError) throw commentsError;
 
-      total_upvotes = count || 0;
+      total_upvotes = upvotesCount || 0;
+      total_comments = commentsCount || 0;
     }
 
     res.json({

@@ -17,6 +17,10 @@ const buildBlogsQuery = (supabase, userId, queryParams) => {
   page = Number(page);
   limit = Number(limit);
 
+  if (!["published", "draft"].includes(status)) {
+    status = "published";
+  }
+
   const fromRange = (page - 1) * limit;
   const toRange = fromRange + limit - 1;
 
@@ -183,15 +187,29 @@ router.get("/stats", verifyToken, async (req, res) => {
   try {
     const supabase = req?.supabase;
     const userId = req.user.id;
+    const nowIso = new Date().toISOString();
 
-    const { data: blogs } = await supabase
+    const { data: publishedBlogs, error: blogsError } = await supabase
       .from("blogs")
       .select("id, views")
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .eq("is_published", true)
+      .lte("published_at", nowIso);
 
-    const blogIds = blogs?.map((b) => b.id);
+    if (blogsError) throw blogsError;
 
-    const totalViews = blogs?.reduce((sum, b) => sum + (b.views || 0), 0);
+    const blogIds = publishedBlogs?.map((b) => b.id);
+
+    const totalViews = publishedBlogs?.reduce((sum, b) => sum + (b.views || 0), 0);
+
+    if (!blogIds?.length) {
+      return res.json({
+        totalBlogs: 0,
+        totalViews: 0,
+        totalComments: 0,
+        totalUpvotes: 0,
+      });
+    }
 
     const { count: totalComments, error: commentsError } = await supabase
       .from("comments")
@@ -211,7 +229,7 @@ router.get("/stats", verifyToken, async (req, res) => {
     if (votesError) throw votesError;
 
     res.json({
-      totalBlogs: blogs?.length,
+      totalBlogs: publishedBlogs?.length,
       totalViews,
       totalComments: totalComments || 0,
       totalUpvotes: totalUpvotes || 0,

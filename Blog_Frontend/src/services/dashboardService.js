@@ -1,7 +1,7 @@
 import api from "@/lib/apiClient";
 
 export const fetchDashboardBlogs = ({
-  status,
+  status = "published",
   search,
   sort,
   tags,
@@ -21,7 +21,6 @@ export const fetchDashboardBlogs = ({
 
   if (dateRange?.from) params?.append("from", dateRange.from.toISOString());
   if (dateRange?.to) params?.append("to", dateRange.to.toISOString());
-  console.log(params);
 
   return api.get(`/dashboard/blog-stats?${params}`);
 };

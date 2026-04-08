@@ -26,8 +26,24 @@ const StatsContainer = () => {
 
     const loadBlogs = async () => {
       try {
-        const res = await fetchDashboardBlogs();
-        setBlogs(res?.data?.blogs || []);
+        const collectedBlogs = [];
+        let page = 1;
+        let hasMore = true;
+
+        while (hasMore) {
+          const res = await fetchDashboardBlogs({
+            status: "published",
+            page,
+            limit: 50,
+          });
+
+          const pageBlogs = res?.data?.blogs || [];
+          collectedBlogs.push(...pageBlogs);
+          hasMore = Boolean(res?.data?.hasMore);
+          page += 1;
+        }
+
+        setBlogs(collectedBlogs);
       } catch (err) {
         console.log("Blogs load failed", err);
       }

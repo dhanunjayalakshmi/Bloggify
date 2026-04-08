@@ -62,17 +62,26 @@ export default function StatsChart({ blogs }) {
     if (!blog.created_at) return;
 
     const date = new Date(blog.created_at);
-    const month = date.toLocaleString("default", { month: "short" });
+    const monthKey = `${date.getFullYear()}-${String(
+      date.getMonth() + 1,
+    ).padStart(2, "0")}`;
 
-    postsPerMonth[month] = (postsPerMonth[month] || 0) + 1;
+    if (!postsPerMonth[monthKey]) {
+      postsPerMonth[monthKey] = {
+        month: date.toLocaleString("default", {
+          month: "short",
+          year: "numeric",
+        }),
+        posts: 0,
+      };
+    }
+
+    postsPerMonth[monthKey].posts += 1;
   });
 
-  const publishingData = Object.entries(postsPerMonth).map(
-    ([month, count]) => ({
-      month,
-      posts: count,
-    }),
-  );
+  const publishingData = Object.entries(postsPerMonth)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, value]) => value);
 
   return (
     <div className="flex flex-col gap-4">
@@ -182,6 +191,8 @@ export default function StatsChart({ blogs }) {
               dataKey="posts"
               stroke="#6366f1"
               strokeWidth={2}
+              dot={{ r: 4, strokeWidth: 2, fill: "#6366f1" }}
+              activeDot={{ r: 6 }}
             />
           </LineChart>
         </ResponsiveContainer>
