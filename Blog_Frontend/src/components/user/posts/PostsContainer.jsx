@@ -46,6 +46,8 @@ const PostsContainer = () => {
   useEffect(() => {
     const id = setTimeout(() => {
       setDebouncedSearch(filters?.search);
+      setPagination((prev) => ({ ...prev, page: 1, hasMore: true }));
+      setDataState((prev) => ({ ...prev, posts: [] }));
     }, 300);
 
     return () => clearTimeout(id);

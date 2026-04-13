@@ -12,6 +12,10 @@ const PostsFilters = ({ filters, onChange, sortOptions, tags }) => {
   const [localSearch, setLocalSearch] = useState(filters?.search);
 
   useEffect(() => {
+    setLocalSearch(filters?.search || "");
+  }, [filters?.search]);
+
+  useEffect(() => {
     const id = setTimeout(() => {
       onChange({ search: localSearch });
     }, 300);
