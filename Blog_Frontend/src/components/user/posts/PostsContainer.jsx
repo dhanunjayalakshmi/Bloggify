@@ -99,9 +99,49 @@ const PostsContainer = () => {
   ]);
 
   useEffect(() => {
-    // placeholder — we will replace with shared tags API
-    setTags(["All Tags", "React", "Javascript", "Tutorial", "Personal"]);
-  }, []);
+    let ignore = false;
+
+    const loadTags = async () => {
+      try {
+        const allTags = new Set();
+        let page = 1;
+        let hasMore = true;
+
+        while (hasMore) {
+          const res = await fetchDashboardBlogs({
+            status: activeTab,
+            page,
+            limit: 50,
+          });
+
+          const posts = res?.data?.blogs || [];
+          posts.forEach((post) => {
+            post?.tags?.forEach((tag) => {
+              if (tag) allTags.add(tag);
+            });
+          });
+
+          hasMore = Boolean(res?.data?.hasMore);
+          page += 1;
+        }
+
+        if (!ignore) {
+          setTags(["All Tags", ...Array.from(allTags).sort()]);
+        }
+      } catch (err) {
+        console.error("Failed to load dashboard post tags", err);
+        if (!ignore) {
+          setTags(["All Tags"]);
+        }
+      }
+    };
+
+    loadTags();
+
+    return () => {
+      ignore = true;
+    };
+  }, [activeTab]);
 
   return (
     <div className="space-y-4">

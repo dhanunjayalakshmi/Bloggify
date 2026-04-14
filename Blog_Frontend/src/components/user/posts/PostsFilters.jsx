@@ -6,28 +6,14 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect, useState } from "react";
 
 const PostsFilters = ({ filters, onChange, sortOptions, tags }) => {
-  const [localSearch, setLocalSearch] = useState(filters?.search);
-
-  useEffect(() => {
-    setLocalSearch(filters?.search || "");
-  }, [filters?.search]);
-
-  useEffect(() => {
-    const id = setTimeout(() => {
-      onChange({ search: localSearch });
-    }, 300);
-    return () => clearTimeout(id);
-  }, [localSearch]);
-
   return (
     <div className="flex flex-col sm:flex-row gap-4">
       <Input
         placeholder="Search by title..."
-        value={localSearch}
-        onChange={(e) => setLocalSearch(e.target.value)}
+        value={filters?.search || ""}
+        onChange={(e) => onChange({ search: e.target.value })}
         className="sm:max-w-sm"
       />
 

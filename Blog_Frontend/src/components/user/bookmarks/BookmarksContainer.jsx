@@ -25,6 +25,18 @@ const BookmarkCardItem = ({ blog }) => {
   );
 };
 
+const formatTag = (tag) => {
+  const normalized = String(tag || "")
+    .trim()
+    .replace(/^#/, "")
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+
+  return normalized
+    ? normalized.charAt(0).toUpperCase() + normalized.slice(1)
+    : "";
+};
+
 const BookmarksContainer = () => {
   const { bookmarkList, loading, fetchBookmarkedBlogs } = useBookmarkStore();
 
@@ -33,13 +45,15 @@ const BookmarksContainer = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const availableTags = [
-    ...new Set(bookmarkList?.flatMap((blog) => blog?.tags)),
-  ];
+    ...new Set(bookmarkList?.flatMap((blog) => blog?.tags?.map(formatTag))),
+  ].sort();
 
   const filteredBookmarks = bookmarkList
     ?.filter(
       (blog) =>
-        (selectedTag ? blog?.tags?.includes(selectedTag) : true) &&
+        (selectedTag
+          ? blog?.tags?.some((tag) => formatTag(tag) === selectedTag)
+          : true) &&
         (searchTerm
           ? blog?.title?.toLowerCase()?.includes(searchTerm?.toLowerCase())
           : true),

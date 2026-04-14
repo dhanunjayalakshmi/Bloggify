@@ -2,6 +2,23 @@ const express = require("express");
 const { verifyToken } = require("../middlewares/authMiddleware");
 const router = express.Router();
 
+const formatTag = (tag) => {
+  const normalized = String(tag || "")
+    .trim()
+    .replace(/^#/, "")
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+
+  return normalized
+    ? normalized.charAt(0).toUpperCase() + normalized.slice(1)
+    : "";
+};
+
+const getTagVariants = (tag) => {
+  const formatted = formatTag(tag);
+  return [...new Set([formatted, formatted.toLowerCase()].filter(Boolean))];
+};
+
 const buildBlogsQuery = (supabase, userId, queryParams) => {
   let {
     status = "published",
@@ -40,8 +57,8 @@ const buildBlogsQuery = (supabase, userId, queryParams) => {
   }
 
   if (tags) {
-    const tagList = tags.split(",").map((t) => t.trim().toLowerCase());
-    query = query.contains("tags", tagList);
+    const tagList = tags.split(",").flatMap(getTagVariants);
+    query = query.overlaps("tags", tagList);
   }
 
   if (from) query = query.gte("created_at", from);
@@ -129,6 +146,7 @@ router.get("/blog-stats", verifyToken, async (req, res) => {
       title: blog?.title,
       views: blog?.views,
       content: getPreview(blog?.content),
+      tags: blog?.tags?.map(formatTag) || [],
       comments: commentMap[blog?.id],
       upvotes: voteMap[blog?.id],
       status: blog?.is_published ? "Published" : "Draft",
@@ -200,7 +218,10 @@ router.get("/stats", verifyToken, async (req, res) => {
 
     const blogIds = publishedBlogs?.map((b) => b.id);
 
-    const totalViews = publishedBlogs?.reduce((sum, b) => sum + (b.views || 0), 0);
+    const totalViews = publishedBlogs?.reduce(
+      (sum, b) => sum + (b.views || 0),
+      0,
+    );
 
     if (!blogIds?.length) {
       return res.json({

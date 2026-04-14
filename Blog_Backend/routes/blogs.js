@@ -9,6 +9,28 @@ const router = express.Router();
 const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() });
 
+const formatTag = (tag) => {
+  const normalized = String(tag || "")
+    .trim()
+    .replace(/^#/, "")
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+
+  return normalized
+    ? normalized.charAt(0).toUpperCase() + normalized.slice(1)
+    : "";
+};
+
+const normalizeTags = (tags = []) => {
+  const tagList = Array.isArray(tags) ? tags : String(tags || "").split(",");
+  return tagList.map(formatTag).filter(Boolean);
+};
+
+const getTagVariants = (tag) => {
+  const formatted = formatTag(tag);
+  return [...new Set([formatted, formatted.toLowerCase()].filter(Boolean))];
+};
+
 // Get all blogs
 router.get("/", async (req, res) => {
   try {
@@ -46,8 +68,8 @@ router.get("/", async (req, res) => {
 
     if (tags) {
       const tagsArray = tags?.includes(",") ? tags?.split(",") : [tags];
-      const tagsLowerCase = tagsArray.map((tag) => tag.toLowerCase());
-      baseQuery = baseQuery?.contains("tags", tagsLowerCase);
+      const tagVariants = tagsArray.flatMap(getTagVariants);
+      baseQuery = baseQuery?.overlaps("tags", tagVariants);
     }
 
     if (exclude) {
@@ -55,9 +77,7 @@ router.get("/", async (req, res) => {
     }
 
     if (overlapTags) {
-      const tagsArray = overlapTags
-        .split(",")
-        .map((t) => t.trim().toLowerCase());
+      const tagsArray = overlapTags.split(",").flatMap(getTagVariants);
       baseQuery = baseQuery.overlaps("tags", tagsArray);
     }
 
@@ -90,8 +110,8 @@ router.get("/", async (req, res) => {
     }
 
     if (tags && tags !== "All Tags") {
-      const tagsArray = tags?.split(",").map((tag) => tag.trim().toLowerCase());
-      query = query?.contains("tags", tagsArray);
+      const tagsArray = tags?.split(",").flatMap(getTagVariants);
+      query = query?.overlaps("tags", tagsArray);
     }
 
     if (exclude) {
@@ -99,9 +119,7 @@ router.get("/", async (req, res) => {
     }
 
     if (overlapTags) {
-      const tagsArray = overlapTags
-        .split(",")
-        .map((t) => t.trim().toLowerCase());
+      const tagsArray = overlapTags.split(",").flatMap(getTagVariants);
       query = query.overlaps("tags", tagsArray);
     }
 
@@ -218,9 +236,7 @@ router.post("/", verifyToken, async (req, res) => {
       title: title.trim(),
       content,
       cover_image: coverImageUrl,
-      tags: Array.isArray(tags)
-        ? tags?.map((tag) => tag?.trim().toLowerCase())
-        : tags?.split(",").map((tag) => tag?.trim().toLowerCase()),
+      tags: normalizeTags(tags),
       read_time: read_time || Math.ceil(content.split(" ").length / 200),
       user_id: user.id,
       is_published: Boolean(is_published),
@@ -326,7 +342,7 @@ router.put("/:blogId", verifyToken, async (req, res) => {
     const updatePayload = {
       title,
       content,
-      tags,
+      tags: tags === undefined ? undefined : normalizeTags(tags),
       cover_image: coverImageUrl,
       is_published,
       is_public,
