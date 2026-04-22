@@ -39,7 +39,7 @@ const buildBlogsQuery = (supabase, userId, queryParams) => {
   }
 
   const fromRange = (page - 1) * limit;
-  const toRange = fromRange + limit - 1;
+  const toRange = fromRange + limit;
 
   let query = supabase.from("blogs").select("*").eq("user_id", userId);
   if (status === "published") {
@@ -100,7 +100,9 @@ router.get("/blog-stats", verifyToken, async (req, res) => {
 
     if (error) throw error;
 
-    const blogIds = blogs?.map((blog) => blog?.id) || [];
+    const hasMore = (blogs?.length || 0) > limit;
+    const pagedBlogs = hasMore ? blogs.slice(0, limit) : blogs;
+    const blogIds = pagedBlogs?.map((blog) => blog?.id) || [];
 
     if (!blogIds?.length) {
       return res.json({
@@ -141,7 +143,7 @@ router.get("/blog-stats", verifyToken, async (req, res) => {
       voteMap[v.content_id]++;
     });
 
-    const result = blogs?.map((blog) => ({
+    const result = pagedBlogs?.map((blog) => ({
       id: blog?.id,
       title: blog?.title,
       views: blog?.views,
@@ -160,7 +162,7 @@ router.get("/blog-stats", verifyToken, async (req, res) => {
       blogs: result,
       page,
       limit,
-      hasMore: blogs?.length === limit,
+      hasMore,
     });
   } catch (err) {
     console.error("Dashboard posts error:", err);
