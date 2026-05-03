@@ -35,7 +35,12 @@ export const useAuthStore = create(
     }),
     {
       name: "auth-storage",
-      getStorage: () => localStorage,
+      partialize: (state) => ({
+        user: state?.user,
+        token: state?.token,
+        profile: state?.profile,
+        isManualLogout: state?.isManualLogout,
+      }),
     },
   ),
 );

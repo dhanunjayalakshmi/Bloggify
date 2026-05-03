@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getAuthToken } from "@/utils/authToken";
+import { useAuthStore } from "@/stores/authStore";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
@@ -10,14 +10,13 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   try {
-    const token = getAuthToken();
+    const token = useAuthStore.getState()?.token;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
   } catch (e) {
-    console.error("Failed to parse auth token", e);
+    console.error("Failed to read auth token", e);
   }
-
   return config;
 });
 

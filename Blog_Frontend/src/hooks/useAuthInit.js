@@ -9,40 +9,23 @@ const useAuthInit = () => {
   const clearAuth = useAuthStore((store) => store.clearAuth);
 
   useEffect(() => {
-    const initSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!session?.user) {
+          clearAuth();
+          return;
+        }
 
-      if (session?.user) {
         setUser(session.user, session.access_token);
 
-        try {
-          const res = await api.get("/users/me");
-          setProfile(res?.data);
-        } catch (err) {
-          console.error("Failed to fetch profile", err);
-        }
-      } else {
-        clearAuth();
-      }
-    };
-
-    initSession();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (_, session) => {
-        if (session?.user) {
-          setUser(session.user, session.access_token);
-
+        // Only fetch profile on actual sign-in or initial page load, not on every token refresh
+        if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
           try {
             const res = await api.get("/users/me");
-            setProfile(res.data);
+            setProfile(res?.data);
           } catch (err) {
             console.error("Failed to fetch profile", err);
           }
-        } else {
-          clearAuth();
         }
       },
     );

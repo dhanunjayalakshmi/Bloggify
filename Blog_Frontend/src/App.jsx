@@ -5,16 +5,21 @@ import AuthModal from "./components/AuthModal";
 import useThemeInit from "./hooks/useThemeInit";
 import useAuthInit from "./hooks/useAuthInit";
 import { useBookmarkStore } from "./stores/bookmarksStore";
+import { useAuthStore } from "./stores/authStore";
 import { useEffect } from "react";
 
 function App() {
   useThemeInit();
   useAuthInit();
   const fetchBookmarks = useBookmarkStore((store) => store?.fetchBookmarks);
+  const isInitialized = useAuthStore((state) => state?.isInitialized);
+  const user = useAuthStore((state) => state?.user);
 
   useEffect(() => {
-    fetchBookmarks();
-  }, [fetchBookmarks]);
+    if (isInitialized && user) {
+      fetchBookmarks();
+    }
+  }, [isInitialized, user, fetchBookmarks]);
 
   return (
     <>
