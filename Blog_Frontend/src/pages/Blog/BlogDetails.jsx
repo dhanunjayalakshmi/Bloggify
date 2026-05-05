@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "@/lib/apiClient";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
-import { Bookmark, MessageCircle, Share2, Flame } from "lucide-react";
+import { Bookmark, MessageCircle, Share2, Link as LinkIcon } from "lucide-react";
 import BlogContentRenderer from "@/components/blogEditor/BlogContentRenderer";
 import ContentVotes from "@/components/blogs/ContentVotes";
 import BlogComments from "@/components/blogs/BlogComments";
@@ -14,6 +14,14 @@ import MiniBlogList from "@/components/blogs/MiniBlogList";
 import useAuthorOtherBlogs from "@/hooks/useAuthorOtherBlogs";
 import FollowButton from "@/components/user/profile/FollowButton";
 import useProfileNavigation from "@/hooks/useProfileNavigation";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 const BlogDetails = () => {
   const { blogId } = useParams();
@@ -21,6 +29,30 @@ const BlogDetails = () => {
   const [commentsCount, setCommentsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const { isBookmarked, toggle } = useBookmark(blogId);
+  const commentsRef = useRef(null);
+
+  const scrollToComments = () => {
+    commentsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handleShareOption = (platform) => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(blog?.title || "");
+
+    const destinations = {
+      twitter: `https://twitter.com/intent/tweet?url=${url}&text=${text}`,
+      linkedin: `https://linkedin.com/sharing/share-offsite/?url=${url}`,
+      whatsapp: `https://wa.me/?text=${text}%20${url}`,
+    };
+
+    if (platform === "copy") {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success("Link copied to clipboard!");
+      return;
+    }
+
+    window.open(destinations[platform], "_blank", "noopener,noreferrer");
+  };
 
   const { blogs: relatedBlogs } = useRelatedBlogs(blog?.tags, blogId);
   const authorId = blog?.users?.id;
@@ -115,7 +147,7 @@ const BlogDetails = () => {
           className="ml-2"
         />
 
-        <Button variant="ghostButton" aria-label="Comment">
+        <Button variant="ghostButton" aria-label="Comment" onClick={scrollToComments}>
           <MessageCircle className="h-5 w-5" />
           <span>{commentsCount}</span>
         </Button>
@@ -139,9 +171,44 @@ const BlogDetails = () => {
           />
         </Button>
 
-        <Button size="icon" variant="ghostButton" aria-label="Share">
-          <Share2 className="h-5 w-5" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="icon"
+              variant="ghostButton"
+              aria-label="Share"
+            >
+              <Share2 className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="dark:bg-gray-900 w-44">
+            <DropdownMenuItem
+              onClick={() => handleShareOption("twitter")}
+              className="gap-2 dark:hover:bg-gray-800 cursor-pointer"
+            >
+              <span className="font-bold text-sm w-4 text-center">𝕏</span> Share on X
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleShareOption("linkedin")}
+              className="gap-2 dark:hover:bg-gray-800 cursor-pointer"
+            >
+              <span className="font-bold text-sm w-4 text-center text-blue-600">in</span> Share on LinkedIn
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleShareOption("whatsapp")}
+              className="gap-2 dark:hover:bg-gray-800 cursor-pointer"
+            >
+              💬 Share on WhatsApp
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => handleShareOption("copy")}
+              className="gap-2 dark:hover:bg-gray-800 cursor-pointer"
+            >
+              <LinkIcon className="h-4 w-4" /> Copy link
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {coverImageUrl && (
@@ -171,7 +238,9 @@ const BlogDetails = () => {
         </div>
       )}
 
-      <BlogComments blogId={blogId} />
+      <div ref={commentsRef}>
+        <BlogComments blogId={blogId} />
+      </div>
 
       {/* Other Articles from Author */}
       <div className="mt-10">
