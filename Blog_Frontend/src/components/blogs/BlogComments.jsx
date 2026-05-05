@@ -75,6 +75,7 @@ const CommentItem = ({ comment, blogId, refresh }) => {
   const [showEdit, setShowEdit] = useState(false);
   const [replies, setReplies] = useState([]);
   const [repliesLoaded, setRepliesLoaded] = useState(false);
+  const [replyCount, setReplyCount] = useState(comment?.reply_count ?? 0);
 
   const userId = useAuthStore((state) => state?.profile?.id);
 
@@ -171,9 +172,11 @@ const CommentItem = ({ comment, blogId, refresh }) => {
               </Button>
             </>
           )}
-          <Button size="sm" variant="ghostButton" onClick={fetchReplies}>
-            {repliesLoaded ? "Hide Replies" : "Show Replies"}
-          </Button>
+          {replyCount > 0 && (
+            <Button size="sm" variant="ghostButton" onClick={fetchReplies}>
+              {repliesLoaded ? "Hide Replies" : `Show Replies (${replyCount})`}
+            </Button>
+          )}
         </div>
         {showReply && (
           <div className="ml-6 mt-3">
@@ -182,6 +185,7 @@ const CommentItem = ({ comment, blogId, refresh }) => {
               parentId={comment?.id}
               onSubmit={() => {
                 setShowReply(false);
+                setReplyCount((c) => c + 1);
                 setRepliesLoaded(false);
                 fetchReplies();
               }}

@@ -65,14 +65,38 @@ router.get("/:blogId", verifyToken, async (req, res) => {
 
     const { data, error } = await req?.supabase
       .from("comments")
-      .select("*, users(name)")
+      .select("*, users(name, avatar)")
       .eq("blog_id", blogId)
       .is("parent_id", null)
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) throw error;
-    res.status(200).json({ comments: data });
+
+    if (!data?.length) {
+      return res.status(200).json({ comments: [] });
+    }
+
+    // Batch-fetch reply counts for all returned comments in one query
+    const commentIds = data.map((c) => c.id);
+    const { data: replyRows, error: replyError } = await req?.supabase
+      .from("comments")
+      .select("parent_id")
+      .in("parent_id", commentIds);
+
+    if (replyError) throw replyError;
+
+    const replyCountMap = {};
+    replyRows?.forEach((r) => {
+      replyCountMap[r.parent_id] = (replyCountMap[r.parent_id] || 0) + 1;
+    });
+
+    const comments = data.map((c) => ({
+      ...c,
+      reply_count: replyCountMap[c.id] || 0,
+    }));
+
+    res.status(200).json({ comments });
   } catch (error) {
     res.status(500).json({ error: error?.message });
   }
@@ -87,7 +111,7 @@ router.get("/:blogId/replies/:commentId", verifyToken, async (req, res) => {
 
     const { data, error } = await req?.supabase
       .from("comments")
-      .select("*, users(name)")
+      .select("*, users(name, avatar)")
       .eq("parent_id", commentId)
       .order("created_at", { ascending: true })
       .range(offset, offset + limit - 1);
