@@ -4,13 +4,13 @@ import { useAuthStore } from "@/stores/authStore";
 import { useParams } from "react-router";
 
 const useUserProfile = () => {
-  const { token } = useAuthStore();
+  const isInitialized = useAuthStore((state) => state?.isInitialized);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const { userId } = useParams();
 
   useEffect(() => {
-    if (!token || !userId) return;
+    if (!isInitialized || !userId) return;
 
     const fetchProfile = async () => {
       try {
@@ -25,7 +25,7 @@ const useUserProfile = () => {
     };
 
     fetchProfile();
-  }, [userId, token]);
+  }, [userId, isInitialized]);
 
   return { data, loading };
 };

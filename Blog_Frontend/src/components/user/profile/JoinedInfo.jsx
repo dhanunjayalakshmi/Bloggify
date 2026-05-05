@@ -1,6 +1,8 @@
-import React from "react";
-
-const formatDate = (iso) => new Date(iso).toLocaleDateString();
+const formatDate = (iso) => {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? "—" : d.toLocaleDateString();
+};
 
 const JoinedInfo = ({ joinDate, lastActive }) => {
   return (

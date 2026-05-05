@@ -28,6 +28,7 @@ const useAuthorBlogs = (username) => {
       setHasMore(res.data.hasMore);
     } catch (err) {
       console.error("Failed to fetch author blogs:", err);
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
