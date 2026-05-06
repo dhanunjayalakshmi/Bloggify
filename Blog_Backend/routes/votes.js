@@ -93,6 +93,20 @@ router.post("/", verifyToken, async (req, res) => {
     const { content_id, content_type, vote_type } = req?.body;
     const userId = req?.user?.id;
 
+    if (content_type === "blog") {
+      const { data: blog, error: blogError } = await req?.supabase
+        .from("blogs")
+        .select("user_id")
+        .eq("id", content_id)
+        .single();
+
+      if (blogError) throw blogError;
+
+      if (blog?.user_id === userId) {
+        return res.status(403).json({ error: "You cannot vote on your own blog" });
+      }
+    }
+
     const { data: existingVote, error: fetchError } = await req?.supabase
       .from("votes")
       .select("id, vote_type")

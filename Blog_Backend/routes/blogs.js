@@ -192,17 +192,22 @@ router.get("/:blogId", verifyToken, async (req, res) => {
       return res.status(404).json({ error: "Access denied" });
     }
 
-    const { data: viewsUpdate, error: updateError } = await req?.supabase
-      .from("blogs")
-      .update({ views: blog?.views + 1 })
-      .eq("id", blogId)
-      .select();
+    let currentViews = blog?.views;
 
-    if (updateError) throw updateError;
+    if (userId !== blog?.user_id) {
+      const { data: viewsUpdate, error: updateError } = await req?.supabase
+        .from("blogs")
+        .update({ views: blog?.views + 1 })
+        .eq("id", blogId)
+        .select();
+
+      if (updateError) throw updateError;
+      currentViews = viewsUpdate[0]?.views;
+    }
 
     res.status(200).json({
       ...blog,
-      views: viewsUpdate[0]?.views,
+      views: currentViews,
     });
   } catch (error) {
     res.status(500).json({ error: error?.message });

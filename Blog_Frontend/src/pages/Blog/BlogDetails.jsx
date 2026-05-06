@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "@/lib/apiClient";
+import { useAuthStore } from "@/stores/authStore";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { Bookmark, MessageCircle, Share2, Link as LinkIcon } from "lucide-react";
@@ -28,6 +29,7 @@ const BlogDetails = () => {
   const [blog, setBlog] = useState(null);
   const [commentsCount, setCommentsCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const currentUserId = useAuthStore((state) => state?.profile?.id);
   const { isBookmarked, toggle } = useBookmark(blogId);
   const commentsRef = useRef(null);
 
@@ -145,6 +147,7 @@ const BlogDetails = () => {
           contentId={blog?.id}
           contentType="blog"
           className="ml-2"
+          disabled={currentUserId === blog?.user_id}
         />
 
         <Button variant="ghostButton" aria-label="Comment" onClick={scrollToComments}>
