@@ -118,6 +118,10 @@ router.post("/", verifyToken, async (req, res) => {
       return res.status(400).json({ error: "Missing following id" });
     }
 
+    if (following_id === follower_id) {
+      return res.status(400).json({ error: "You cannot follow yourself" });
+    }
+
     const { data: existingFollower, error: fetchError } = await req?.supabase
       .from("follows")
       .select("id")

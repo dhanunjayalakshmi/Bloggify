@@ -139,7 +139,7 @@ const BlogDetails = () => {
             </span>
           </div>
         </div>
-        <FollowButton userId={users?.id} />
+        {currentUserId !== users?.id && <FollowButton userId={users?.id} />}
       </div>
 
       <div className="flex items-center gap-4 mt-4">

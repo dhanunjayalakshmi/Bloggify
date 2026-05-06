@@ -195,14 +195,33 @@ router.get("/:blogId", verifyToken, async (req, res) => {
     let currentViews = blog?.views;
 
     if (userId !== blog?.user_id) {
-      const { data: viewsUpdate, error: updateError } = await req?.supabase
-        .from("blogs")
-        .update({ views: blog?.views + 1 })
-        .eq("id", blogId)
-        .select();
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-      if (updateError) throw updateError;
-      currentViews = viewsUpdate[0]?.views;
+      const { data: existingView } = await req?.supabase
+        .from("blog_views")
+        .select("last_viewed_at")
+        .eq("user_id", userId)
+        .eq("blog_id", blogId)
+        .maybeSingle();
+
+      const shouldCount =
+        !existingView || existingView.last_viewed_at < oneDayAgo;
+
+      if (shouldCount) {
+        await req?.supabase.from("blog_views").upsert(
+          { user_id: userId, blog_id: blogId, last_viewed_at: new Date().toISOString() },
+          { onConflict: "user_id,blog_id" }
+        );
+
+        const { data: viewsUpdate, error: updateError } = await req?.supabase
+          .from("blogs")
+          .update({ views: blog?.views + 1 })
+          .eq("id", blogId)
+          .select();
+
+        if (updateError) throw updateError;
+        currentViews = viewsUpdate[0]?.views;
+      }
     }
 
     res.status(200).json({
