@@ -3,6 +3,26 @@ import useFollowList from "@/hooks/useFollowList";
 import FollowButton from "@/components/user/profile/FollowButton";
 import useProfileNavigation from "@/hooks/useProfileNavigation";
 
+const FollowListSkeleton = () => (
+  <div className="max-w-2xl mx-auto my-10 animate-pulse">
+    <div className="h-8 w-36 bg-gray-200 dark:bg-gray-700 rounded mb-6" />
+    <div className="space-y-4">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="flex items-center justify-between border p-4 rounded-lg">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700" />
+            <div className="space-y-2">
+              <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded" />
+              <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
+            </div>
+          </div>
+          <div className="h-8 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 const FollowListPage = () => {
   const { userId } = useParams();
   const location = useLocation();
@@ -14,7 +34,7 @@ const FollowListPage = () => {
 
   const { users, loading } = useFollowList(type, userId);
 
-  if (loading) return <div className="p-6">Loading...</div>;
+  if (loading) return <FollowListSkeleton />;
 
   return (
     <div className="max-w-2xl mx-auto my-10">
