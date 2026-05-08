@@ -1,3 +1,4 @@
+import NotFound from "@/pages/NotFound";
 import MainLayout from "@/layouts/MainLayout";
 import UpdatePassword from "@/pages/Auth/UpdatePassword";
 import BlogDetails from "@/pages/Blog/BlogDetails";
@@ -60,6 +61,8 @@ const AppRoutes = () => {
           </Route>
         </Route>
       </Route>
+
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };

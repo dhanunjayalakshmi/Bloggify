@@ -7,6 +7,7 @@ import useAuthInit from "./hooks/useAuthInit";
 import { useBookmarkStore } from "./stores/bookmarksStore";
 import { useAuthStore } from "./stores/authStore";
 import { useEffect } from "react";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {
   useThemeInit();
@@ -22,13 +23,13 @@ function App() {
   }, [isInitialized, user, fetchBookmarks]);
 
   return (
-    <>
+    <ErrorBoundary>
       <BrowserRouter>
         <AppRoutes />
         <AuthModal />
       </BrowserRouter>
       <Toaster richColors position="bottom-right" closeButton theme="system" />
-    </>
+    </ErrorBoundary>
   );
 }
 
