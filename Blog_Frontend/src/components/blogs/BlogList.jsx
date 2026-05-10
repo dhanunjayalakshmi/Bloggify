@@ -19,13 +19,18 @@ const BlogList = ({
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
-  const loaderRef = useRef();
   const navigate = useNavigate();
 
   const seenIds = useRef(new Set());
 
-  useInfiniteScroll(loaderRef, () => {
-    if (!loading && hasMore) {
+  // Refs so the intersection callback always reads current values — no stale closures
+  const loadingRef = useRef(loading);
+  const hasMoreRef = useRef(hasMore);
+  useEffect(() => { loadingRef.current = loading; }, [loading]);
+  useEffect(() => { hasMoreRef.current = hasMore; }, [hasMore]);
+
+  const loaderRef = useInfiniteScroll(() => {
+    if (!loadingRef.current && hasMoreRef.current) {
       setPage((prev) => prev + 1);
     }
   });
@@ -39,7 +44,7 @@ const BlogList = ({
 
   useEffect(() => {
     const getBlogs = async () => {
-      if (!hasMore || loading) return;
+      if (loading) return;
 
       setLoading(true);
       try {
@@ -80,12 +85,7 @@ const BlogList = ({
         setBlogs((prev) => [...prev, ...uniqueBlogs]);
 
         const totalPages = blogsRes?.totalPages || 1;
-
-        if (page >= totalPages) {
-          setHasMore(false);
-        } else {
-          setHasMore(true);
-        }
+        setHasMore(page < totalPages);
       } catch (err) {
         console.error("BlogList error:", {
           message: err?.message,
@@ -104,9 +104,34 @@ const BlogList = ({
     <>
       <div className="space-y-4">
         {blogs?.length === 0 && !loading && (
-          <p className="text-center text-muted-foreground py-6">
-            {search ? `No blogs found for "${search}"` : "No blogs found."}
-          </p>
+          <div className="flex flex-col items-center gap-3 py-16 text-center">
+            <span className="text-4xl">📭</span>
+            <p className="text-muted-foreground font-medium">
+              {search
+                ? `No results for "${search}"`
+                : tag && tag !== "All Tags"
+                  ? `No blogs tagged with #${tag} yet`
+                  : authorId
+                    ? "This author hasn't published anything yet"
+                    : "No blogs here yet"}
+            </p>
+            {!search && !authorId && (
+              <button
+                className="text-sm text-orange-500 hover:underline"
+                onClick={() => navigate("/create")}
+              >
+                Be the first to write something
+              </button>
+            )}
+            {search && (
+              <button
+                className="text-sm text-orange-500 hover:underline"
+                onClick={() => navigate("/home")}
+              >
+                Back to home feed
+              </button>
+            )}
+          </div>
         )}
         {blogs?.map((blog) => (
           <BlogCard
@@ -125,7 +150,9 @@ const BlogList = ({
         </div>
       )}
 
-      {!loading && hasMore && <div ref={loaderRef} className="h-10" />}
+      {/* Always rendered so the observer isn't recreated on every hasMore/loading change.
+          Intersection only fires when the user genuinely scrolls to this element. */}
+      <div ref={loaderRef} className="h-10" />
     </>
   );
 };

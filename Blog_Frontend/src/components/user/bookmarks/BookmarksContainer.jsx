@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import BlogCard from "@/components/blogs/BlogCard";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,7 +11,6 @@ import {
 } from "@/components/ui/select";
 import useBookmark from "@/hooks/useBookmark";
 import { useBookmarkStore } from "@/stores/bookmarksStore";
-import { useNavigate } from "react-router";
 
 const BookmarkCardItem = ({ blog }) => {
   const { isBookmarked, toggle } = useBookmark(blog?.id);
@@ -37,7 +37,20 @@ const formatTag = (tag) => {
     : "";
 };
 
+const BookmarksSkeleton = () => (
+  <div className="space-y-4 animate-pulse">
+    <div className="flex gap-4">
+      <div className="h-10 w-64 bg-gray-200 dark:bg-gray-700 rounded" />
+      <div className="h-10 w-40 bg-gray-200 dark:bg-gray-700 rounded" />
+    </div>
+    {Array.from({ length: 4 }).map((_, i) => (
+      <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+    ))}
+  </div>
+);
+
 const BookmarksContainer = () => {
+  const navigate = useNavigate();
   const { bookmarkList, loading, fetchBookmarkedBlogs } = useBookmarkStore();
 
   const [sortBy, setSortBy] = useState("recent");
@@ -68,14 +81,21 @@ const BookmarksContainer = () => {
     fetchBookmarkedBlogs();
   }, [fetchBookmarkedBlogs]);
 
-  if (loading) {
-    return <div className="py-20 text-center">Loading bookmarks...</div>;
-  }
+  if (loading) return <BookmarksSkeleton />;
 
   if (!bookmarkList?.length) {
     return (
-      <div className="text-center text-muted-foreground py-20">
-        You haven’t bookmarked anything yet.
+      <div className="flex flex-col items-center gap-3 py-20 text-center">
+        <span className="text-4xl">🔖</span>
+        <p className="text-muted-foreground font-medium">
+          You haven’t bookmarked anything yet
+        </p>
+        <button
+          className="text-sm text-orange-500 hover:underline"
+          onClick={() => navigate("/home")}
+        >
+          Explore blogs to save
+        </button>
       </div>
     );
   }
@@ -128,6 +148,15 @@ const BookmarksContainer = () => {
           </Select>
         )}
       </div>
+
+      {filteredBookmarks?.length === 0 && (
+        <div className="flex flex-col items-center gap-2 py-12 text-center">
+          <span className="text-3xl">🔍</span>
+          <p className="text-muted-foreground font-medium">
+            No bookmarks match your search or filter
+          </p>
+        </div>
+      )}
 
       {filteredBookmarks?.map((blog) => (
         <BookmarkCardItem key={blog?.id} blog={blog} />
