@@ -7,6 +7,16 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import api from "@/lib/apiClient";
 import { useAuthStore } from "@/stores/authStore";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import UpdatePassword from "../Auth/UpdatePassword";
@@ -17,6 +27,7 @@ const SettingsPage = () => {
   const [isPublic, setIsPublic] = useState(true);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -51,16 +62,9 @@ const SettingsPage = () => {
   };
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete your account? This cannot be undone.",
-    );
-
-    if (!confirmDelete) return;
-
     try {
       await api.delete("/users/me");
       toast.success("Account deleted successfully");
-
       logout();
     } catch (err) {
       toast.error(err?.response?.data?.error || "Failed to delete account");
@@ -149,7 +153,7 @@ const SettingsPage = () => {
           <Button
             variant="destructive"
             className="w-full"
-            onClick={handleDelete}
+            onClick={() => setDeleteOpen(true)}
           >
             Delete Account
           </Button>
@@ -161,6 +165,24 @@ const SettingsPage = () => {
           <UpdatePassword closeModal={() => setPasswordModalOpen(false)} />
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent className="bg-white dark:bg-gray-800">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete your account and all your blogs. This
+              action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleDelete}>
+              Delete Account
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -5,6 +5,16 @@ import { useEffect, useState } from "react";
 import api from "@/lib/apiClient";
 import { Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const PreviewPage = () => {
   const location = useLocation();
@@ -17,6 +27,7 @@ const PreviewPage = () => {
   const [blog, setBlog] = useState(location?.state || null);
   const [loading, setLoading] = useState(!isEditorPreview);
   const [error, setError] = useState(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const previewCoverImage = blog?.cover_image || blog?.coverImageUrl || "";
 
   useEffect(() => {
@@ -39,12 +50,6 @@ const PreviewPage = () => {
   }, [mode, id]);
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this blog?",
-    );
-
-    if (!confirmDelete) return;
-
     try {
       await api.delete(`/blogs/${blog.id}`);
       toast.success("Blog deleted successfully");
@@ -70,6 +75,7 @@ const PreviewPage = () => {
   }
 
   return (
+    <>
     <div className="mx-auto my-6 max-w-5xl px-4">
       <div className="rounded-3xl border border-slate-200 bg-white px-5 py-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:px-8 md:py-8">
         {mode === "editor" && (
@@ -131,7 +137,7 @@ const PreviewPage = () => {
                 Edit
               </Button>
 
-              <Button size="sm" variant="destructive" onClick={handleDelete}>
+              <Button size="sm" variant="destructive" onClick={() => setDeleteOpen(true)}>
                 <Trash2 className="mr-1 h-4 w-4" />
                 Delete
               </Button>
@@ -140,6 +146,24 @@ const PreviewPage = () => {
         </div>
       </div>
     </div>
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent className="bg-white dark:bg-gray-800">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this blog?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. The blog will be permanently deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleDelete}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 

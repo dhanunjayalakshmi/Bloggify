@@ -28,6 +28,7 @@ const MiniBlogList = ({
                 blog?.cover_image ||
                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcKpkc_AQKNOt8OsfV3wsfDGOrr-SkE_MRcg&s"
               }
+              alt={blog?.title || "Blog cover"}
               className="w-12 h-12 rounded-full object-cover shrink-0"
             />
             <div className="text-sm gap-2">
