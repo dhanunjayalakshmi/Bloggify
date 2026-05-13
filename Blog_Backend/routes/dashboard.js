@@ -197,7 +197,7 @@ router.get("/posts/:id", verifyToken, async (req, res) => {
 
     res.status(200).json(blog);
   } catch (err) {
-    console.log("Error...", err);
+    console.error("Dashboard error:", err);
     res.status(500).json({ error: err.message });
   }
 });

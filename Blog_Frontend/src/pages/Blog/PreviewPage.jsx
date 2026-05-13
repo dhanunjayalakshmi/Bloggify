@@ -39,7 +39,7 @@ const PreviewPage = () => {
           setBlog(res?.data);
         } catch (err) {
           setError("Post not found or access denied");
-          console.log("Error...", err);
+          console.error("Failed to load preview:", err);
         } finally {
           setLoading(false);
         }

@@ -45,7 +45,7 @@ const StatsContainer = () => {
 
         setBlogs(collectedBlogs);
       } catch (err) {
-        console.log("Blogs load failed", err);
+        console.error("Blogs load failed", err);
       }
     };
 

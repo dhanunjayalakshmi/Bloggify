@@ -57,7 +57,7 @@ const FollowButton = ({
 
         setIsFollowing(res?.data?.is_following);
       } catch (err) {
-        console.log("Follow state fetch error:", err);
+        console.error("Follow state fetch error:", err);
       } finally {
         setCheckingInitialState(false);
       }
@@ -74,7 +74,7 @@ const FollowButton = ({
 
       setIsFollowing(res?.data?.is_following);
     } catch (err) {
-      console.log("Follow toggle error:", err);
+      console.error("Follow toggle error:", err);
     } finally {
       setLoading(false);
     }

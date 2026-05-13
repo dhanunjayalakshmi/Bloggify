@@ -134,7 +134,6 @@ const EditProfileForm = ({ initialData }) => {
 
       const res = await api.put("/users/me", payload);
 
-      console.log("Response...", res?.data);
 
       // Update global profile store immediately
       if (res?.data?.user) {

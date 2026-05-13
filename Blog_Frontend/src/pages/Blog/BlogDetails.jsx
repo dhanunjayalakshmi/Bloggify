@@ -88,10 +88,10 @@ const BlogDetails = () => {
   }, [blogId]);
 
   useEffect(() => {
-    if (!blogId) return;
+    if (!blog) return;
 
     hydrateVotesForContent({ items: [blog] });
-  }, [blogId]);
+  }, [blog]);
 
   if (loading)
     return (

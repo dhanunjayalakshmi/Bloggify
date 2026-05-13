@@ -37,8 +37,8 @@ router.get("/", async (req, res) => {
     let { page, limit, search, sort, tags, authorId, exclude, overlapTags } =
       req?.query;
 
-    page = parseInt(page) || 1;
-    limit = parseInt(limit) || 5;
+    page = Math.max(1, parseInt(page) || 1);
+    limit = Math.min(50, Math.max(1, parseInt(limit) || 5));
     const offset = (page - 1) * limit;
 
     // Get reported blog IDs
@@ -138,7 +138,7 @@ router.get("/", async (req, res) => {
 
     // Exclude reported blogs
     if (reportedIds.length > 0) {
-      query = query?.not("id", "in", `(${reportedIds.join(",")})`);
+      query = query?.not("id", "in", reportedIds);
     }
 
     // Add pagination

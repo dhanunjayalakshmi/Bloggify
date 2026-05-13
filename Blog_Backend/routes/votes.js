@@ -93,6 +93,10 @@ router.post("/", verifyToken, async (req, res) => {
     const { content_id, content_type, vote_type } = req?.body;
     const userId = req?.user?.id;
 
+    if (!["upvote", "downvote"].includes(vote_type)) {
+      return res.status(400).json({ error: "Invalid vote type" });
+    }
+
     if (content_type === "blog") {
       const { data: blog, error: blogError } = await req?.supabase
         .from("blogs")
