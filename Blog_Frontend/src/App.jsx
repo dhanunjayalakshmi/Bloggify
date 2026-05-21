@@ -8,6 +8,7 @@ import { useBookmarkStore } from "./stores/bookmarksStore";
 import { useAuthStore } from "./stores/authStore";
 import { useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
+import BackToTop from "./components/BackToTop";
 
 function App() {
   useThemeInit();
@@ -27,6 +28,7 @@ function App() {
       <BrowserRouter>
         <AppRoutes />
         <AuthModal />
+        <BackToTop />
       </BrowserRouter>
       <Toaster richColors position="bottom-right" closeButton theme="system" />
     </ErrorBoundary>
