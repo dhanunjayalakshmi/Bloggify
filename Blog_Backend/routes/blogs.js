@@ -138,7 +138,7 @@ router.get("/", async (req, res) => {
 
     // Exclude reported blogs
     if (reportedIds.length > 0) {
-      query = query?.not("id", "in", reportedIds);
+      query = query?.not("id", "in", `(${reportedIds.join(",")})`);
     }
 
     // Add pagination
