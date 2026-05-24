@@ -10,6 +10,7 @@ const bookmarksRoutes = require("./routes/bookmarks");
 const followsRoutes = require("./routes/follows");
 const reportsRoutes = require("./routes/reports");
 const dashboardRoutes = require("./routes/dashboard");
+const notificationsRoutes = require("./routes/notifications");
 
 const app = express();
 app.use(
@@ -34,6 +35,7 @@ app.use("/api/bookmarks", bookmarksRoutes);
 app.use("/api/follows", followsRoutes);
 app.use("/api/reports", reportsRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/notifications", notificationsRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
