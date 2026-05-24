@@ -1,6 +1,7 @@
 const express = require("express");
 const supabase = require("../config/supabaseClient");
 const { verifyToken } = require("../middlewares/authMiddleware");
+const { createNotification } = require("../utils/notificationHelpers");
 
 const router = express.Router();
 
@@ -13,9 +14,44 @@ router.post("/", verifyToken, async (req, res) => {
     const { data, error } = await req?.supabase
       .from("comments")
       .insert([{ blog_id, user_id, content, parent_id }])
-      .select();
+      .select()
+      .single();
 
     if (error) throw error;
+
+    if (parent_id) {
+      const { data: parentComment } = await req.supabase
+        .from("comments")
+        .select("user_id")
+        .eq("id", parent_id)
+        .single();
+
+      if (parentComment) {
+        await createNotification(req.supabase, {
+          userId: parentComment.user_id,
+          actorId: user_id,
+          type: "comment_reply",
+          blogId: blog_id,
+          commentId: data.id,
+        });
+      }
+    } else {
+      const { data: blog } = await req.supabase
+        .from("blogs")
+        .select("user_id")
+        .eq("id", blog_id)
+        .single();
+
+      if (blog) {
+        await createNotification(req.supabase, {
+          userId: blog.user_id,
+          actorId: user_id,
+          type: "new_comment",
+          blogId: blog_id,
+          commentId: data.id,
+        });
+      }
+    }
 
     res
       .status(201)

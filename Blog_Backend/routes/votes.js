@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const supabase = require("../config/supabaseClient");
 const { verifyToken } = require("../middlewares/authMiddleware");
+const { createNotification } = require("../utils/notificationHelpers");
 
 const router = express.Router();
 
@@ -148,6 +149,24 @@ router.post("/", verifyToken, async (req, res) => {
       .insert({ user_id: userId, content_id, content_type, vote_type });
 
     if (insertError) throw insertError;
+
+    if (content_type === "blog" && vote_type === "upvote") {
+      const { data: blog } = await req.supabase
+        .from("blogs")
+        .select("user_id")
+        .eq("id", content_id)
+        .single();
+
+      if (blog) {
+        await createNotification(req.supabase, {
+          userId: blog.user_id,
+          actorId: userId,
+          type: "new_upvote",
+          blogId: content_id,
+        });
+      }
+    }
+
     res.status(200).json({ message: "Vote added successfully" });
   } catch (error) {
     res.status(500).json({ error: error?.message });

@@ -2,6 +2,7 @@ const express = require("express");
 const supabase = require("../config/supabaseClient");
 const { verifyToken } = require("../middlewares/authMiddleware");
 const { attachFollowState } = require("../utils/followHelpers");
+const { createNotification } = require("../utils/notificationHelpers");
 
 const router = express.Router();
 
@@ -150,6 +151,12 @@ router.post("/", verifyToken, async (req, res) => {
       .insert([{ follower_id, following_id }]);
 
     if (insertError) throw insertError;
+
+    await createNotification(req.supabase, {
+      userId: following_id,
+      actorId: follower_id,
+      type: "new_follower",
+    });
 
     res.status(201).json({
       message: "Followed successfully",
