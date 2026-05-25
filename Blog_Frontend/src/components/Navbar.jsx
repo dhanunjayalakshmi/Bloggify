@@ -2,7 +2,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import { Button } from "./ui/button";
-import { Bell, Pencil, User, X } from "lucide-react";
+import { Pencil, User } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import {
   DropdownMenu,
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/lib/supabaseClient";
 import NavbarSearch from "./NavbarSearch";
+import NotificationsDropdown from "./NotificationsDropdown";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -49,12 +50,7 @@ const Navbar = () => {
         >
           <Pencil className="w-4 h-4" /> Write
         </Button>
-        <Button
-          variant="outline"
-          className="hidden md:flex items-center gap-2 cursor-pointer"
-        >
-          <Bell className="w-4 h-4" />
-        </Button>
+        <NotificationsDropdown />
         <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger className="focus:outline-none">
