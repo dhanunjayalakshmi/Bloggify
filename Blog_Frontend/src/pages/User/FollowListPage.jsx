@@ -2,6 +2,7 @@ import { useParams, useLocation } from "react-router-dom";
 import useFollowList from "@/hooks/useFollowList";
 import FollowButton from "@/components/user/profile/FollowButton";
 import useProfileNavigation from "@/hooks/useProfileNavigation";
+import { useAuthStore } from "@/stores/authStore";
 
 const FollowListSkeleton = () => (
   <div className="max-w-2xl mx-auto my-10 animate-pulse">
@@ -33,6 +34,7 @@ const FollowListPage = () => {
     : "following";
 
   const { users, loading } = useFollowList(type, userId);
+  const currentUserId = useAuthStore((state) => state.profile?.id);
 
   if (loading) return <FollowListSkeleton />;
 
@@ -67,11 +69,13 @@ const FollowListPage = () => {
               </div>
             </div>
 
-            <FollowButton
-              userId={user?.id}
-              initialFollowing={user?.is_following}
-              hasInitialFollowing={true}
-            />
+            {user?.id !== currentUserId && (
+              <FollowButton
+                userId={user?.id}
+                initialFollowing={user?.is_following}
+                hasInitialFollowing={true}
+              />
+            )}
           </div>
         ))}
       </div>

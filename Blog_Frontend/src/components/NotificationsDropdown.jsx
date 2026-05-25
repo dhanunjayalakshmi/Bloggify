@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,9 +8,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/stores/authStore";
 import { useNotificationStore } from "@/stores/notificationStore";
-import { fetchNotifications, markAllRead } from "@/services/notificationService";
+import {
+  fetchNotifications,
+  markAllRead,
+  markOneRead,
+} from "@/services/notificationService";
 import { supabase } from "@/lib/supabaseClient";
 import { formatDistanceToNow } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 const notificationMessage = (type, actorName) => {
   switch (type) {
@@ -22,11 +27,26 @@ const notificationMessage = (type, actorName) => {
   }
 };
 
+const getNotificationLink = (notification) => {
+  const { type, blog_id, actor } = notification;
+  if (type === "new_follower") return `/users/${actor?.id}`;
+  if (blog_id) return `/blogs/${blog_id}`;
+  return null;
+};
+
 const NotificationsDropdown = () => {
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const profile = useAuthStore((state) => state.profile);
-  const { notifications, unreadCount, setNotifications, addNotification, markAllReadLocally } =
-    useNotificationStore();
+  const {
+    notifications,
+    unreadCount,
+    setNotifications,
+    addNotification,
+    markAllReadLocally,
+    markOneReadLocally,
+  } = useNotificationStore();
 
   useEffect(() => {
     if (!user || !profile?.id) return;
@@ -59,10 +79,25 @@ const NotificationsDropdown = () => {
     } catch {}
   };
 
+  const handleNotificationClick = async (notification) => {
+    setOpen(false);
+
+    if (!notification.is_read) {
+      markOneReadLocally(notification.id);
+      markOneRead(notification.id).catch(() => {});
+    }
+
+    const link = getNotificationLink(notification);
+    if (link) navigate(link);
+  };
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="relative hidden md:flex items-center gap-2 cursor-pointer">
+        <Button
+          variant="outline"
+          className="relative hidden md:flex items-center gap-2 cursor-pointer"
+        >
           <Bell className="w-4 h-4" />
           {unreadCount > 0 && (
             <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
@@ -94,7 +129,8 @@ const NotificationsDropdown = () => {
             notifications.map((n) => (
               <div
                 key={n.id}
-                className={`flex items-start gap-3 px-4 py-3 border-b dark:border-gray-800 last:border-0 ${
+                onClick={() => handleNotificationClick(n)}
+                className={`flex cursor-pointer items-start gap-3 px-4 py-3 border-b dark:border-gray-800 last:border-0 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 ${
                   !n.is_read ? "bg-blue-50 dark:bg-blue-950/20" : ""
                 }`}
               >
@@ -112,7 +148,9 @@ const NotificationsDropdown = () => {
                     {notificationMessage(n.type, n.actor?.name || "Someone")}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(n.created_at), {
+                      addSuffix: true,
+                    })}
                   </p>
                 </div>
                 {!n.is_read && (
