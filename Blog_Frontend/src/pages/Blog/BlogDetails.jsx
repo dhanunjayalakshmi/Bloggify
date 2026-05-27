@@ -14,6 +14,7 @@ import useRelatedBlogs from "@/hooks/useRelatedBlogs";
 import MiniBlogList from "@/components/blogs/MiniBlogList";
 import useAuthorOtherBlogs from "@/hooks/useAuthorOtherBlogs";
 import FollowButton from "@/components/user/profile/FollowButton";
+import BlogReactions from "@/components/blogs/BlogReactions";
 import useProfileNavigation from "@/hooks/useProfileNavigation";
 import {
   DropdownMenu,
@@ -266,6 +267,8 @@ const BlogDetails = () => {
           ))}
         </div>
       )}
+
+      <BlogReactions blogId={blogId} />
 
       <div ref={commentsRef}>
         <BlogComments blogId={blogId} />
