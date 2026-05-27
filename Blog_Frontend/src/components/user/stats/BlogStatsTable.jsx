@@ -81,6 +81,20 @@ const BlogStatsTable = ({ blogs }) => {
               </div>
             </div>
 
+            {/* Reactions */}
+            {blog.reactions && Object.keys(blog.reactions).length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(blog.reactions).map(([emoji, count]) => (
+                  <span
+                    key={emoji}
+                    className="flex items-center gap-1 rounded-full border border-gray-200 dark:border-gray-700 px-2.5 py-1 text-xs text-muted-foreground"
+                  >
+                    {emoji} {count}
+                  </span>
+                ))}
+              </div>
+            )}
+
             {/* Engagement Bar */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs text-muted-foreground">

@@ -127,12 +127,20 @@ router.get("/blog-stats", verifyToken, async (req, res) => {
       .eq("vote_type", "upvote")
       .in("content_id", blogIds);
 
+    // reactions
+    const { data: reactions } = await supabase
+      .from("reactions")
+      .select("blog_id, emoji")
+      .in("blog_id", blogIds);
+
     const commentMap = {};
     const voteMap = {};
+    const reactionMap = {};
 
     blogIds.forEach((id) => {
       commentMap[id] = 0;
       voteMap[id] = 0;
+      reactionMap[id] = {};
     });
 
     comments?.forEach((c) => {
@@ -143,6 +151,11 @@ router.get("/blog-stats", verifyToken, async (req, res) => {
       voteMap[v.content_id]++;
     });
 
+    reactions?.forEach((r) => {
+      if (!reactionMap[r.blog_id][r.emoji]) reactionMap[r.blog_id][r.emoji] = 0;
+      reactionMap[r.blog_id][r.emoji]++;
+    });
+
     const result = pagedBlogs?.map((blog) => ({
       id: blog?.id,
       title: blog?.title,
@@ -151,6 +164,7 @@ router.get("/blog-stats", verifyToken, async (req, res) => {
       tags: blog?.tags?.map(formatTag) || [],
       comments: commentMap[blog?.id],
       upvotes: voteMap[blog?.id],
+      reactions: reactionMap[blog?.id],
       status: blog?.is_published ? "Published" : "Draft",
       updated: blog?.updated_at,
       created_at: blog?.created_at,
