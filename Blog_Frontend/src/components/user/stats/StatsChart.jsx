@@ -39,6 +39,27 @@ const CustomTooltip = ({ active, payload }) => {
   return null;
 };
 
+const ReactionsTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 shadow text-sm">
+        <p className="text-gray-900 dark:text-gray-100 font-medium mb-1">
+          {data.title}
+        </p>
+        {payload.map((entry) =>
+          entry.value > 0 ? (
+            <p key={entry.dataKey} className="text-gray-600 dark:text-gray-300">
+              {entry.dataKey} {entry.value}
+            </p>
+          ) : null,
+        )}
+      </div>
+    );
+  }
+  return null;
+};
+
 const EMOJI_COLORS = {
   "❤️": "#ef4444",
   "🔥": "#f97316",
@@ -207,10 +228,11 @@ export default function StatsChart({ blogs }) {
               />
               <YAxis allowDecimals={false} />
               <Tooltip
-                contentStyle={{
-                  background: "var(--background)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
+                content={<ReactionsTooltip />}
+                cursor={{
+                  fill: document.documentElement.classList.contains("dark")
+                    ? "rgba(255,255,255,0.08)"
+                    : "rgba(0,0,0,0.05)",
                 }}
               />
               <Legend verticalAlign="top" />

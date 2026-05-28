@@ -185,7 +185,7 @@ export default function BlogAnalytics({ blogs }) {
                   <YAxis type="category" dataKey="tag" tick={{ fontSize: 11 }} width={80} />
                   <Tooltip
                     formatter={(value) => [value, "Avg Views"]}
-                    contentStyle={{ background: "var(--background)", border: "1px solid var(--border)", borderRadius: 8 }}
+                    contentStyle={{ borderRadius: 8 }}
                   />
                   <Bar dataKey="avgViews" fill="#6366f1" radius={[0, 4, 4, 0]} barSize={18} />
                 </BarChart>
@@ -209,7 +209,7 @@ export default function BlogAnalytics({ blogs }) {
                   <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
                   <Tooltip
                     formatter={(value) => [value, "Reactions"]}
-                    contentStyle={{ background: "var(--background)", border: "1px solid var(--border)", borderRadius: 8 }}
+                    contentStyle={{ borderRadius: 8 }}
                   />
                   <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={36}>
                     {reactionsData.map((entry) => (
@@ -237,7 +237,7 @@ export default function BlogAnalytics({ blogs }) {
                   <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
                   <Tooltip
                     formatter={(value, name) => [value, name === "avgViews" ? "Avg Views" : name]}
-                    contentStyle={{ background: "var(--background)", border: "1px solid var(--border)", borderRadius: 8 }}
+                    contentStyle={{ borderRadius: 8 }}
                   />
                   <Bar dataKey="avgViews" fill="#22c55e" radius={[4, 4, 0, 0]} barSize={48} />
                 </BarChart>
