@@ -8,6 +8,7 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
+  Legend,
 } from "recharts";
 
 const CustomTooltip = ({ active, payload }) => {
@@ -38,6 +39,15 @@ const CustomTooltip = ({ active, payload }) => {
   return null;
 };
 
+const EMOJI_COLORS = {
+  "❤️": "#ef4444",
+  "🔥": "#f97316",
+  "💡": "#eab308",
+  "🤔": "#8b5cf6",
+  "🎉": "#22c55e",
+};
+const EMOJIS = ["❤️", "🔥", "💡", "🤔", "🎉"];
+
 export default function StatsChart({ blogs }) {
   const viewsData =
     blogs?.map((blog) => ({
@@ -50,6 +60,16 @@ export default function StatsChart({ blogs }) {
       title: blog.title,
       engagement: blog.upvotes + blog.comments,
     })) || [];
+
+  const reactionsData = blogs
+    ?.filter((blog) => blog.reactions && Object.keys(blog.reactions).length > 0)
+    .map((blog) => {
+      const entry = { title: blog.title };
+      EMOJIS.forEach((e) => {
+        entry[e] = blog.reactions?.[e] || 0;
+      });
+      return entry;
+    }) || [];
 
   const formatTitle = (title) => {
     if (!title) return "";
@@ -166,6 +186,47 @@ export default function StatsChart({ blogs }) {
           </BarChart>
         </ResponsiveContainer>
       </div>
+
+      {/* Reactions Per Blog Chart */}
+      {reactionsData.length > 0 && (
+        <div className="w-full h-96 bg-background rounded-xl shadow p-4 dark:bg-gray-900">
+          <h3 className="text-sm font-semibold mb-4">Reactions Per Blog</h3>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={reactionsData}
+              margin={{ top: 20, right: 20, left: 0, bottom: 90 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="title"
+                tickFormatter={formatTitle}
+                angle={-30}
+                textAnchor="end"
+                interval={0}
+                height={70}
+              />
+              <YAxis allowDecimals={false} />
+              <Tooltip
+                contentStyle={{
+                  background: "var(--background)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                }}
+              />
+              <Legend verticalAlign="top" />
+              {EMOJIS.map((emoji) => (
+                <Bar
+                  key={emoji}
+                  dataKey={emoji}
+                  stackId="reactions"
+                  fill={EMOJI_COLORS[emoji]}
+                  barSize={40}
+                />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       {/* Publishing Activity Chart */}
       <div className="w-full h-96 bg-background rounded-xl shadow p-4 dark:bg-gray-900">
