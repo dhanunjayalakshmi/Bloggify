@@ -15,6 +15,7 @@ import MiniBlogList from "@/components/blogs/MiniBlogList";
 import useAuthorOtherBlogs from "@/hooks/useAuthorOtherBlogs";
 import FollowButton from "@/components/user/profile/FollowButton";
 import BlogReactions from "@/components/blogs/BlogReactions";
+import TagFollowButton from "@/components/TagFollowButton";
 import useProfileNavigation from "@/hooks/useProfileNavigation";
 import {
   DropdownMenu,
@@ -258,12 +259,7 @@ const BlogDetails = () => {
       {tags?.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
           {tags.map((tag, idx) => (
-            <span
-              key={idx}
-              className="inline-block bg-muted text-muted-foreground px-2 py-1 rounded text-xs"
-            >
-              #{tag}
-            </span>
+            <TagFollowButton key={idx} tag={tag} />
           ))}
         </div>
       )}

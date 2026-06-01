@@ -160,6 +160,80 @@ router.get("/", async (req, res) => {
   }
 });
 
+// For You feed — blogs from followed users + followed tags
+router.get("/foryou", verifyToken, async (req, res) => {
+  try {
+    const supabase = req.supabase;
+    const userId = req.user.id;
+
+    let page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 5));
+    const offset = (page - 1) * limit;
+
+    // Get followed user IDs
+    const { data: followedUsers } = await supabase
+      .from("follows")
+      .select("following_id")
+      .eq("follower_id", userId);
+
+    // Get followed tags
+    const { data: followedTags } = await supabase
+      .from("tag_follows")
+      .select("tag")
+      .eq("user_id", userId);
+
+    const followedUserIds = followedUsers?.map((f) => f.following_id) || [];
+    const followedTagList = followedTags?.map((t) => t.tag) || [];
+
+    if (!followedUserIds.length && !followedTagList.length) {
+      return res.json({ blogs: [], total: 0, page, limit, totalPages: 0, empty: true });
+    }
+
+    // Get reported blog IDs
+    const { data: reportedBlogs } = await supabase
+      .from("reports")
+      .select("content_id");
+    const reportedIds = reportedBlogs?.map((r) => r.content_id) || [];
+
+    let query = supabase
+      .from("blogs")
+      .select(`*, users ( id, name, username, avatar )`)
+      .eq("is_published", true)
+      .lte("published_at", new Date().toISOString())
+      .neq("user_id", userId);
+
+    // Filter: from followed users OR matching followed tags
+    const filters = [];
+    if (followedUserIds.length) {
+      filters.push(`user_id.in.(${followedUserIds.join(",")})`);
+    }
+    if (followedTagList.length) {
+      followedTagList.forEach((tag) => {
+        filters.push(`tags.cs.{"${tag}"}`);
+      });
+    }
+    query = query.or(filters.join(","));
+
+    if (reportedIds.length > 0) {
+      query = query.not("id", "in", `(${reportedIds.join(",")})`);
+    }
+
+    query = query.order("published_at", { ascending: false });
+
+    const { data: allBlogs, error } = await query;
+    if (error) throw error;
+
+    const total = allBlogs?.length || 0;
+    const totalPages = Math.ceil(total / limit);
+    const blogs = allBlogs?.slice(offset, offset + limit) || [];
+
+    res.json({ blogs, total, page, limit, totalPages });
+  } catch (err) {
+    console.error("For You feed error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 //Get a single blog
 router.get("/:blogId", verifyToken, async (req, res) => {
   try {

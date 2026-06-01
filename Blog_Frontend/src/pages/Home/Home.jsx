@@ -1,4 +1,5 @@
 import BlogList from "@/components/blogs/BlogList";
+import ForYouFeed from "@/components/blogs/ForYouFeed";
 import BookmarkedArticles from "@/components/sidebar/BookmarkedArticles";
 import ProfileSuggestions from "@/components/sidebar/ProfileSuggestions";
 import Suggestions from "@/components/sidebar/Suggestions";
@@ -24,12 +25,18 @@ const Home = () => {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-4 pt-4">
       <div className="lg:col-span-2 space-y-6">
         <SortOptions value={sort} onChange={setSort} />
-        {debouncedSearch && (
-          <p className="text-sm text-muted-foreground">
-            Results for "{debouncedSearch}"
-          </p>
+        {sort === "For You" ? (
+          <ForYouFeed />
+        ) : (
+          <>
+            {debouncedSearch && (
+              <p className="text-sm text-muted-foreground">
+                Results for "{debouncedSearch}"
+              </p>
+            )}
+            <BlogList sort={sort} search={debouncedSearch} tag="All Tags" />
+          </>
         )}
-        <BlogList sort={sort} search={debouncedSearch} tag="All Tags" />
       </div>
 
       <aside className="hidden lg:block sticky top-12 self-start space-y-4 my-4">
