@@ -53,6 +53,26 @@ router.post("/", verifyToken, async (req, res) => {
       }
     }
 
+    // Parse @mentions and notify mentioned users
+    const mentionMatches = content.match(/@([a-zA-Z0-9_]+)/g) || [];
+    if (mentionMatches.length > 0) {
+      const usernames = [...new Set(mentionMatches.map((m) => m.slice(1).toLowerCase()))];
+      const { data: mentionedUsers } = await req.supabase
+        .from("users")
+        .select("id")
+        .in("username", usernames);
+
+      for (const mentionedUser of mentionedUsers || []) {
+        await createNotification(req.supabase, {
+          userId: mentionedUser.id,
+          actorId: user_id,
+          type: "mention",
+          blogId: blog_id,
+          commentId: data.id,
+        });
+      }
+    }
+
     res
       .status(201)
       .json({ message: "Comment added successfully", comment: data });

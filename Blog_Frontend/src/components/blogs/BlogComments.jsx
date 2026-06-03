@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "@/lib/apiClient";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import { Textarea } from "../ui/textarea";
 import { useAuthStore } from "@/stores/authStore";
 import ContentVotes from "./ContentVotes";
 import { hydrateVotesForContent } from "@/utils/hydrateVotesForContent";
+import useMentions from "@/hooks/useMentions";
+import MentionDropdown from "./MentionDropdown";
 
 const CommentEditor = ({
   blogId,
@@ -18,11 +20,16 @@ const CommentEditor = ({
 }) => {
   const [content, setContent] = useState(initial);
   const [loading, setLoading] = useState(false);
+  const textareaRef = useRef(null);
+
+  const handleContentChange = (e) => setContent(e.target.value);
+
+  const { isOpen, users, selectedIndex, coords, handleChange, handleKeyDown, selectUser } =
+    useMentions(content, handleContentChange, textareaRef);
 
   const handleSubmit = async () => {
     if (!content.trim()) return;
     setLoading(true);
-
     try {
       if (initial === "") {
         await api.post("/comments", {
@@ -30,7 +37,6 @@ const CommentEditor = ({
           content,
           parent_id: parentId || null,
         });
-
         onSubmit?.();
       } else {
         onSubmit?.(content);
@@ -48,14 +54,24 @@ const CommentEditor = ({
   };
 
   return (
-    <div>
+    <div className="relative">
       <Textarea
+        ref={textareaRef}
         className="border w-full p-2 rounded"
         rows={3}
         value={content}
-        onChange={(e) => setContent(e?.target?.value)}
-        placeholder="Write a comment (Markdown supported)..."
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        placeholder="Write a comment... (use @ to mention someone)"
       />
+      {isOpen && (
+        <MentionDropdown
+          users={users}
+          selectedIndex={selectedIndex}
+          coords={coords}
+          onSelect={selectUser}
+        />
+      )}
       <div className="flex gap-2 mt-4">
         <Button onClick={handleSubmit} disabled={loading || !content.trim()}>
           {initial ? "Update" : "Comment"}

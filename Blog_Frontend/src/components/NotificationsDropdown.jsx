@@ -23,6 +23,7 @@ const notificationMessage = (type, actorName) => {
     case "new_comment": return `${actorName} commented on your blog`;
     case "comment_reply": return `${actorName} replied to your comment`;
     case "new_upvote": return `${actorName} upvoted your blog`;
+    case "mention": return `${actorName} mentioned you in a comment`;
     default: return `${actorName} interacted with you`;
   }
 };

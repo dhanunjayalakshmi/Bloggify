@@ -220,6 +220,31 @@ router.get("/explore", verifyToken, async (req, res) => {
   }
 });
 
+// Search users by username (for @mentions)
+router.get("/search", verifyToken, async (req, res) => {
+  try {
+    const supabase = req.supabase;
+    const userId = req.user.id;
+    const q = (req.query.q || "").trim();
+
+    if (!q) return res.json({ users: [] });
+
+    const { data, error } = await supabase
+      .from("users")
+      .select("id, name, username, avatar")
+      .ilike("username", `${q}%`)
+      .neq("id", userId)
+      .limit(5);
+
+    if (error) throw error;
+
+    res.json({ users: data || [] });
+  } catch (err) {
+    console.error("User search error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Author Public Profile
 router.get("/:userId", verifyToken, async (req, res) => {
   try {
