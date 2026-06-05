@@ -86,6 +86,40 @@ const CommentEditor = ({
   );
 };
 
+const highlightMentions = (text) => {
+  if (typeof text !== "string") return text;
+  const parts = text.split(/(@[a-zA-Z0-9_]+)/g);
+  if (parts.length === 1) return text;
+  return parts.map((part, i) =>
+    /^@[a-zA-Z0-9_]+$/.test(part) ? (
+      <span
+        key={i}
+        className="text-blue-500 font-semibold bg-blue-50 dark:bg-blue-900/20 rounded px-0.5"
+      >
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  );
+};
+
+const MentionParagraph = ({ children }) => (
+  <p>
+    {Array.isArray(children)
+      ? children.map((child, i) =>
+          typeof child === "string" ? (
+            <span key={i}>{highlightMentions(child)}</span>
+          ) : (
+            child
+          ),
+        )
+      : typeof children === "string"
+        ? highlightMentions(children)
+        : children}
+  </p>
+);
+
 const CommentItem = ({ comment, blogId, refresh }) => {
   const [showReply, setShowReply] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -156,7 +190,9 @@ const CommentItem = ({ comment, blogId, refresh }) => {
           />
         ) : (
           <div className="mt-4 prose prose-sm dark:prose-invert">
-            <ReactMarkdown>{comment?.content}</ReactMarkdown>
+            <ReactMarkdown components={{ p: MentionParagraph }}>
+              {comment?.content}
+            </ReactMarkdown>
           </div>
         )}
         <div className="flex gap-2 mt-2">
