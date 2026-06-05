@@ -93,7 +93,7 @@ const BlogDetails = () => {
   useEffect(() => {
     if (!blog) return;
 
-    hydrateVotesForContent({ items: [blog] });
+    hydrateVotesForContent({ contentType: "blog", items: [blog] });
   }, [blog]);
 
   if (loading)
