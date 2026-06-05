@@ -13,6 +13,7 @@ const dashboardRoutes = require("./routes/dashboard");
 const notificationsRoutes = require("./routes/notifications");
 const reactionsRoutes = require("./routes/reactions");
 const tagFollowsRoutes = require("./routes/tagFollows");
+const seriesRoutes = require("./routes/series");
 
 const app = express();
 app.use(
@@ -40,6 +41,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/notifications", notificationsRoutes);
 app.use("/api/reactions", reactionsRoutes);
 app.use("/api/tag-follows", tagFollowsRoutes);
+app.use("/api/series", seriesRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

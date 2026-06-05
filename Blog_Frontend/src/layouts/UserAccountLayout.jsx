@@ -15,6 +15,7 @@ const tabs = [
   { name: "Posts", path: "/profile/posts" },
   { name: "Bookmarks", path: "/profile/bookmarks" },
   { name: "Stats & Activity", path: "/profile/stats" },
+  { name: "Series", path: "/profile/series" },
   { name: "Settings", path: "/profile/settings" },
 ];
 

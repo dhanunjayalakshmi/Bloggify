@@ -16,6 +16,7 @@ import useAuthorOtherBlogs from "@/hooks/useAuthorOtherBlogs";
 import FollowButton from "@/components/user/profile/FollowButton";
 import BlogReactions from "@/components/blogs/BlogReactions";
 import TagFollowButton from "@/components/TagFollowButton";
+import SeriesWidget from "@/components/blogs/SeriesWidget";
 import useProfileNavigation from "@/hooks/useProfileNavigation";
 import {
   DropdownMenu,
@@ -255,6 +256,8 @@ const BlogDetails = () => {
       <div className="prose prose-lg dark:prose-invert tiptap max-w-none mt-6 space-y-2">
         <BlogContentRenderer content={content} />
       </div>
+
+      <SeriesWidget blogId={blogId} />
 
       {tags?.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
