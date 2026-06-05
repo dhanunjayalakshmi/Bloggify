@@ -6,6 +6,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Trash2, Plus, GripVertical, X } from "lucide-react";
 import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -16,6 +30,41 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+
+const SortableBlogItem = ({ blog, index, onRemove }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: blog.blogId });
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`flex items-center gap-3 rounded-lg bg-gray-50 dark:bg-gray-800 px-3 py-2 ${
+        isDragging ? "opacity-50 shadow-lg" : ""
+      }`}
+    >
+      <button
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground shrink-0"
+        aria-label="Drag to reorder"
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 text-xs font-bold text-blue-600 dark:text-blue-400">
+        {index + 1}
+      </span>
+      <span className="flex-1 text-sm truncate">{blog.title}</span>
+      <button
+        onClick={() => onRemove(blog.blogId)}
+        className="text-muted-foreground hover:text-red-500 transition-colors shrink-0"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </li>
+  );
+};
+
 const SeriesTab = () => {
   const [seriesList, setSeriesList] = useState([]);
   const [myBlogs, setMyBlogs] = useState([]);
@@ -25,6 +74,30 @@ const SeriesTab = () => {
   const [newDesc, setNewDesc] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [addingBlogTo, setAddingBlogTo] = useState(null);
+
+  const sensors = useSensors(useSensor(PointerSensor));
+
+  const handleDragEnd = async (event, seriesId) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setSeriesList((prev) =>
+      prev.map((s) => {
+        if (s.id !== seriesId) return s;
+        const oldIndex = s.blogs.findIndex((b) => b.blogId === active.id);
+        const newIndex = s.blogs.findIndex((b) => b.blogId === over.id);
+        const reordered = arrayMove(s.blogs, oldIndex, newIndex).map(
+          (b, i) => ({ ...b, order: i }),
+        );
+        api
+          .patch(`/series/${seriesId}/blogs/reorder`, {
+            order: reordered.map((b) => ({ blogId: b.blogId, orderIndex: b.order })),
+          })
+          .catch(() => toast.error("Failed to save order"));
+        return { ...s, blogs: reordered };
+      }),
+    );
+  };
 
   useEffect(() => {
     Promise.all([
@@ -164,7 +237,7 @@ const SeriesTab = () => {
 
       {/* Series list */}
       {seriesList.map((series) => (
-        <div key={series.id} className="rounded-xl border dark:border-gray-700 p-5 space-y-4">
+        <div key={series.id} className="rounded-xl border bg-background dark:bg-gray-900 dark:border-gray-700 p-5 space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h3 className="font-semibold text-base">{series.title}</h3>
@@ -185,27 +258,28 @@ const SeriesTab = () => {
             </Button>
           </div>
 
-          {/* Blog parts */}
-          <ol className="space-y-2">
-            {series.blogs.map((blog, idx) => (
-              <li
-                key={blog.blogId}
-                className="flex items-center gap-3 rounded-lg bg-gray-50 dark:bg-gray-800 px-3 py-2"
-              >
-                <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 text-xs font-bold text-blue-600 dark:text-blue-400">
-                  {idx + 1}
-                </span>
-                <span className="flex-1 text-sm truncate">{blog.title}</span>
-                <button
-                  onClick={() => handleRemoveBlog(series.id, blog.blogId)}
-                  className="text-muted-foreground hover:text-red-500 transition-colors shrink-0"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </li>
-            ))}
-          </ol>
+          {/* Blog parts — drag to reorder */}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={(e) => handleDragEnd(e, series.id)}
+          >
+            <SortableContext
+              items={series.blogs.map((b) => b.blogId)}
+              strategy={verticalListSortingStrategy}
+            >
+              <ol className="space-y-2">
+                {series.blogs.map((blog, idx) => (
+                  <SortableBlogItem
+                    key={blog.blogId}
+                    blog={blog}
+                    index={idx}
+                    onRemove={(blogId) => handleRemoveBlog(series.id, blogId)}
+                  />
+                ))}
+              </ol>
+            </SortableContext>
+          </DndContext>
 
           {/* Add blog dropdown */}
           {addingBlogTo === series.id ? (

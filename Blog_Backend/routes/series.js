@@ -205,6 +205,41 @@ router.post("/:id/blogs", verifyToken, async (req, res) => {
   }
 });
 
+// Reorder blogs in a series
+router.patch("/:id/blogs/reorder", verifyToken, async (req, res) => {
+  try {
+    const supabase = req.supabase;
+    const userId = req.user.id;
+    const { id } = req.params;
+    const { order } = req.body; // [{ blogId, orderIndex }, ...]
+
+    const { data: series } = await supabase
+      .from("series")
+      .select("user_id")
+      .eq("id", id)
+      .single();
+
+    if (!series || series.user_id !== userId) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    await Promise.all(
+      order.map(({ blogId, orderIndex }) =>
+        supabase
+          .from("series_blogs")
+          .update({ order_index: orderIndex })
+          .eq("series_id", id)
+          .eq("blog_id", blogId),
+      ),
+    );
+
+    res.json({ message: "Order updated" });
+  } catch (err) {
+    console.error("Reorder series error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Remove a blog from a series
 router.delete("/:id/blogs/:blogId", verifyToken, async (req, res) => {
   try {
