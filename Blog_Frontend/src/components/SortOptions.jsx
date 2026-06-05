@@ -1,6 +1,6 @@
 import { Button } from "./ui/button";
 
-const sortOptions = ["For You", "Latest", "Popular", "Trending"];
+const sortOptions = ["Latest", "Popular", "Trending", "For You"];
 
 const SortOptions = ({ value, onChange }) => {
   return (
