@@ -108,6 +108,7 @@ const CreateEditBlog = () => {
     dirty,
     autosaveStatus,
     isPublishedBlog,
+    scheduledAt,
     showDraftConflict,
     conflictingDraft,
     draftConflictMode,
@@ -118,6 +119,7 @@ const CreateEditBlog = () => {
     handleContinueCurrentDraft,
     handleDiscardAndProceed,
     handleSaveDraftToDbAndProceed,
+    saveScheduled,
   } = useBlogEditorController();
 
   const editor = useEditor(
@@ -190,9 +192,11 @@ const CreateEditBlog = () => {
         dirty={dirty}
         isEditMode={isEditMode}
         isPublishedBlog={isPublishedBlog}
+        scheduledAt={scheduledAt}
         onPreview={() => handlePreview(editor)}
         onSaveDraft={() => saveBlog(editor, "draft")}
         onPublish={() => saveBlog(editor, "published")}
+        onSchedule={(date) => saveScheduled(editor, date)}
       />
     </div>
   );

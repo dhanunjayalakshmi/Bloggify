@@ -2,9 +2,7 @@ import { useMemo } from "react";
 const DashboardPostCard = ({ post, stats, onOpen }) => {
   const status = useMemo(() => {
     if (!post?.is_published) {
-      if (post?.published_at && new Date(post?.published_at) > new Date()) {
-        return "scheduled";
-      }
+      if (post?.scheduled_at) return "scheduled";
       return "draft";
     }
     return "published";
@@ -41,7 +39,7 @@ const DashboardPostCard = ({ post, stats, onOpen }) => {
 
       {status === "scheduled" && (
         <span className="inline-block rounded bg-orange-400 px-2 py-0.5 text-xs dark:text-black">
-          Scheduled for: {new Date(post?.published_at).toLocaleString()}
+          Scheduled for: {new Date(post?.scheduled_at).toLocaleString()}
         </span>
       )}
     </div>

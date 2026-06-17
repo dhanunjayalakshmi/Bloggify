@@ -34,7 +34,7 @@ const buildBlogsQuery = (supabase, userId, queryParams) => {
   page = Number(page);
   limit = Number(limit);
 
-  if (!["published", "draft"].includes(status)) {
+  if (!["published", "draft", "scheduled"].includes(status)) {
     status = "published";
   }
 
@@ -49,7 +49,11 @@ const buildBlogsQuery = (supabase, userId, queryParams) => {
   }
 
   if (status === "draft") {
-    query = query.eq("is_published", false);
+    query = query.eq("is_published", false).is("scheduled_at", null);
+  }
+
+  if (status === "scheduled") {
+    query = query.eq("is_published", false).not("scheduled_at", "is", null);
   }
 
   if (search) {

@@ -322,6 +322,7 @@ router.post("/", verifyToken, async (req, res) => {
       is_published,
       is_public,
       draftId,
+      scheduled_at,
     } = req?.body;
 
     // Validate blog data
@@ -329,6 +330,8 @@ router.post("/", verifyToken, async (req, res) => {
     if (validationError) {
       return res.status(400).json({ validationError });
     }
+
+    const isScheduled = !is_published && scheduled_at;
 
     const blogData = {
       title: title.trim(),
@@ -339,6 +342,7 @@ router.post("/", verifyToken, async (req, res) => {
       user_id: user.id,
       is_published: Boolean(is_published),
       published_at: is_published ? new Date().toISOString() : null,
+      scheduled_at: isScheduled ? new Date(scheduled_at).toISOString() : null,
       is_public: Boolean(is_public),
       draft_id: draftId,
     };
@@ -422,6 +426,7 @@ router.put("/:blogId", verifyToken, async (req, res) => {
       read_time,
       coverImageUrl,
       draftId,
+      scheduled_at,
     } = req?.body;
 
     const userId = req?.user?.id;
@@ -437,6 +442,8 @@ router.put("/:blogId", verifyToken, async (req, res) => {
     if (!blog || blog?.user_id !== userId) {
       return res.status(403).json({ error: "Unauthorized" });
     }
+    const isScheduled = !is_published && scheduled_at;
+
     const updatePayload = {
       title,
       content,
@@ -449,6 +456,7 @@ router.put("/:blogId", verifyToken, async (req, res) => {
       published_at: is_published
         ? blog.published_at || new Date().toISOString()
         : null,
+      scheduled_at: isScheduled ? new Date(scheduled_at).toISOString() : null,
     };
 
     const { data, error } = await req?.supabase

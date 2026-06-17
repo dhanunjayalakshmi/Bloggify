@@ -15,6 +15,7 @@ const reactionsRoutes = require("./routes/reactions");
 const tagFollowsRoutes = require("./routes/tagFollows");
 const seriesRoutes = require("./routes/series");
 const publicStatsRoutes = require("./routes/publicStats");
+const supabaseAdmin = require("./config/supabaseAdmin");
 
 const ALLOWED_ORIGINS = [
   process.env.FRONTEND_URL,
@@ -58,4 +59,22 @@ app.use("/api/series", seriesRoutes);
 app.use("/api/public", publicStatsRoutes);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+
+  // Publish scheduled blogs every 60 seconds
+  setInterval(async () => {
+    const { error } = await supabaseAdmin
+      .from("blogs")
+      .update({
+        is_published: true,
+        published_at: new Date().toISOString(),
+        scheduled_at: null,
+      })
+      .lte("scheduled_at", new Date().toISOString())
+      .eq("is_published", false)
+      .not("scheduled_at", "is", null);
+
+    if (error) console.error("Scheduled publish job error:", error.message);
+  }, 60 * 1000);
+});

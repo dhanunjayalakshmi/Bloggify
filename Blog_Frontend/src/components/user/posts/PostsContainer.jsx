@@ -153,6 +153,9 @@ const PostsContainer = () => {
           <TabsTrigger value="draft" className="flex-1 cursor-pointer">
             Drafts
           </TabsTrigger>
+          <TabsTrigger value="scheduled" className="flex-1 cursor-pointer">
+            Scheduled
+          </TabsTrigger>
         </TabsList>
       </Tabs>
 

@@ -25,6 +25,7 @@ const useBlogEditorController = () => {
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [isPublishedBlog, setIsPublishedBlog] = useState(false);
+  const [scheduledAt, setScheduledAt] = useState(null);
   const [autosaveStatus, setAutosaveStatus] = useState("idle");
 
   const [pendingBlogId, setPendingBlogId] = useState(null);
@@ -62,6 +63,7 @@ const useBlogEditorController = () => {
       setDraftId(data?.draftId || data?.draft_id || randomDraftId());
       setInitialContent(data?.html || data?.content || "<p></p>");
       setIsPublishedBlog(Boolean(data?.is_published));
+      setScheduledAt(data?.scheduled_at || null);
 
       const initialHtml = data?.html || data?.content || "<p></p>";
 
@@ -455,6 +457,57 @@ const useBlogEditorController = () => {
     ],
   );
 
+  const saveScheduled = useCallback(
+    async (editor, scheduledDate) => {
+      if (!editor || saving) return;
+
+      const html = editor.getHTML();
+      const extractedTitle = title.trim();
+
+      if (!extractedTitle || isEmptyContent(html)) {
+        toast.error("Title and content are required to schedule.");
+        return;
+      }
+
+      const payload = {
+        title: extractedTitle,
+        content: html,
+        tags: selectedTags,
+        coverImageUrl,
+        read_time: Math.ceil(
+          html.replace(/<[^>]*>/g, " ").trim().split(/\s+/).length / 200,
+        ),
+        is_published: false,
+        is_public: true,
+        draftId,
+        scheduled_at: scheduledDate,
+      };
+
+      try {
+        setSaving(true);
+        let res;
+        if (isEditMode) {
+          res = await api.put(`/blogs/${blogId}`, payload);
+        } else {
+          res = await api.post("/blogs", payload);
+        }
+
+        if (res?.status === 200 || res?.status === 201) {
+          setScheduledAt(scheduledDate);
+          toast.success(`Post scheduled for ${new Date(scheduledDate).toLocaleString()}`);
+          await clearDraft(false);
+          navigate("/profile/posts");
+        }
+      } catch (err) {
+        console.error("Schedule blog error:", err);
+        toast.error("Failed to schedule blog.");
+      } finally {
+        setSaving(false);
+      }
+    },
+    [blogId, clearDraft, coverImageUrl, draftId, isEditMode, navigate, saving, selectedTags, title],
+  );
+
   const runAutosave = useCallback(
     (editor) => {
       if (!editor || !dirty) return;
@@ -513,6 +566,7 @@ const useBlogEditorController = () => {
     dirty,
     autosaveStatus,
     isPublishedBlog,
+    scheduledAt,
     showDraftConflict,
     conflictingDraft,
     draftConflictMode,
@@ -520,6 +574,7 @@ const useBlogEditorController = () => {
     runAutosave,
     handlePreview,
     saveBlog,
+    saveScheduled,
     handleContinueCurrentDraft,
     handleDiscardAndProceed,
     handleSaveDraftToDbAndProceed,
