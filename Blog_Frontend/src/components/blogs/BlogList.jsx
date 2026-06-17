@@ -44,8 +44,6 @@ const BlogList = ({
 
   useEffect(() => {
     const getBlogs = async () => {
-      if (loading) return;
-
       setLoading(true);
       try {
         const blogsRes = await fetchBlogs({
