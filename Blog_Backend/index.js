@@ -14,6 +14,7 @@ const notificationsRoutes = require("./routes/notifications");
 const reactionsRoutes = require("./routes/reactions");
 const tagFollowsRoutes = require("./routes/tagFollows");
 const seriesRoutes = require("./routes/series");
+const publicStatsRoutes = require("./routes/publicStats");
 
 const ALLOWED_ORIGINS = [
   process.env.FRONTEND_URL,
@@ -54,6 +55,7 @@ app.use("/api/notifications", notificationsRoutes);
 app.use("/api/reactions", reactionsRoutes);
 app.use("/api/tag-follows", tagFollowsRoutes);
 app.use("/api/series", seriesRoutes);
+app.use("/api/public", publicStatsRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
