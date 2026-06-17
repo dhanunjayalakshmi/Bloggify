@@ -1,27 +1,40 @@
-import { Pencil, Search, Sparkles, Bookmark } from "lucide-react";
+import { Pencil, Search, Bell, Bookmark, Tag, BookOpen } from "lucide-react";
 
 const features = [
   {
     icon: <Pencil className="w-8 h-8 text-primary" />,
     title: "Write Freely",
     description:
-      "Create and publish blogs with powerful formatting, media, and tags.",
+      "Rich text editor with formatting, images, code blocks, and cover photos.",
   },
   {
     icon: <Search className="w-8 h-8 text-primary" />,
     title: "Explore Ideas",
     description:
-      "Discover insightful content across technology, lifestyle, and more.",
+      "Discover content across tags, authors, and a personalised For You feed.",
   },
   {
-    icon: <Sparkles className="w-8 h-8 text-primary" />,
-    title: "AI-Assisted Writing",
-    description: "Coming soon: Get AI help to refine your writing style.",
+    icon: <Tag className="w-8 h-8 text-primary" />,
+    title: "Follow Tags",
+    description:
+      "Follow topics you care about and get a curated feed of matching blogs.",
+  },
+  {
+    icon: <BookOpen className="w-8 h-8 text-primary" />,
+    title: "Blog Series",
+    description:
+      "Group related posts into ordered series so readers never lose their place.",
+  },
+  {
+    icon: <Bell className="w-8 h-8 text-primary" />,
+    title: "Notifications",
+    description:
+      "Real-time alerts for new followers, comments, and reactions on your posts.",
   },
   {
     icon: <Bookmark className="w-8 h-8 text-primary" />,
     title: "Save What You Love",
-    description: "Bookmark and organize blogs for easy access later.",
+    description: "Bookmark blogs and revisit them any time from your profile.",
   },
 ];
 
@@ -29,9 +42,9 @@ const FeaturesSection = () => {
   return (
     <section className="py-16 px-4 max-w-6xl mx-auto text-center">
       <h2 className="text-3xl md:text-4xl font-bold mb-10 text-gray-900 dark:text-white">
-        Features That Empower Creators
+        Everything a Modern Blog Platform Should Have
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
         {features.map((feature, index) => (
           <div
             key={index}

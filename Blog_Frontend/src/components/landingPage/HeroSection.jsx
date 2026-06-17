@@ -1,10 +1,14 @@
 import { useModalStore } from "@/stores/modalStore";
 import { Button } from "../ui/button";
-import { useNavigate } from "react-router-dom";
 
-const HeroSection = () => {
+const formatNumber = (n) => {
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+  return String(n);
+};
+
+const HeroSection = ({ stats }) => {
   const { openModal } = useModalStore();
-  const navigate = useNavigate();
 
   return (
     <section className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4 pt-28">
@@ -24,11 +28,36 @@ const HeroSection = () => {
         <Button
           variant="outline"
           className="px-6 py-2 text-base"
-          onClick={() => navigate("/home")}
+          onClick={() => openModal("login")}
         >
           Explore Blogs
         </Button>
       </div>
+
+      {stats && (
+        <div className="mt-10 flex flex-wrap justify-center gap-6 text-sm text-gray-500 dark:text-gray-400">
+          <span>
+            <span className="text-gray-900 dark:text-white font-semibold text-base">
+              {formatNumber(stats.blogCount)}
+            </span>{" "}
+            blogs published
+          </span>
+          <span className="hidden sm:block text-gray-300 dark:text-gray-600">|</span>
+          <span>
+            <span className="text-gray-900 dark:text-white font-semibold text-base">
+              {formatNumber(stats.userCount)}
+            </span>{" "}
+            writers
+          </span>
+          <span className="hidden sm:block text-gray-300 dark:text-gray-600">|</span>
+          <span>
+            <span className="text-gray-900 dark:text-white font-semibold text-base">
+              {formatNumber(stats.totalViews)}
+            </span>{" "}
+            total reads
+          </span>
+        </div>
+      )}
     </section>
   );
 };

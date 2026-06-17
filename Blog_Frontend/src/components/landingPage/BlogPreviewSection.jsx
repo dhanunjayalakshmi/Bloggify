@@ -7,7 +7,7 @@ import {
 } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
-import { useNavigate } from "react-router-dom";
+import { useModalStore } from "@/stores/modalStore";
 
 const mockBlogs = [
   {
@@ -35,7 +35,7 @@ const mockBlogs = [
 ];
 
 const BlogPreviewSection = () => {
-  const navigate = useNavigate();
+  const { openModal } = useModalStore();
 
   return (
     <section className="py-16 px-4 max-w-6xl mx-auto">
@@ -67,7 +67,7 @@ const BlogPreviewSection = () => {
       </div>
 
       <div className="flex justify-center mt-10">
-        <Button onClick={() => navigate("/home")} size="lg">
+        <Button onClick={() => openModal("login")} size="lg">
           Explore All Blogs
         </Button>
       </div>

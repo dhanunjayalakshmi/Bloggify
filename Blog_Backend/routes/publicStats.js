@@ -9,7 +9,6 @@ router.get("/stats", async (req, res) => {
       { count: blogCount },
       { count: userCount },
       { data: viewsData },
-      { data: trendingBlogs },
       { data: topAuthors },
       { data: popularTagsRaw },
     ] = await Promise.all([
@@ -17,26 +16,18 @@ router.get("/stats", async (req, res) => {
       supabaseAdmin
         .from("blogs")
         .select("*", { count: "exact", head: true })
-        .eq("status", "published"),
+        .eq("is_published", true),
 
       // Total users
       supabaseAdmin
         .from("users")
         .select("*", { count: "exact", head: true }),
 
-      // Total views (sum)
+      // Total views (sum) from published blogs
       supabaseAdmin
         .from("blogs")
         .select("views")
-        .eq("status", "published"),
-
-      // Trending blogs — top 3 by views
-      supabaseAdmin
-        .from("blogs")
-        .select("id, title, tags, views, read_time, published_at, users(id, name, avatar)")
-        .eq("status", "published")
-        .order("views", { ascending: false })
-        .limit(3),
+        .eq("is_published", true),
 
       // Top authors — by follower count
       supabaseAdmin
@@ -49,7 +40,7 @@ router.get("/stats", async (req, res) => {
       supabaseAdmin
         .from("blogs")
         .select("tags")
-        .eq("status", "published"),
+        .eq("is_published", true),
     ]);
 
     const totalViews = (viewsData || []).reduce(
@@ -75,7 +66,6 @@ router.get("/stats", async (req, res) => {
         userCount: userCount || 0,
         totalViews,
       },
-      trendingBlogs: trendingBlogs || [],
       topAuthors: topAuthors || [],
       popularTags,
     });
