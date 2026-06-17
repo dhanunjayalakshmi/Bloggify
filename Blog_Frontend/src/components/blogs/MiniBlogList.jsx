@@ -2,6 +2,25 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
+const extractPlainText = (content) => {
+  if (!content) return "";
+  try {
+    const doc = typeof content === "string" ? JSON.parse(content) : content;
+    const texts = [];
+    const traverse = (node) => {
+      if (!node) return;
+      if (node.type === "text") texts.push(node.text || "");
+      if (Array.isArray(node.content)) node.content.forEach(traverse);
+    };
+    traverse(doc);
+    return texts.join(" ").trim();
+  } catch {
+    return typeof content === "string"
+      ? content.replace(/<[^>]*>/g, "").trim()
+      : "";
+  }
+};
+
 const MiniBlogList = ({
   title,
   blogs = [],
@@ -34,8 +53,7 @@ const MiniBlogList = ({
             <div className="text-sm gap-2">
               <p className="font-medium line-clamp-1">{blog?.title}</p>
               <p className="text-muted-foreground">
-                {blog?.content?.replace(/<[^>]*>/g, "").substring(0, 70) +
-                  "..."}
+                {extractPlainText(blog?.content).substring(0, 70) + "..."}
               </p>
               <p className="text-muted-foreground text-xs">
                 {blog?.users?.username}

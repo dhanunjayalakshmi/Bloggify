@@ -276,7 +276,7 @@ const BlogDetails = () => {
       {/* Other Articles from Author */}
       <div className="mt-10">
         <MiniBlogList
-          title="More from this"
+          title={`More from ${users?.name || "this author"}`}
           blogs={authorBlogs}
           seeMorePath={users?.id ? `/users/${users?.id}` : null}
         />
