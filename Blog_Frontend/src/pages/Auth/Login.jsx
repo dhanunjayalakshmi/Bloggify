@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Lock, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +7,7 @@ import { z } from "zod";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { useModalStore } from "@/stores/modalStore";
+import SocialAuthButtons from "@/components/SocialAuthButtons";
 
 const schema = z.object({
   email: z.string().email("Email address must not empty"),
@@ -109,17 +109,7 @@ const Login = () => {
             </Button>
           </form>
 
-          <div className="text-center text-md text-gray-900 dark:text-gray-100">
-            Or Login with
-          </div>
-          <div className="flex justify-center space-x-4">
-            <Button variant="outline" className="rounded-full">
-              <Mail />
-            </Button>
-            <Button variant="outline" className="rounded-full">
-              <Lock />
-            </Button>
-          </div>
+          <SocialAuthButtons />
           <p className="text-center text-md mt-4 text-gray-900 dark:text-gray-100">
             Dont have an account ?{" "}
             <Button

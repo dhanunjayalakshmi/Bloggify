@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
+import SocialAuthButtons from "@/components/SocialAuthButtons";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -152,6 +153,9 @@ const Signup = () => {
             </div>
             <Button className="w-full">Sign Up</Button>
           </form>
+
+          <SocialAuthButtons />
+
           <p className="text-center text-md mt-4 text-gray-900 dark:text-gray-100">
             Already have an account?{" "}
             <Button
