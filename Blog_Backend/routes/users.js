@@ -135,34 +135,46 @@ router.get("/me/history", verifyToken, async (req, res) => {
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
-    const { data, error } = await supabase
+    // Step 1: get blog_ids ordered by last viewed (admin bypasses RLS — user_id is users.id not auth.uid)
+    const { data: views, error: viewsError } = await supabaseAdmin
       .from("blog_views")
-      .select(`
-        last_viewed_at,
-        blogs (
-          id, title, description, cover_image, tags, read_time, views, published_at,
-          users ( id, name, username, avatar )
-        )
-      `)
+      .select("blog_id, last_viewed_at")
       .eq("user_id", userId)
       .order("last_viewed_at", { ascending: false })
       .range(from, to);
 
-    if (error) throw error;
+    if (viewsError) throw viewsError;
+    if (!views?.length) return res.json({ history: [], page, hasMore: false });
 
-    const history = (data || [])
-      .filter((row) => row.blogs)
-      .map((row) => ({ ...row.blogs, read_at: row.last_viewed_at }));
+    const blogIds = views.map((v) => v.blog_id);
+    const viewedAtMap = Object.fromEntries(views.map((v) => [v.blog_id, v.last_viewed_at]));
 
-    res.json({ history, page, hasMore: data?.length === limit });
+    // Step 2: fetch blog details with author
+    const { data: blogs, error: blogsError } = await supabase
+      .from("blogs")
+      .select("id, title, cover_image, tags, read_time, views, published_at, users(id, name, username, avatar)")
+      .in("id", blogIds);
+
+    if (blogsError) throw blogsError;
+
+    // Re-sort to match blog_views order
+    const history = blogIds
+      .map((id) => {
+        const blog = blogs?.find((b) => b.id === id);
+        return blog ? { ...blog, read_at: viewedAtMap[id] } : null;
+      })
+      .filter(Boolean);
+
+    res.json({ history, page, hasMore: views.length === limit });
   } catch (err) {
+    console.error("History error:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 router.delete("/me/history", verifyToken, async (req, res) => {
   try {
-    const { error } = await req.supabase
+    const { error } = await supabaseAdmin
       .from("blog_views")
       .delete()
       .eq("user_id", req.user.id);
@@ -175,7 +187,7 @@ router.delete("/me/history", verifyToken, async (req, res) => {
 
 router.delete("/me/history/:blogId", verifyToken, async (req, res) => {
   try {
-    const { error } = await req.supabase
+    const { error } = await supabaseAdmin
       .from("blog_views")
       .delete()
       .eq("user_id", req.user.id)

@@ -1,5 +1,6 @@
 const express = require("express");
 const supabase = require("../config/supabaseClient");
+const supabaseAdmin = require("../config/supabaseAdmin");
 const { validateBlog } = require("../utils/validators");
 const { verifyToken } = require("../middlewares/authMiddleware");
 const path = require("path");
@@ -270,7 +271,7 @@ router.get("/:blogId", verifyToken, async (req, res) => {
 
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-    const { data: existingView } = await req?.supabase
+    const { data: existingView } = await supabaseAdmin
       .from("blog_views")
       .select("last_viewed_at")
       .eq("user_id", userId)
@@ -278,7 +279,7 @@ router.get("/:blogId", verifyToken, async (req, res) => {
       .maybeSingle();
 
     // Always upsert so the blog appears in reading history
-    await req?.supabase.from("blog_views").upsert(
+    await supabaseAdmin.from("blog_views").upsert(
       { user_id: userId, blog_id: blogId, last_viewed_at: new Date().toISOString() },
       { onConflict: "user_id,blog_id" }
     );
