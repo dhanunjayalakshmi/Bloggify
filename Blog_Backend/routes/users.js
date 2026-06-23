@@ -1,6 +1,7 @@
 const express = require("express");
 const { verifyToken } = require("../middlewares/authMiddleware");
 const { attachFollowState } = require("../utils/followHelpers");
+const supabaseAdmin = require("../config/supabaseAdmin");
 
 const router = express.Router();
 
@@ -106,6 +107,19 @@ router.get("/me", verifyToken, async (req, res) => {
         last_active_at: user?.last_active_at,
       },
     });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update last active timestamp (called on login, logout, and tab close)
+router.post("/me/ping", verifyToken, async (req, res) => {
+  try {
+    await supabaseAdmin
+      .from("users")
+      .update({ last_active_at: new Date().toISOString() })
+      .eq("id", req.user.id);
+    res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -476,7 +490,7 @@ router.put("/me", verifyToken, async (req, res) => {
         username,
         social_links,
         is_profile_public,
-        last_active_at: new Date(),
+        last_active_at: new Date().toISOString(),
       })
       .eq("auth_id", authId)
       .select()

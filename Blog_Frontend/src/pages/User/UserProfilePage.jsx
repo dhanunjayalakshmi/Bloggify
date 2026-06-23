@@ -55,6 +55,7 @@ const UserProfilePage = () => {
         <JoinedInfo
           joinDate={profile?.account_metadata?.join_date}
           lastActive={profile?.account_metadata?.last_active_at}
+          isCurrentUser={true}
         />
       </div>
     </div>

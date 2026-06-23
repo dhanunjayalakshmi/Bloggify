@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 
 export const useAuthStore = create(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       profile: null,
@@ -23,6 +23,14 @@ export const useAuthStore = create(
         set({ user: null, token: null, profile: null, isInitialized: true }),
       setManualLogout: (val) => set({ isManualLogout: val }),
       logout: async () => {
+        const token = get().token;
+        if (token) {
+          await fetch(`${import.meta.env.VITE_API_BASE_URL || "/api"}/users/me/ping`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+            keepalive: true,
+          }).catch(() => {});
+        }
         await supabase.auth.signOut();
         set({
           user: null,

@@ -6,6 +6,7 @@ import Badges from "@/components/user/profile/Badges";
 import JoinedInfo from "@/components/user/profile/JoinedInfo";
 import useUserProfile from "@/hooks/useUserProfile";
 import { useParams } from "react-router";
+import { useAuthStore } from "@/stores/authStore";
 const AuthorProfileSkeleton = () => (
   <div className="max-w-4xl mx-auto px-4 py-8 animate-pulse">
     <div className="flex flex-col items-center space-y-4">
@@ -33,6 +34,8 @@ const AuthorProfileSkeleton = () => (
 const AuthorProfilePage = () => {
   const { data: author, error, loading } = useUserProfile();
   const { userId } = useParams();
+  const currentProfile = useAuthStore((s) => s.profile);
+  const isCurrentUser = currentProfile?.id === userId;
 
   if (loading) return <AuthorProfileSkeleton />;
   if (author?.message)
@@ -59,6 +62,7 @@ const AuthorProfilePage = () => {
         <JoinedInfo
           joinDate={author?.account_metadata?.join_date}
           lastActive={author?.account_metadata?.last_active_at}
+          isCurrentUser={isCurrentUser}
         />
       </div>
       <BlogListSection authorUserName={author?.username} />
