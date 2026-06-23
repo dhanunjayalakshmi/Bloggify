@@ -70,33 +70,36 @@ router.get("/blogs", verifyToken, async (req, res) => {
   try {
     const userId = req?.user?.id;
 
-    const { data, error } = await req?.supabase
+    // Step 1: get bookmark rows (simple select, no join — avoids FK requirement)
+    const { data: bookmarkRows, error: bookmarkError } = await req?.supabase
       .from("bookmarks")
-      .select(
-        `
-        created_at,
-        blogs (
-          id,
-          title,
-          read_time,
-          content,
-          cover_image,
-          tags,
-          views,
-          users (name, avatar)
-        )
-      `,
-      )
+      .select("blog_id, created_at")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
-    if (error) throw error;
+    if (bookmarkError) throw bookmarkError;
+    if (!bookmarkRows?.length) return res.status(200).json({ blogs: [] });
 
-    const blogs = data?.map((row) => ({
-      ...row?.blogs,
-      bookmarked_at: row?.created_at,
-      isBookmarked: true,
-    }));
+    const blogIds = bookmarkRows.map((b) => b.blog_id);
+    const bookmarkedAtMap = Object.fromEntries(
+      bookmarkRows.map((b) => [b.blog_id, b.created_at])
+    );
+
+    // Step 2: fetch blog details with author
+    const { data: blogsData, error: blogsError } = await req?.supabase
+      .from("blogs")
+      .select("id, title, read_time, content, cover_image, tags, views, users(name, avatar)")
+      .in("id", blogIds);
+
+    if (blogsError) throw blogsError;
+
+    // Re-sort to match bookmark order
+    const blogs = blogIds
+      .map((id) => {
+        const blog = blogsData?.find((b) => b.id === id);
+        return blog ? { ...blog, bookmarked_at: bookmarkedAtMap[id], isBookmarked: true } : null;
+      })
+      .filter(Boolean);
 
     res.status(200).json({ blogs });
   } catch (err) {

@@ -18,14 +18,17 @@ export const useBookmarkStore = create((set, get) => ({
 
   fetchBookmarkedBlogs: async () => {
     set({ loading: true });
-
-    const blogs = await getBookmarkedBlogs();
-
-    set({
-      bookmarkList: blogs,
-      bookmarks: new Set(blogs?.map((blog) => blog?.id)),
-      loading: false,
-    });
+    try {
+      const blogs = await getBookmarkedBlogs();
+      set({
+        bookmarkList: blogs || [],
+        bookmarks: new Set((blogs || []).map((blog) => blog?.id)),
+        loading: false,
+      });
+    } catch (err) {
+      console.error("Failed to fetch bookmarked blogs:", err);
+      set({ loading: false });
+    }
   },
 
   isBookmarked: (blogId) => get()?.bookmarks?.has(blogId),
