@@ -9,6 +9,8 @@ import BlogContentRenderer from "@/components/blogEditor/BlogContentRenderer";
 import ContentVotes from "@/components/blogs/ContentVotes";
 import BlogComments from "@/components/blogs/BlogComments";
 import ReadingProgressBar from "@/components/blogs/ReadingProgressBar";
+import TableOfContents from "@/components/blogs/TableOfContents";
+import useTableOfContents from "@/hooks/useTableOfContents";
 import useBookmark from "@/hooks/useBookmark";
 import { hydrateVotesForContent } from "@/utils/hydrateVotesForContent";
 import useRelatedBlogs from "@/hooks/useRelatedBlogs";
@@ -61,6 +63,7 @@ const BlogDetails = () => {
   };
 
   const { blogs: relatedBlogs } = useRelatedBlogs(blog?.tags, blogId);
+  const { headings, activeId } = useTableOfContents(blog?.content, "blog-content");
   const authorId = blog?.users?.id;
   const { blogs: authorBlogs } = useAuthorOtherBlogs(authorId, blogId);
 
@@ -139,7 +142,8 @@ const BlogDetails = () => {
   return (
     <>
     <ReadingProgressBar />
-    <div className="max-w-4xl mx-auto p-8 my-8 rounded-lg dark:bg-gray-800 bg-white text-gray-900 dark:text-white">
+    <div className="max-w-6xl mx-auto my-8 px-4 flex gap-8 items-start">
+    <div className="flex-1 min-w-0 p-8 rounded-lg dark:bg-gray-800 bg-white text-gray-900 dark:text-white">
       <h1 className="text-4xl font-bold leading-tight tracking-tight mb-4">
         {title}
       </h1>
@@ -257,7 +261,7 @@ const BlogDetails = () => {
       )}
 
       <div className="prose prose-lg dark:prose-invert tiptap max-w-none mt-6 space-y-2">
-        <BlogContentRenderer content={content} />
+        <BlogContentRenderer content={content} id="blog-content" />
       </div>
 
       <SeriesWidget blogId={blogId} />
@@ -294,6 +298,13 @@ const BlogDetails = () => {
           seeMorePath={tags?.[0] ? `/tags/${tags[0]}` : null}
         />
       </div>
+    </div>
+
+    {/* TOC sidebar — visible only on xl screens */}
+    <aside className="hidden xl:block w-52 flex-shrink-0">
+      <TableOfContents headings={headings} activeId={activeId} />
+    </aside>
+
     </div>
     </>
   );

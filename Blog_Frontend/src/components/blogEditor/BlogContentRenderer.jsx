@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-const BlogContentRenderer = ({ content }) => {
+const BlogContentRenderer = ({ content, id }) => {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -96,6 +96,7 @@ const BlogContentRenderer = ({ content }) => {
         [&_img[data-align='right']]:ml-auto
         [&_img[data-align='right']]:mr-0
       "
+      id={id}
       dangerouslySetInnerHTML={{ __html: content }}
     />
   );
