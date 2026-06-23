@@ -8,6 +8,7 @@ import { Bookmark, MessageCircle, Share2, Link as LinkIcon } from "lucide-react"
 import BlogContentRenderer from "@/components/blogEditor/BlogContentRenderer";
 import ContentVotes from "@/components/blogs/ContentVotes";
 import BlogComments from "@/components/blogs/BlogComments";
+import ReadingProgressBar from "@/components/blogs/ReadingProgressBar";
 import useBookmark from "@/hooks/useBookmark";
 import { hydrateVotesForContent } from "@/utils/hydrateVotesForContent";
 import useRelatedBlogs from "@/hooks/useRelatedBlogs";
@@ -136,6 +137,8 @@ const BlogDetails = () => {
   } = blog;
 
   return (
+    <>
+    <ReadingProgressBar />
     <div className="max-w-4xl mx-auto p-8 my-8 rounded-lg dark:bg-gray-800 bg-white text-gray-900 dark:text-white">
       <h1 className="text-4xl font-bold leading-tight tracking-tight mb-4">
         {title}
@@ -292,6 +295,7 @@ const BlogDetails = () => {
         />
       </div>
     </div>
+    </>
   );
 };
 
