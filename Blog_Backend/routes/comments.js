@@ -1,5 +1,6 @@
 const express = require("express");
 const supabase = require("../config/supabaseClient");
+const supabaseAdmin = require("../config/supabaseAdmin");
 const { verifyToken } = require("../middlewares/authMiddleware");
 const { createNotification } = require("../utils/notificationHelpers");
 
@@ -124,6 +125,7 @@ router.get("/:blogId", verifyToken, async (req, res) => {
       .select("*, users(name, avatar)")
       .eq("blog_id", blogId)
       .is("parent_id", null)
+      .order("is_pinned", { ascending: false })
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -210,6 +212,52 @@ router.put("/:id", verifyToken, async (req, res) => {
       .json({ message: "Comment has been updated", comment: data });
   } catch (error) {
     res.status(500).json({ error: error?.message });
+  }
+});
+
+// Pin / unpin a comment (blog author only, one pinned comment per blog)
+router.patch("/:id/pin", verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    const { data: comment, error: commentError } = await req.supabase
+      .from("comments")
+      .select("blog_id, is_pinned")
+      .eq("id", id)
+      .single();
+
+    if (commentError || !comment) return res.status(404).json({ error: "Comment not found" });
+
+    const { data: blog, error: blogError } = await req.supabase
+      .from("blogs")
+      .select("user_id")
+      .eq("id", comment.blog_id)
+      .single();
+
+    if (blogError || blog.user_id !== userId)
+      return res.status(403).json({ error: "Only the blog author can pin comments" });
+
+    // Unpin any existing pinned comment on this blog first (admin bypasses RLS — author may not own that comment)
+    if (!comment.is_pinned) {
+      await supabaseAdmin
+        .from("comments")
+        .update({ is_pinned: false })
+        .eq("blog_id", comment.blog_id)
+        .eq("is_pinned", true);
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from("comments")
+      .update({ is_pinned: !comment.is_pinned })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json({ comment: data });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

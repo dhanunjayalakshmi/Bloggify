@@ -277,7 +277,7 @@ const BlogDetails = () => {
       <BlogReactions blogId={blogId} />
 
       <div ref={commentsRef}>
-        <BlogComments blogId={blogId} />
+        <BlogComments blogId={blogId} blogAuthorId={blog?.user_id} />
       </div>
 
       {/* Other Articles from Author */}
