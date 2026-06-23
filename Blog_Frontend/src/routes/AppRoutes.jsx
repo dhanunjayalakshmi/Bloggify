@@ -14,6 +14,7 @@ import Posts from "@/pages/User/PostsTab";
 import Bookmarks from "@/pages/User/BookmarksTab";
 import Settings from "@/pages/User/SettingsTab";
 import SeriesTab from "@/pages/User/SeriesTab";
+import HistoryTab from "@/pages/User/HistoryTab";
 import EditProfilePage from "@/pages/User/EditProfilePage";
 import PrivateRoute from "@/routes/PrivateRoute";
 import LandingPage from "@/pages/LandingPage/LandingPage";
@@ -60,6 +61,7 @@ const AppRoutes = () => {
             <Route path="bookmarks" element={<Bookmarks />} />
             <Route path="settings" element={<Settings />} />
             <Route path="series" element={<SeriesTab />} />
+            <Route path="history" element={<HistoryTab />} />
           </Route>
         </Route>
       </Route>

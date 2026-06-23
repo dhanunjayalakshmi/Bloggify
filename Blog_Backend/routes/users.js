@@ -125,6 +125,68 @@ router.post("/me/ping", verifyToken, async (req, res) => {
   }
 });
 
+// Reading history
+router.get("/me/history", verifyToken, async (req, res) => {
+  try {
+    const supabase = req.supabase;
+    const userId = req.user.id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 15;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    const { data, error } = await supabase
+      .from("blog_views")
+      .select(`
+        last_viewed_at,
+        blogs (
+          id, title, description, cover_image, tags, read_time, views, published_at,
+          users ( id, name, username, avatar )
+        )
+      `)
+      .eq("user_id", userId)
+      .order("last_viewed_at", { ascending: false })
+      .range(from, to);
+
+    if (error) throw error;
+
+    const history = (data || [])
+      .filter((row) => row.blogs)
+      .map((row) => ({ ...row.blogs, read_at: row.last_viewed_at }));
+
+    res.json({ history, page, hasMore: data?.length === limit });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete("/me/history", verifyToken, async (req, res) => {
+  try {
+    const { error } = await req.supabase
+      .from("blog_views")
+      .delete()
+      .eq("user_id", req.user.id);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete("/me/history/:blogId", verifyToken, async (req, res) => {
+  try {
+    const { error } = await req.supabase
+      .from("blog_views")
+      .delete()
+      .eq("user_id", req.user.id)
+      .eq("blog_id", req.params.blogId);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Get Profile Suggestions
 router.get("/suggestions", verifyToken, async (req, res) => {
   try {

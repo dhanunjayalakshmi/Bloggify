@@ -16,6 +16,7 @@ const tabs = [
   { name: "Bookmarks", path: "/profile/bookmarks" },
   { name: "Stats & Activity", path: "/profile/stats" },
   { name: "Series", path: "/profile/series" },
+  { name: "History", path: "/profile/history" },
   { name: "Settings", path: "/profile/settings" },
 ];
 
