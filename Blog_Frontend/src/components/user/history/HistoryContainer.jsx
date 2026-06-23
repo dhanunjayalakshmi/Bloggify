@@ -43,7 +43,7 @@ const HistoryItem = ({ blog, onRemove }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex items-start gap-4 p-4 bg-white dark:bg-gray-900 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group">
+    <div className="flex items-start gap-4 p-4 bg-white dark:bg-gray-900 rounded-lg border border-transparent hover:border-orange-200 dark:hover:border-gray-600 hover:bg-orange-50/50 dark:hover:bg-gray-700 transition-colors group">
       {blog?.cover_image && (
         <img
           src={blog.cover_image}
@@ -81,10 +81,10 @@ const HistoryItem = ({ blog, onRemove }) => {
       </div>
       <button
         onClick={() => onRemove(blog.id)}
-        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 flex-shrink-0"
+        className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-md bg-orange-100 dark:bg-orange-900/30 hover:bg-orange-200 dark:hover:bg-orange-800/50 cursor-pointer flex-shrink-0"
         title="Remove from history"
       >
-        <X className="w-4 h-4 text-gray-500" />
+        <X className="w-4 h-4 text-orange-500 dark:text-orange-400" />
       </button>
     </div>
   );
