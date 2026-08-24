@@ -16,6 +16,7 @@ import {
 import { supabase } from "@/lib/supabaseClient";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import { parseUTC } from "@/utils/parseUTC";
 
 const notificationMessage = (type, actorName) => {
   switch (type) {
@@ -149,7 +150,7 @@ const NotificationsDropdown = () => {
                     {notificationMessage(n.type, n.actor?.name || "Someone")}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {formatDistanceToNow(new Date(n.created_at), {
+                    {formatDistanceToNow(parseUTC(n.created_at), {
                       addSuffix: true,
                     })}
                   </p>

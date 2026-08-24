@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { parseUTC } from "@/utils/parseUTC";
 
 const BlogCard = ({ blog, user, onOpen }) => {
   const { title, content, cover_image, published_at } = blog;
@@ -28,7 +29,7 @@ const BlogCard = ({ blog, user, onOpen }) => {
             </p>
 
             <p className="text-muted-foreground text-xs mt-2">
-              {user} - {new Date(published_at).toLocaleDateString()}
+              {user} - {parseUTC(published_at)?.toLocaleDateString()}
             </p>
           </div>
         </div>

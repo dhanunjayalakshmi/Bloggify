@@ -10,6 +10,7 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
+import { parseUTC } from "@/utils/parseUTC";
 
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
@@ -102,7 +103,7 @@ export default function StatsChart({ blogs }) {
   blogs?.forEach((blog) => {
     if (!blog.created_at) return;
 
-    const date = new Date(blog.created_at);
+    const date = parseUTC(blog.created_at);
     const monthKey = `${date.getFullYear()}-${String(
       date.getMonth() + 1,
     ).padStart(2, "0")}`;

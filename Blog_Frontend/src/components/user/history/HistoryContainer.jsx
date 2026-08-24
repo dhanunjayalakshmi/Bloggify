@@ -5,11 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2, X, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { parseUTC } from "@/utils/parseUTC";
 
 const relativeTime = (iso) => {
   if (!iso) return "";
-  const hasTimezone = iso.endsWith("Z") || /[+-]\d{2}:?\d{2}$/.test(iso);
-  const d = new Date(hasTimezone ? iso : iso + "Z");
+  const d = parseUTC(iso);
   const diff = Date.now() - d.getTime();
   const minutes = Math.floor(diff / 60_000);
   const hours = Math.floor(diff / 3_600_000);

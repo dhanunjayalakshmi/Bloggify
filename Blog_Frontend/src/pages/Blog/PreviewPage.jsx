@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import api from "@/lib/apiClient";
 import { Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { parseUTC } from "@/utils/parseUTC";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -95,7 +96,7 @@ const PreviewPage = () => {
             <span>{blog?.read_time || 1} min read</span>
             <span>•</span>
             <span>
-              {new Date(blog?.updated_at || Date.now()).toLocaleDateString()}
+              {(blog?.updated_at ? parseUTC(blog.updated_at) : new Date()).toLocaleDateString()}
             </span>
           </div>
         </div>

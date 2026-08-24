@@ -1,5 +1,6 @@
 import { Eye, ThumbsUp, MessageCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { parseUTC } from "@/utils/parseUTC";
 
 const BlogStatsTable = ({ blogs }) => {
   if (!blogs || blogs.length === 0) {
@@ -52,7 +53,7 @@ const BlogStatsTable = ({ blogs }) => {
                 </div>
 
                 <p className="text-xs text-muted-foreground">
-                  Updated {new Date(blog.updated).toLocaleDateString()}
+                  Updated {parseUTC(blog.updated)?.toLocaleDateString()}
                 </p>
               </div>
 

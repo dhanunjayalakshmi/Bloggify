@@ -21,6 +21,7 @@ import BlogReactions from "@/components/blogs/BlogReactions";
 import TagFollowButton from "@/components/TagFollowButton";
 import SeriesWidget from "@/components/blogs/SeriesWidget";
 import useProfileNavigation from "@/hooks/useProfileNavigation";
+import { parseUTC } from "@/utils/parseUTC";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -170,7 +171,7 @@ const BlogDetails = () => {
               {users?.name || "Unknown Author"}
             </span>
             <span className="text-xs">
-              {new Date(published_at).toLocaleDateString()} • {read_time} min
+              {parseUTC(published_at)?.toLocaleDateString()} • {read_time} min
               read
             </span>
           </div>

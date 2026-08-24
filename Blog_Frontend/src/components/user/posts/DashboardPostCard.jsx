@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { parseUTC } from "@/utils/parseUTC";
 const DashboardPostCard = ({ post, stats, onOpen }) => {
   const status = useMemo(() => {
     if (!post?.is_published) {
@@ -21,7 +22,7 @@ const DashboardPostCard = ({ post, stats, onOpen }) => {
 
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>
-              Last updated: {new Date(post?.updated).toLocaleDateString()}
+              Last updated: {parseUTC(post?.updated)?.toLocaleDateString()}
             </span>
           </div>
 
@@ -39,7 +40,7 @@ const DashboardPostCard = ({ post, stats, onOpen }) => {
 
       {status === "scheduled" && (
         <span className="inline-block rounded bg-orange-400 px-2 py-0.5 text-xs dark:text-black">
-          Scheduled for: {new Date(post?.scheduled_at).toLocaleString()}
+          Scheduled for: {parseUTC(post?.scheduled_at)?.toLocaleString()}
         </span>
       )}
     </div>
